@@ -14,6 +14,7 @@
 #include <Box.h>
 #include <MessageFilter.h>
 
+
 enum {
 	M_UP = 'mmup',
 	M_DOWN,
@@ -113,12 +114,42 @@ public:
 
 Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg,
 				uint32 resize,uint32 flags)
- : BControl(frame, name,NULL,msg,resize,flags)
+ :	BControl(frame,name,label,msg,resize,flags),
+	fStep(1),
+	fMin(0),
+	fMax(100)
+{
+	_InitObject();
+}
+
+
+Spinner::Spinner(BMessage *data)
+ :	BControl(data)
+{
+	if (data->FindInt32("_min",&fMin) != B_OK)
+		fMin = 0;
+	if (data->FindInt32("_max",&fMax) != B_OK)
+		fMin = 100;
+	if (data->FindInt32("_step",&fStep) != B_OK)
+		fMin = 1;
+	_InitObject();
+}
+
+
+Spinner::~Spinner(void)
+{
+	delete fPrivateData;
+	delete fFilter;
+}
+
+
+void
+Spinner::_InitObject(void)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BRect r(Bounds());
-	if (r.Height() < B_H_SCROLL_BAR_HEIGHT*2)
-		r.bottom = r.top + B_H_SCROLL_BAR_HEIGHT * 2;
+	if (r.Height() < B_H_SCROLL_BAR_HEIGHT * 2)
+		r.bottom = r.top + 1 + B_H_SCROLL_BAR_HEIGHT * 2;
 	ResizeTo(r.Width(),r.Height());
 	
 	r.right -= B_V_SCROLL_BAR_WIDTH;
@@ -127,13 +158,21 @@ Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg
 	BFont font;
 	font.GetHeight(&fh);
 	float textheight = fh.ascent + fh.descent + fh.leading;
-	r.bottom = r.top + textheight + 10;
-	r.OffsetTo(0, ( (Bounds().Height() - r.Height()) / 2) );
 	
-	fTextControl = new BTextControl(r,"textcontrol",label,"0",
-									new BMessage(M_TEXT_CHANGED), B_FOLLOW_ALL,
+	r.top = 0;
+	r.bottom = textheight;
+	
+	fTextControl = new BTextControl(r,"textcontrol",Label(),"0",
+									new BMessage(M_TEXT_CHANGED), B_FOLLOW_TOP | 
+									B_FOLLOW_LEFT_RIGHT,
 									B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(fTextControl);
+	fTextControl->ResizeTo(r.Width(), MAX(textheight, fTextControl->TextView()->LineHeight(0) + 4.0));
+	fTextControl->MoveTo(0,
+		((B_H_SCROLL_BAR_HEIGHT * 2) - fTextControl->Bounds().Height()) / 2);
+		
+	fTextControl->SetDivider(StringWidth(Label()) + 5);
+	
 	BTextView *tview = fTextControl->TextView();
 	tview->SetAlignment(B_ALIGN_LEFT);
 	tview->SetWordWrap(false);
@@ -141,41 +180,53 @@ Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg
 	BString string("QWERTYUIOP[]\\ASDFGHJKL;'ZXCVBNM,/qwertyuiop{}| "
 		"asdfghjkl:\"zxcvbnm<>?!@#$%^&*()-_=+`~\r");
 	
-	for (int32 i = 0; i < string.CountChars(); i++)
-	{
+	for (int32 i = 0; i < string.CountChars(); i++) {
 		char c = string.ByteAt(i);
 		tview->DisallowChar(c);
 	}
 	
 	r = Bounds();
 	r.left = r.right - B_V_SCROLL_BAR_WIDTH;
-	r.bottom /= 2;
+	r.bottom = B_H_SCROLL_BAR_HEIGHT;
 	
 	fUpButton = new SpinnerArrowButton(r.LeftTop(),"up",ARROW_UP);
 	AddChild(fUpButton);
-
-	r = Bounds();
-	r.left = r.right - B_V_SCROLL_BAR_WIDTH;
-	r.top = r.bottom / 2 + 1;
 	
+	r.OffsetBy(0,r.Height() + 1);
 	fDownButton = new SpinnerArrowButton(r.LeftTop(),"down",ARROW_DOWN);
 	AddChild(fDownButton);
 	
-	fStep = 1;
-	fMin = 0;
-	fMax = 100;
 	
 	fPrivateData = new SpinnerPrivateData;
 	fFilter = new SpinnerMsgFilter;
-	
-	SetValue(0);
 }
 
 
-Spinner::~Spinner(void)
+BArchivable *
+Spinner::Instantiate(BMessage *data)
 {
-	delete fPrivateData;
-	delete fFilter;
+	if (validate_instantiation(data, "Spinner"))
+		return new Spinner(data);
+
+	return NULL;
+}
+
+
+status_t
+Spinner::Archive(BMessage *data, bool deep) const
+{
+	status_t status = BControl::Archive(data, deep);
+	
+	if (status == B_OK)
+		status = data->AddInt32("_min",fMin);
+	
+	if (status == B_OK)
+		status = data->AddInt32("_max",fMax);
+	
+	if (status == B_OK)
+		status = data->AddInt32("_step",fStep);
+	
+	return status;
 }
 
 
@@ -257,6 +308,44 @@ Spinner::MessageReceived(BMessage *msg)
 	}
 	else
 		BControl::MessageReceived(msg);
+}
+
+
+void
+Spinner::GetPreferredSize(float *width, float *height)
+{
+	float w, h;
+	
+	// This code shamelessly copied from the Haiku TextControl.cpp and adapted
+	
+	// we need enough space for the label and the child text view
+	font_height fontHeight;
+	fTextControl->GetFontHeight(&fontHeight);
+	float labelHeight = ceil(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
+	float textHeight = fTextControl->TextView()->LineHeight(0) + 4.0;
+
+	h = max_c(labelHeight, textHeight);
+	
+	w = 25.0f + ceilf(fTextControl->StringWidth(fTextControl->Label())) + 
+		ceilf(fTextControl->StringWidth(fTextControl->Text()));
+	
+	w += B_V_SCROLL_BAR_WIDTH;
+	if (h < fDownButton->Frame().bottom)
+		h = fDownButton->Frame().bottom;
+	
+	if (width)
+		*width = w;
+	if (height)
+		*height = h;
+}
+
+
+void
+Spinner::ResizeToPreferred(void)
+{
+	float w,h;
+	GetPreferredSize(&w,&h);
+	ResizeTo(w,h);
 }
 
 
@@ -390,7 +479,7 @@ SpinnerPrivateData::ButtonRepeaterThread(void *data)
 SpinnerArrowButton::SpinnerArrowButton(BPoint location, const char *name,
 										arrow_direction dir)
  :BView(BRect(0,0,B_V_SCROLL_BAR_WIDTH - 1,B_H_SCROLL_BAR_HEIGHT - 1).OffsetToCopy(location),
- 		name, B_FOLLOW_ALL, B_WILL_DRAW)
+ 		name, B_FOLLOW_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW)
 {
 	fDirection = dir;
 	fEnabled = true;

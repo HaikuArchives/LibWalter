@@ -25,11 +25,19 @@ public:
 							const char *label, BMessage *msg,
 							uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 							uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+							Spinner(BMessage *data);
 	virtual					~Spinner(void);
+	
+	static	BArchivable *	Instantiate(BMessage *data);
+	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
+		
 	virtual void			AttachedToWindow(void);
 	virtual void			DetachedFromWindow(void);
 	virtual void			ValueChanged(int32 value);
 	virtual void			MessageReceived(BMessage *msg);
+	
+	virtual	void			GetPreferredSize(float *width, float *height);
+	virtual void			ResizeToPreferred(void);
 	
 	virtual void			SetSteps(int32 stepsize);
 			int32			GetSteps(void) const { return fStep; }
@@ -51,6 +59,8 @@ public:
 	virtual	void			SetEnabled(bool value);
 	
 private:
+			void			_InitObject(void);
+			
 	friend	SpinnerArrowButton;
 	friend	SpinnerPrivateData;
 	
