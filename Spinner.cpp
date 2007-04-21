@@ -15,14 +15,14 @@
 #include <MessageFilter.h>
 
 enum {
-	M_UP='mmup',
+	M_UP = 'mmup',
 	M_DOWN,
-	M_TEXT_CHANGED='mtch'
+	M_TEXT_CHANGED = 'mtch'
 };
 
 
 typedef enum {
-	ARROW_LEFT=0,
+	ARROW_LEFT = 0,
 	ARROW_RIGHT,
 	ARROW_UP,
 	ARROW_DOWN,
@@ -52,16 +52,16 @@ public:
 					void	MouseMoved(BPoint pt, uint32 code, const BMessage *msg);
 					void	Draw(BRect update);
 					void	SetEnabled(bool value);
-					bool	IsEnabled(void) const { return enabled; }
+					bool	IsEnabled(void) const { return fEnabled; }
 	
 private:
 	arrow_direction		fDirection;
-	BPoint				tri1,
-						tri2,
-						tri3;
-	Spinner				*parent;
-	bool				mousedown;
-	bool				enabled;
+	BPoint				fTrianglePoint1,
+						fTrianglePoint2,
+						fTrianglePoint3;
+	Spinner				*fParent;
+	bool				fMouseDown;
+	bool				fEnabled;
 };
 
 class SpinnerPrivateData
@@ -69,45 +69,45 @@ class SpinnerPrivateData
 public:
 	SpinnerPrivateData(void)
 	{
-		thumbframe.Set(0,0,0,0);
-		enabled = true;
+		fThumbFrame.Set(0,0,0,0);
+		fEnabled = true;
 		tracking = false;
-		mousept.Set(0,0);
-		thumbinc = 1.0;
-		repeaterid = -1;
-		exit_repeater = false;
-		arrowdown = ARROW_NONE;
+		fMousePoint.Set(0,0);
+		fThumbIncrement = 1.0;
+		fRepeaterID = -1;
+		fExitRepeater = false;
+		fArrowDown = ARROW_NONE;
 		
 		#ifdef TEST_MODE
-			sbinfo.proportional=true;
-			sbinfo.double_arrows=false;
-			sbinfo.knob=0;
-			sbinfo.min_knob_size=14;
+			sbinfo.proportional = true;
+			sbinfo.double_arrows = false;
+			sbinfo.knob = 0;
+			sbinfo.min_knob_size = 14;
 		#else
-			get_scroll_bar_info(&sbinfo);
+			get_scroll_bar_info(&fScrollbarInfo);
 		#endif
 	}
 	
 	~SpinnerPrivateData(void)
 	{
-		if (repeaterid != -1)
+		if (fRepeaterID != -1)
 		{
-			exit_repeater=false;
-			kill_thread(repeaterid);
+			fExitRepeater = false;
+			kill_thread(fRepeaterID);
 		}
 	}
 	
 	static	int32	ButtonRepeaterThread(void *data);
 	
-			thread_id 		repeaterid;
-			scroll_bar_info	sbinfo;
-			BRect			thumbframe;
-			bool			enabled;
+			thread_id 		fRepeaterID;
+			scroll_bar_info	fScrollbarInfo;
+			BRect			fThumbFrame;
+			bool			fEnabled;
 			bool			tracking;
-			BPoint			mousept;
-			float			thumbinc;
-			bool			exit_repeater;
-			arrow_direction	arrowdown;
+			BPoint			fMousePoint;
+			float			fThumbIncrement;
+			bool			fExitRepeater;
+			arrow_direction	fArrowDown;
 };
 
 
@@ -155,8 +155,8 @@ Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg
 	AddChild(fUpButton);
 
 	r = Bounds();
-	r.left=r.right - B_V_SCROLL_BAR_WIDTH;
-	r.top=r.bottom / 2 + 1;
+	r.left = r.right - B_V_SCROLL_BAR_WIDTH;
+	r.top = r.bottom / 2 + 1;
 	
 	fDownButton = new SpinnerArrowButton(r.LeftTop(),"down",ARROW_DOWN);
 	AddChild(fDownButton);
@@ -165,7 +165,7 @@ Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg
 	fMin = 0;
 	fMax = 100;
 	
-	privatedata = new SpinnerPrivateData;
+	fPrivateData = new SpinnerPrivateData;
 	fFilter = new SpinnerMsgFilter;
 	
 	SetValue(0);
@@ -174,7 +174,7 @@ Spinner::Spinner(BRect frame, const char *name, const char *label, BMessage *msg
 
 Spinner::~Spinner(void)
 {
-	delete privatedata;
+	delete fPrivateData;
 	delete fFilter;
 }
 
@@ -226,7 +226,7 @@ Spinner::MessageReceived(BMessage *msg)
 {
 	if (msg->what == M_TEXT_CHANGED) {
 		BString string(fTextControl->Text());
-		int32 newvalue=0;
+		int32 newvalue = 0;
 		
 		sscanf(string.String(),"%ld",&newvalue);
 		if (newvalue >= GetMin() && newvalue <= GetMax()) {
@@ -238,12 +238,12 @@ Spinner::MessageReceived(BMessage *msg)
 		} else {
 			// new value is out of bounds. Clip to range if current value is not
 			// at the end of its range
-			if(newvalue < GetMin() && Value() != GetMin()) {
+			if (newvalue < GetMin() && Value() != GetMin()) {
 				SetValue(GetMin());
 				Invoke();
 				Draw(Bounds());
 				ValueChanged(Value());
-			} else if(newvalue>GetMax() && Value()!=GetMax()) {
+			} else if (newvalue>GetMax() && Value() != GetMax()) {
 				SetValue(GetMax());
 				Invoke();
 				Draw(Bounds());
@@ -298,7 +298,6 @@ Spinner::SetMin(int32 min)
 	fMin = min;
 	if (Value() < fMin)
 		SetValue(fMin);
-	
 }
 
 
@@ -332,12 +331,12 @@ SpinnerPrivateData::ButtonRepeaterThread(void *data)
 	bool exitval = false;
 	
 	sp->Window()->Lock();
-	exitval=sp->privatedata->exit_repeater;
+	exitval = sp->fPrivateData->fExitRepeater;
 	
 	int32 scrollvalue = 0;
-	if(sp->privatedata->arrowdown == ARROW_UP)
+	if (sp->fPrivateData->fArrowDown == ARROW_UP)
 		scrollvalue = sp->fStep;
-	else if (sp->privatedata->arrowdown != ARROW_NONE)
+	else if (sp->fPrivateData->fArrowDown != ARROW_NONE)
 		scrollvalue = -sp->fStep;
 	else
 		exitval = true;
@@ -375,13 +374,13 @@ SpinnerPrivateData::ButtonRepeaterThread(void *data)
 		snooze(50000);
 		
 		sp->Window()->Lock();
-		exitval = sp->privatedata->exit_repeater;
+		exitval = sp->fPrivateData->fExitRepeater;
 		sp->Window()->Unlock();
 	}
 	
 	sp->Window()->Lock();
-	sp->privatedata->exit_repeater = false;
-	sp->privatedata->repeaterid = -1;
+	sp->fPrivateData->fExitRepeater = false;
+	sp->fPrivateData->fRepeaterID = -1;
 	sp->Window()->Unlock();
 	return 0;
 	exit_thread(0);
@@ -394,36 +393,36 @@ SpinnerArrowButton::SpinnerArrowButton(BPoint location, const char *name,
  		name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	fDirection = dir;
-	enabled = true;
+	fEnabled = true;
 	BRect r = Bounds();
 	
 	switch (fDirection) {
 		case ARROW_LEFT: {
-			tri1.Set(r.left + 3,(r.top + r.bottom) / 2);
-			tri2.Set(r.right - 3,r.top + 3);
-			tri3.Set(r.right - 3,r.bottom - 3);
+			fTrianglePoint1.Set(r.left + 3,(r.top + r.bottom) / 2);
+			fTrianglePoint2.Set(r.right - 3,r.top + 3);
+			fTrianglePoint3.Set(r.right - 3,r.bottom - 3);
 			break;
 		}
 		case ARROW_RIGHT: {
-			tri1.Set(r.left + 3,r.bottom - 3);
-			tri2.Set(r.left + 3,r.top + 3);
-			tri3.Set(r.right - 3,(r.top + r.bottom) / 2);
+			fTrianglePoint1.Set(r.left + 3,r.bottom - 3);
+			fTrianglePoint2.Set(r.left + 3,r.top + 3);
+			fTrianglePoint3.Set(r.right - 3,(r.top + r.bottom) / 2);
 			break;
 		}
 		case ARROW_UP: {
-			tri1.Set(r.left + 3,r.bottom - 3);
-			tri2.Set((r.left + r.right) / 2,r.top + 3);
-			tri3.Set(r.right - 3,r.bottom - 3);
+			fTrianglePoint1.Set(r.left + 3,r.bottom - 3);
+			fTrianglePoint2.Set((r.left + r.right) / 2,r.top + 3);
+			fTrianglePoint3.Set(r.right - 3,r.bottom - 3);
 			break;
 		}
 		default: {
-			tri1.Set(r.left + 3,r.top + 3);
-			tri2.Set(r.right - 3,r.top + 3);
-			tri3.Set((r.left + r.right) / 2,r.bottom - 3);
+			fTrianglePoint1.Set(r.left + 3,r.top + 3);
+			fTrianglePoint2.Set(r.right - 3,r.top + 3);
+			fTrianglePoint3.Set((r.left + r.right) / 2,r.bottom - 3);
 			break;
 		}
 	}
-	mousedown = false;
+	fMouseDown = false;
 }
 
 
@@ -435,55 +434,55 @@ SpinnerArrowButton::~SpinnerArrowButton(void)
 void
 SpinnerArrowButton::MouseDown(BPoint pt)
 {
-	if (enabled == false)
+	if (fEnabled == false)
 		return;
 	
-/*	mousedown=true;
+/*	fMouseDown = true;
 	Draw(Bounds());
 
-	if(parent)
+	if (fParent)
 	{
-		int32 step=parent->GetSteps();
+		int32 step = fParent->GetSteps();
 				
-		int32 newvalue=parent->Value();
+		int32 newvalue = fParent->Value();
 		
-		if(fDirection==ARROW_UP)
+		if (fDirection == ARROW_UP)
 		{
-			parent->privatedata->arrowdown=ARROW_UP;
-			newvalue+=step;
+			fParent->fPrivateData->fArrowDown = ARROW_UP;
+			newvalue += step;
 		}
 		else
 		{
-			parent->privatedata->arrowdown=ARROW_DOWN;
-			newvalue-=step;
+			fParent->fPrivateData->fArrowDown = ARROW_DOWN;
+			newvalue -= step;
 		}
 
-		if( newvalue>=parent->GetMin() && newvalue<=parent->GetMax())
+		if ( newvalue >= fParent->GetMin() && newvalue <= fParent->GetMax())
 		{
 			// new value is in range, so set it and go
-			parent->SetValue(newvalue);
-			parent->Invoke();
-			parent->Draw(parent->Bounds());
-			parent->ValueChanged(parent->Value());
+			fParent->SetValue(newvalue);
+			fParent->Invoke();
+			fParent->Draw(fParent->Bounds());
+			fParent->ValueChanged(fParent->Value());
 		}
 		else
 		{
 			// new value is out of bounds. Clip to range if current value is not
 			// at the end of its range
-			if(newvalue<parent->GetMin() && parent->Value()!=parent->GetMin())
+			if (newvalue<fParent->GetMin() && fParent->Value() != fParent->GetMin())
 			{
-				parent->SetValue(parent->GetMin());
-				parent->Invoke();
-				parent->Draw(parent->Bounds());
-				parent->ValueChanged(parent->Value());
+				fParent->SetValue(fParent->GetMin());
+				fParent->Invoke();
+				fParent->Draw(fParent->Bounds());
+				fParent->ValueChanged(fParent->Value());
 			}
 			else
-			if(newvalue>parent->GetMax() && parent->Value()!=parent->GetMax())
+			if (newvalue>fParent->GetMax() && fParent->Value() != fParent->GetMax())
 			{
-				parent->SetValue(parent->GetMax());
-				parent->Invoke();
-				parent->Draw(parent->Bounds());
-				parent->ValueChanged(parent->Value());
+				fParent->SetValue(fParent->GetMax());
+				fParent->Invoke();
+				fParent->Draw(fParent->Bounds());
+				fParent->ValueChanged(fParent->Value());
 			}
 			else
 			{
@@ -493,12 +492,12 @@ SpinnerArrowButton::MouseDown(BPoint pt)
 			}
 		}
 
-		if(parent->privatedata->repeaterid==-1)
+		if (fParent->fPrivateData->fRepeaterID == -1)
 		{
-			parent->privatedata->exit_repeater=false;
-			parent->privatedata->repeaterid=spawn_thread(parent->privatedata->ButtonRepeaterThread,
-				"scroll repeater",B_NORMAL_PRIORITY,parent);
-			resume_thread(parent->privatedata->repeaterid);
+			fParent->fPrivateData->fExitRepeater = false;
+			fParent->fPrivateData->fRepeaterID = spawn_thread(fParent->fPrivateData->ButtonRepeaterThread,
+				"scroll repeater",B_NORMAL_PRIORITY,fParent);
+			resume_thread(fParent->fPrivateData->fRepeaterID);
 		}
 	}
 */
@@ -517,42 +516,42 @@ SpinnerArrowButton::MouseDown(BPoint pt)
 		uint32 buttons;
 		BPoint point;
 
-		int32 step = parent->GetSteps();
+		int32 step = fParent->GetSteps();
 		
-		int32 newvalue = parent->Value();
+		int32 newvalue = fParent->Value();
 		
 		int32 waitvalue = 250000;
 		
 		do {
 			if (fDirection == ARROW_UP) {
-				parent->privatedata->arrowdown = ARROW_UP;
+				fParent->fPrivateData->fArrowDown = ARROW_UP;
 				newvalue += step;
 			} else {
-				parent->privatedata->arrowdown = ARROW_DOWN;
+				fParent->fPrivateData->fArrowDown = ARROW_DOWN;
 				newvalue -= step;
 			}
 			
-			if (newvalue >= parent->GetMin() && newvalue <= parent->GetMax()) {
+			if (newvalue >= fParent->GetMin() && newvalue <= fParent->GetMax()) {
 				// new value is in range, so set it and go
-				parent->SetValue(newvalue);
-				parent->Invoke();
-//				parent->Draw(parent->Bounds());
-				parent->ValueChanged(parent->Value());
+				fParent->SetValue(newvalue);
+				fParent->Invoke();
+//				fParent->Draw(fParent->Bounds());
+				fParent->ValueChanged(fParent->Value());
 			} else {
 				// new value is out of bounds. Clip to range if current value is not
 				// at the end of its range
-				if (newvalue < parent->GetMin() && 
-						parent->Value() != parent->GetMin()) {
-					parent->SetValue(parent->GetMin());
-					parent->Invoke();
-//					parent->Draw(parent->Bounds());
-					parent->ValueChanged(parent->Value());
-				} else if (newvalue>parent->GetMax() && 
-							parent->Value() != parent->GetMax()) {
-					parent->SetValue(parent->GetMax());
-					parent->Invoke();
-//					parent->Draw(parent->Bounds());
-					parent->ValueChanged(parent->Value());
+				if (newvalue < fParent->GetMin() && 
+						fParent->Value() != fParent->GetMin()) {
+					fParent->SetValue(fParent->GetMin());
+					fParent->Invoke();
+//					fParent->Draw(fParent->Bounds());
+					fParent->ValueChanged(fParent->Value());
+				} else if (newvalue>fParent->GetMax() && 
+							fParent->Value() != fParent->GetMax()) {
+					fParent->SetValue(fParent->GetMax());
+					fParent->Invoke();
+//					fParent->Draw(fParent->Bounds());
+					fParent->ValueChanged(fParent->Value());
 				} else {
 					// cases which go here are if new value is <minimum and value already at
 					// minimum or if > maximum and value already at maximum
@@ -584,12 +583,12 @@ SpinnerArrowButton::MouseDown(BPoint pt)
 void
 SpinnerArrowButton::MouseUp(BPoint pt)
 {
-	if (enabled) {
-		mousedown = false;
+	if (fEnabled) {
+		fMouseDown = false;
 		
-		if (parent) {
-			parent->privatedata->arrowdown = ARROW_NONE;
-			parent->privatedata->exit_repeater = true;
+		if (fParent) {
+			fParent->fPrivateData->fArrowDown = ARROW_NONE;
+			fParent->fPrivateData->fExitRepeater = true;
 		}
 		Draw(Bounds());
 	}
@@ -599,7 +598,7 @@ SpinnerArrowButton::MouseUp(BPoint pt)
 void
 SpinnerArrowButton::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 {
-	if (enabled == false)
+	if (fEnabled == false)
 		return;
 	
 	if (transit == B_ENTERED_VIEW) {
@@ -609,9 +608,9 @@ SpinnerArrowButton::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0 &&
 			(buttons & B_SECONDARY_MOUSE_BUTTON) == 0 &&
 			(buttons & B_PRIMARY_MOUSE_BUTTON) == 0 )
-			mousedown = false;
+			fMouseDown = false;
 		else
-			mousedown = true;
+			fMouseDown = true;
 		Draw(Bounds());
 	}
 	
@@ -627,13 +626,13 @@ SpinnerArrowButton::Draw(BRect update)
 	BRect r(Bounds());
 	
 	rgb_color light, dark, normal,arrow,arrow2;
-	if (mousedown) {	
+	if (fMouseDown) {	
 		light = tint_color(c,B_DARKEN_3_TINT);
 		arrow2 = dark = tint_color(c,B_LIGHTEN_MAX_TINT);
 		normal = c;
 		arrow = tint_color(c,B_DARKEN_MAX_TINT);
-	} else if (enabled) {
-		arrow2 = light=tint_color(c,B_LIGHTEN_MAX_TINT);
+	} else if (fEnabled) {
+		arrow2 = light = tint_color(c,B_LIGHTEN_MAX_TINT);
 		dark = tint_color(c,B_DARKEN_3_TINT);
 		normal = c;
 		arrow = tint_color(c,B_DARKEN_MAX_TINT);
@@ -649,42 +648,42 @@ SpinnerArrowButton::Draw(BRect update)
 	FillRect(r);
 	
 	SetHighColor(arrow);
-	FillTriangle(tri1,tri2,tri3);
+	FillTriangle(fTrianglePoint1,fTrianglePoint2,fTrianglePoint3);
 	
 	r.InsetBy(-1,-1);
 	SetHighColor(dark);
 	StrokeLine(r.LeftBottom(),r.RightBottom());
 	StrokeLine(r.RightTop(),r.RightBottom());
-	StrokeLine(tri2,tri3);
-	StrokeLine(tri1,tri3);
+	StrokeLine(fTrianglePoint2,fTrianglePoint3);
+	StrokeLine(fTrianglePoint1,fTrianglePoint3);
 	
 	SetHighColor(light);
 	StrokeLine(r.LeftTop(),r.RightTop());
 	StrokeLine(r.LeftTop(),r.LeftBottom());
 	
 	SetHighColor(arrow2);
-	StrokeLine(tri1,tri2);
+	StrokeLine(fTrianglePoint1,fTrianglePoint2);
 }
 
 
 void
 SpinnerArrowButton::AttachedToWindow(void)
 {
-	parent = (Spinner*)Parent();
+	fParent = (Spinner*)Parent();
 }
 
 
 void
 SpinnerArrowButton::DetachedToWindow(void)
 {
-	parent = NULL;
+	fParent = NULL;
 }
 
 
 void
 SpinnerArrowButton::SetEnabled(bool value)
 {
-	enabled = value;
+	fEnabled = value;
 	Invalidate();
 }
 

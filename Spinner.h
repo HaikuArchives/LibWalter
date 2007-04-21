@@ -57,7 +57,7 @@ private:
 	BTextControl		*fTextControl;
 	SpinnerArrowButton	*fUpButton,
 						*fDownButton;
-	SpinnerPrivateData	*privatedata;
+	SpinnerPrivateData	*fPrivateData;
 	
 	int32				fStep;
 	int32				fMin,
