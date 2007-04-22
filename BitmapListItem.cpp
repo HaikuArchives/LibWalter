@@ -9,6 +9,7 @@
 #include <View.h>
 #include <String.h>
 #include <Font.h>
+#include <Message.h>
 
 BitmapListItem::BitmapListItem(BBitmap *bitmap, const char *text, uint32 level,
 								bool expanded)
@@ -38,8 +39,12 @@ status_t
 BitmapListItem::Archive(BMessage *data, bool deep) const
 {
 	status_t status = BStringItem::Archive(data,deep);
+	
 	if (status == B_OK && fBitmap)
 		status = fBitmap->Archive(data,deep);
+	
+	if (status == B_OK)
+		status = data->AddString("class","BitmapListItem");
 	
 	return status;
 }

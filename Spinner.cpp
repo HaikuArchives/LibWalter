@@ -13,7 +13,44 @@
 #include <Font.h>
 #include <Box.h>
 #include <MessageFilter.h>
+#include <PropertyInfo.h>
 
+
+static property_info sProperties[] = {
+	{ "MinValue", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the minimum value for the spinner.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "MinValue", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the minimum value for the spinner.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "MaxValue", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the maximum value for the spinner.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "MaxValue", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the maximum value for the spinner.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "Step", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the amount of change when an arrow button is clicked.",
+		0, { B_INT32_TYPE }
+	},
+	
+	{ "Step", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the amount of change when an arrow button is clicked.",
+		0, { B_INT32_TYPE }
+	},
+	
+	{ "Value", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the value for the spinner.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "Value", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the value for the spinner.", 0, { B_INT32_TYPE }
+	},
+};
 
 enum {
 	M_UP = 'mmup',
@@ -216,6 +253,7 @@ status_t
 Spinner::Archive(BMessage *data, bool deep) const
 {
 	status_t status = BControl::Archive(data, deep);
+	data->AddString("class","Spinner");
 	
 	if (status == B_OK)
 		status = data->AddInt32("_min",fMin);
@@ -227,6 +265,25 @@ Spinner::Archive(BMessage *data, bool deep) const
 		status = data->AddInt32("_step",fStep);
 	
 	return status;
+}
+
+
+status_t
+Spinner::GetSupportedSuites(BMessage *msg)
+{
+	msg->AddString("suites","suite/vnd.DW-spinner");
+	
+	BPropertyInfo prop_info(sProperties);
+	msg->AddFlat("messages",&prop_info);
+	return BControl::GetSupportedSuites(msg);
+}
+
+
+BHandler *
+Spinner::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+									int32 form, const char *property)
+{
+	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 

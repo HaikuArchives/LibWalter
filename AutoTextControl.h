@@ -28,7 +28,17 @@ public:
 							BMessage *msg,
 							uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 							uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
-	virtual	~AutoTextControl(void);
+							
+							AutoTextControl(BMessage *data);
+	static	BArchivable *	Instantiate(BMessage *data);
+	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
+	
+	virtual	status_t		GetSupportedSuites(BMessage *msg);
+	virtual BHandler *		ResolveSpecifier(BMessage *msg, int32 index,
+											BMessage *specifier, int32 form,
+											const char *property);
+			
+	virtual					~AutoTextControl(void);
 	
 	virtual	void	AttachedToWindow(void);
 	virtual	void 	DetachedFromWindow(void);

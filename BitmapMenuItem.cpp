@@ -32,8 +32,12 @@ status_t
 BitmapMenuItem::Archive(BMessage *data, bool deep) const
 {
 	status_t status = BMenuItem::Archive(data,deep);
+	
 	if (status == B_OK && fBitmap)
 		status = fBitmap->Archive(data,deep);
+	
+	if (status == B_OK)
+		status = data->AddString("class","BitmapMenuItem");
 	
 	return status;
 }

@@ -37,6 +37,11 @@ public:
 	static	BArchivable *	Instantiate(BMessage *data);
 	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
 		
+	virtual	status_t		GetSupportedSuites(BMessage *msg);
+	virtual BHandler *		ResolveSpecifier(BMessage *msg, int32 index,
+											BMessage *specifier, int32 form,
+											const char *property);
+	
 	virtual void			AttachedToWindow(void);
 	virtual void			DetachedFromWindow(void);
 	virtual void			ValueChanged(int32 value);
