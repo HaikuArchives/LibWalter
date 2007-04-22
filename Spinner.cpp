@@ -1,6 +1,6 @@
 /*
 	Spinner.cpp: A number spinner control.
-	Written by DarkWyrm <bpmagic@columbus.rr.com>, Copyright 2004
+	Written by DarkWyrm <darkwyrm@earthlink.net>, Copyright 2004
 	Released under the MIT license.
 	
 	Original BScrollBarButton class courtesy Haiku project
