@@ -18,6 +18,12 @@ class SpinnerPrivateData;
 class SpinnerArrowButton;
 class SpinnerMsgFilter;
 
+/*
+	The Spinner control provides a numeric input which can be nudged by way of two
+	small arrow buttons at the right side. The API is quite similar to that of
+	BScrollBar.
+*/
+
 class Spinner : public BControl
 {
 public:
@@ -50,7 +56,7 @@ public:
 	virtual	void			SetMin(int32 min);
 			int32			GetMin(void) const { return fMin; }
 	
-	virtual	void			MakeFocus(bool value=true);
+	virtual	void			MakeFocus(bool value = true);
 	
 	virtual	void			SetValue(int32 value);
 	virtual	void			SetLabel(const char *text);

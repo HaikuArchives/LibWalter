@@ -11,6 +11,15 @@
 
 class AutoTextControlFilter;
 
+/*
+	The AutoTextControl provides realtime updates to any changes made to it.
+	It also provides the ability to limit the text to a certain number of 
+	characters.
+	
+	If, for some reason, you want to disable the updates-per-keypress, pass
+	a regular BMessageFilter to the SetFilter method.
+*/
+
 class AutoTextControl : public BTextControl
 {
 public:
@@ -37,7 +46,15 @@ private:
 	uint32					fCharLimit;
 };
 
-
+/*
+	This class does all of the heavy lifting for AutoTextControl's realtime
+	updates.
+	
+	You can further customize input and updates by subclassing the 
+	KeyFilter hook function. When doing so, the current key message can
+	be accessed by way of GetCurrentMessage(). However, it will return NULL
+	when called from any other method.
+*/
 class AutoTextControlFilter : public BMessageFilter
 {
 public:

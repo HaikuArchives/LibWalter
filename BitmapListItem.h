@@ -11,6 +11,12 @@
 #include <ListItem.h>
 #include <Bitmap.h>
 
+/*
+	BitmapListItems are simple little items, really. They provide the
+	ability to show a list item with some text, a picture, or both. The item
+	takes ownership of the BBitmap given to it, so please do not delete it.
+*/
+
 class BitmapListItem : public BStringItem
 {
 public:

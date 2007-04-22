@@ -8,6 +8,14 @@
 
 #include <MenuItem.h>
 
+/*
+	BitmapMenuItems are simple little items, really. They provide the
+	ability to show a menu item with some text, a picture, or both. The item
+	takes ownership of the BBitmap given to it, so please do not delete it.
+	Note that it is still possible to see the checkmark on marked
+	BitmapMenuItems -- the bitmap does not obscure the checkmark.
+*/
+
 class BitmapMenuItem : public BMenuItem
 {
 public:
