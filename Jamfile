@@ -1,0 +1,5 @@
+Library libwalter :
+	BitmapListItem.cpp
+	BitmapMenuItem.cpp
+	Spinner.cpp
+	;

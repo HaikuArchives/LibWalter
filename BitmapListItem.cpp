@@ -37,11 +37,11 @@ BitmapListItem::~BitmapListItem(void)
 status_t
 BitmapListItem::Archive(BMessage *data, bool deep) const
 {
-	BStringItem::Archive(data,deep);
-	if (fBitmap)
-		fBitmap->Archive(data,deep);
+	status_t status = BStringItem::Archive(data,deep);
+	if (status == B_OK && fBitmap)
+		status = fBitmap->Archive(data,deep);
 	
-	return B_OK;
+	return status;
 }
 
 
