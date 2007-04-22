@@ -22,9 +22,9 @@ class Spinner : public BControl
 {
 public:
 							Spinner(BRect frame, const char *name,
-							const char *label, BMessage *msg,
-							uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-							uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+									const char *label, BMessage *msg,
+									uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 							Spinner(BMessage *data);
 	virtual					~Spinner(void);
 	
