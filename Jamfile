@@ -1,5 +1,6 @@
 Library libwalter :
 	AutoTextControl.cpp
+	ColorWell.cpp
 	BitmapListItem.cpp
 	BitmapMenuItem.cpp
 	Spinner.cpp
