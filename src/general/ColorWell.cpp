@@ -6,6 +6,30 @@
  *		DarkWyrm (darkwyrm@earthlink.net)
  */
 #include "ColorWell.h"
+#include <PropertyInfo.h>
+
+static property_info sProperties[] = {
+	{ "Red", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the red value for the color well.", 0, { B_INT32_TYPE }
+	},
+	{ "Red", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the red value for the color well.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "Green", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the green value for the color well.", 0, { B_INT32_TYPE }
+	},
+	{ "Green", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the green value for the color well.", 0, { B_INT32_TYPE }
+	},
+	
+	{ "Blue", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the blue value for the color well.", 0, { B_INT32_TYPE }
+	},
+	{ "Blue", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the blue value for the color well.", 0, { B_INT32_TYPE }
+	},
+};
 
 ColorWell::ColorWell(BRect frame, const char *name, BMessage *message,
 	int32 resize, int32 flags, int32 style)
@@ -24,13 +48,13 @@ ColorWell::ColorWell(BRect frame, const char *name, BMessage *message,
 ColorWell::ColorWell(BMessage *data)
  : BControl(data)
 {
-	// TODO: Implement
+	// This will update fColor
+	SetValue(Value());
 }
 
 
 ColorWell::~ColorWell(void)
 {
-	// TODO: Implement
 }
 
 
@@ -47,16 +71,21 @@ ColorWell::Instantiate(BMessage *data)
 status_t
 ColorWell::Archive(BMessage *data, bool deep = true) const
 {
-	// TODO: Implement
-	return B_ERROR;
+	status_t status = BControl::Archive(data, deep);
+	data->AddString("class","ColorWell");
+	
+	return status;
 }
 
 		
 status_t
 ColorWell::GetSupportedSuites(BMessage *msg)
 {
-	// TODO: Implement
-	return B_ERROR;
+	msg->AddString("suites","suite/vnd.DW-colorwell");
+	
+	BPropertyInfo prop_info(sProperties);
+	msg->AddFlat("messages",&prop_info);
+	return BView::GetSupportedSuites(msg);
 }
 
 
@@ -64,8 +93,7 @@ BHandler *
 ColorWell::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 							int32 form, const char *property)
 {
-	// TODO: Implement
-	return NULL;
+	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
@@ -217,53 +245,55 @@ ColorWell::DrawRound(void)
 void
 ColorWell::DrawSquare(void)
 {
-	// TODO: Implement properly
-	if (IsEnabled()) {
-		SetHighColor(fColor);
-		FillRect(Bounds());
-	} else {
-		SetHighColor(fDisabledColor);
-		FillRect(Bounds());
-	}
+	// This code adapted from Haiku's BButton::Draw
+	const rgb_color fillColor = IsEnabled() ? fColor : fDisabledColor;
+	const rgb_color highlightHigh = tint_color(fillColor, IsEnabled() ?
+														B_LIGHTEN_2_TINT :
+														B_LIGHTEN_1_TINT);
+	const rgb_color highlightLow = tint_color(fillColor, B_LIGHTEN_1_TINT);
+	const rgb_color shadowHigh = tint_color(fillColor, B_DARKEN_1_TINT);
+	const rgb_color shadowLow = tint_color(fillColor, IsEnabled() ?
+													 B_DARKEN_2_TINT :
+													 B_DARKEN_1_TINT);
+	const rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	
+	SetHighColor(fillColor);
+	FillRect(Bounds());
+	
+	BRect rect(Bounds());
+	
+	// external border
 	SetHighColor(0,0,0);
-	StrokeRect(Bounds());
+	StrokeRect(rect);
+		
+	BeginLineArray(14);
+
+	// Corners
+	AddLine(rect.LeftTop(), rect.LeftTop(), panelColor);
+	AddLine(rect.LeftBottom(), rect.LeftBottom(), panelColor);
+	AddLine(rect.RightTop(), rect.RightTop(), panelColor);
+	AddLine(rect.RightBottom(), rect.RightBottom(), panelColor);
+
+	rect.InsetBy(1.0f,1.0f);
 	
-/*
-	BPoint pt1(Bounds().LeftTop()), pt2(Bounds().RightTop());
+	// Shadow
+	AddLine(rect.LeftBottom(), rect.RightBottom(), highlightHigh);
+	AddLine(rect.RightBottom(), rect.RightTop(), highlightHigh);
 	
-	if (IsEnabled()) {
-		SetHighColor(fColor);
-		FillRect(Bounds());
-		
-		SetHighColor(tint_color(fColor,B_DARKEN_1_TINT));
-		StrokeLine(pt1,pt2);
-		
-		pt2 = Bounds().LeftBottom();
-		pt2.y--;
-		StrokeLine(pt1,pt2);
-		
-		pt1.x++;
-		pt1.y++;
-		pt2.
-		
-		SetHighColor(tint_color(fColor,B_LIGHTEN_1_TINT));
-		pt1 = Bounds().RightBottom();
-		StrokeArc(r, 225, 180);
-		SetPenSize(1.0);
-		
-		SetHighColor(0,0,0);
-		StrokeEllipse(Bounds());
-		
-		SetHighColor(0,0,0);
-		StrokeArc(Bounds(), 45, 180);
-		
-		SetHighColor(255,255,255);
-		StrokeArc(Bounds(), 225, 180);
-	} else {
-		SetHighColor(fDisabledColor);
-		FillRect(Bounds());
-		
-	}
-*/
+	// Light
+	AddLine(rect.LeftTop(), rect.LeftBottom(),shadowLow);
+	AddLine(rect.LeftTop(), rect.RightTop(), shadowLow);	
+	
+	rect.InsetBy(1.0f, 1.0f);
+	
+	// Shadow
+	AddLine(rect.LeftBottom(), rect.RightBottom(), highlightLow);
+	AddLine(rect.RightBottom(), rect.RightTop(), highlightLow);
+	
+	// Light
+	AddLine(rect.LeftTop(), rect.LeftBottom(),shadowHigh);
+	AddLine(rect.LeftTop(), rect.RightTop(), shadowHigh);	
+	
+	EndLineArray();	
 }
 
