@@ -1,5 +1,6 @@
 Library libwalter :
 	general/AutoTextControl.cpp
+	general/BitmapButton.cpp
 	general/BitmapListItem.cpp
 	general/BitmapMenuItem.cpp
 	general/BitmapView.cpp
