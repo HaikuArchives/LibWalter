@@ -4,6 +4,7 @@ Library libwalter :
 	BitmapMenuItem.cpp
 	BitmapView.cpp
 	ColorWell.cpp
+	ComboBox.cpp
 	FontPanel.cpp
 	Spinner.cpp
 	;
