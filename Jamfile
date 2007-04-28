@@ -2,6 +2,7 @@ Library libwalter :
 	AutoTextControl.cpp
 	BitmapListItem.cpp
 	BitmapMenuItem.cpp
+	BitmapView.cpp
 	ColorWell.cpp
 	FontPanel.cpp
 	Spinner.cpp
