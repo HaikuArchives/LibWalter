@@ -1,10 +1,10 @@
 Library libwalter :
-	AutoTextControl.cpp
-	BitmapListItem.cpp
-	BitmapMenuItem.cpp
-	BitmapView.cpp
-	ColorWell.cpp
-	ComboBox.cpp
-	FontPanel.cpp
-	Spinner.cpp
+	general/AutoTextControl.cpp
+	general/BitmapListItem.cpp
+	general/BitmapMenuItem.cpp
+	general/BitmapView.cpp
+	general/ColorWell.cpp
+	general/ComboBox.cpp
+	general/FontPanel.cpp
+	general/Spinner.cpp
 	;
