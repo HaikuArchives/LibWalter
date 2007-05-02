@@ -1,3 +1,8 @@
+/*
+	BitmapView.cpp: A simple picture display control with some nice extras
+	Written by DarkWyrm <darkwyrm@earthlink.net>, Copyright 2007
+	Released under the MIT license.
+*/
 #ifndef BMPVIEW_H
 #define BMPVIEW_H
 
@@ -17,75 +22,79 @@ enum
 class BitmapView : public BView, public BInvoker
 {
 public:
-	BitmapView(BRect frame, const char *name, BMessage *mod, BBitmap *bitmap, 
-		const char *label=NULL, border_style=B_PLAIN_BORDER,
-		int32 resize=B_FOLLOW_LEFT|B_FOLLOW_TOP, int32 flags=B_WILL_DRAW);
-	~BitmapView(void);
-	virtual void AttachedToWindow(void);
+							BitmapView(const BRect &frame, const char *name,
+										BMessage *mod, BBitmap *bitmap, 
+										border_style = B_PLAIN_BORDER,
+										const int32 &resize = B_FOLLOW_LEFT | 
+																B_FOLLOW_TOP,
+										const int32 &flags = B_WILL_DRAW);
+							~BitmapView(void);
+						
+	virtual	void			AttachedToWindow(void);
+	virtual	void			Draw(BRect rect);
+	virtual	void			MessageReceived(BMessage *msg);
+	virtual	void			MouseDown(BPoint pt);
 	
-	virtual void Draw(BRect rect);
-	virtual void MessageReceived(BMessage *msg);
-	virtual void MouseDown(BPoint pt);
+	virtual	void			SetBitmap(BBitmap *bitmap);
+			BBitmap *		GetBitmap(void) const;
 	
-	virtual void SetBitmap(BBitmap *bitmap);
-	BBitmap *GetBitmap(void) const { return fBitmap; }
-
-	bool IsEnabled(void) const { return fEnabled; }
-	virtual void SetEnabled(bool value);
+	virtual	void			SetEnabled(bool value);
+			bool			IsEnabled(void) const;
 	
-//	const char *Label(void) const { return fLabel.String(); }
-//	virtual void SetLabel(const char *label);
+	virtual void			SetStyle(border_style style);
+			border_style	Style(void) const;
 	
-	border_style Style(void) const { return fBorderStyle; }
-	virtual void SetStyle(border_style style);
+			void			SetFixedSize(bool isfixed);
+			bool			IsFixedSize(void) const;
 	
-	bool IsFixedSize(void) const { return fFixedSize; }
-	void SetFixedSize(bool isfixed);
+	virtual	void			SetAcceptDrops(bool accept);
+			bool			AcceptsDrops(void) const;
 	
-	bool AcceptsDrops(void) const { return fAcceptDrops; }
-	virtual void SetAcceptDrops(bool accept);
+	virtual	void			SetAcceptPaste(bool accept);
+			bool			AcceptsPaste(void) const;
 	
-	bool AcceptsPaste(void) const { return fAcceptPaste; }
-	virtual void SetAcceptPaste(bool accept);
+	virtual	void			SetConstrainDrops(bool value);
+			bool			ConstrainsDrops(void) const;
 	
-	bool ConstrainsDrops(void) const { return fConstrainDrops; }
-	virtual void SetConstrainDrops(bool value);
+	virtual	void			SetMaxBitmapSize(const float &width, const float &height);
+			void			MaxBitmapSize(float *width, float *height) const;
 	
-	void MaxBitmapSize(float *width, float *height) const;
-	virtual void SetMaxBitmapSize(const float &width, const float &height);
+			void			SetBitmapRemovable(bool isremovable);
+			bool			IsBitmapRemovable(void) const;
 	
-	bool IsBitmapRemovable(void) const { return fRemovableBitmap; }
-	void SetBitmapRemovable(bool isremovable);
-	
-	void RemoveBitmap(void);
-	void PasteBitmap(void);
+			void			RemoveBitmap(void);
+			void			PasteBitmap(void);
 	
 private:
-	void CalculateBitmapRect(void);
-	BRect ScaleRectToFit(const BRect &from, const BRect &to);
-	void ConstrainBitmap(void);
+			void			CalculateBitmapRect(void);
+			BRect			ScaleRectToFit(const BRect &from, const BRect &to);
+			void			ConstrainBitmap(void);
+			
+			bool			ClipboardHasBitmap(void);
+			BBitmap *		BitmapFromClipboard(void);
 	
-	bool ClipboardHasBitmap(void);
-	BBitmap *BitmapFromClipboard(void);
+	float 			fNoPhotoWidths[4];
+	BPoint			fNoPhotoOffsets[4];
 	
-	float fNoPhotoWidths[4];
-	BPoint fNoPhotoOffsets[4];
+	BBitmap			*fBitmap;
+	BRect			fBitmapRect;
+	bool			fEnabled;
+	border_style	fBorderStyle;
 	
-	BBitmap *fBitmap;
-	BRect fBitmapRect;
-	bool fEnabled;
-	BString fLabel;
-	border_style fBorderStyle;
-	bool fFixedSize;
-	bool fAcceptDrops;
-	bool fAcceptPaste;
-	bool fConstrainDrops;
-	float fMaxWidth, fMaxHeight;
-	bool fRemovableBitmap;
-	BPopUpMenu *fPopUpMenu;
-	uint32 fMouseButtons;
-	BMenuItem *fPasteItem;
-	BMenuItem *fRemoveItem;
+	bool			fFixedSize,
+					fAcceptDrops,
+					fAcceptPaste,
+					fConstrainDrops;
+	
+	float			fMaxWidth,
+					fMaxHeight;
+	
+	bool			fRemovableBitmap;
+	BPopUpMenu 		*fPopUpMenu;
+	uint32			fMouseButtons;
+	
+	BMenuItem		*fPasteItem;
+	BMenuItem		*fRemoveItem;
 };
 
 #endif
