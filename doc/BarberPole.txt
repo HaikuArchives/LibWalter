@@ -1,0 +1,22 @@
+Dortmund, Germany.
+December, 12th 1998
+
+BarberPole is a little class, that shows this little spinning barber pole, you probably know from Net+ or the Tracker.
+
+This is V1.0 and should compile on both x86 and PPC, although I currently haven't tested it on PPC. If you want to set the color of the pole, do it by using 
+
+myBarberPol->SetHighColor(...) 
+	and 
+myBarberPole->SetLowColor(...)
+
+BarberPole is Freeware. If you made any changes, please report it to me, so I could update it.
+
+dirk116@wallace.free.de 	// 	Member of DeBUG - German Be User Group
+						//	http://www.BeUserGroup.de
+
+BarberPole V1.1
+August, 2nd 2003
+
+Changes by Michael Pfeiffer
+Uses Pulse instead of thread to update BarberPool (SetPulseRate(100000) in BWindow).
+Added a 3D-ish look.
