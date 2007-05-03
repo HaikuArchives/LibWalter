@@ -1,11 +1,11 @@
+/*
+ * Copyright 1998 dirk116, dirk116@wallace.free.de
+ * Copyright 2003 Michael Pfeiffer
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 #ifndef _BARBERPOLE_H_
 #define _BARBERPOLE_H_
-
-/*
-	BarberPole.h: 
-	Written by Michael Pfeiffer, dirk116
-	Released under the MIT license.
-*/
 
 #include <View.h>
 

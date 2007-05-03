@@ -1,9 +1,8 @@
 /*
-	BarberPole.cpp: 
-	Written by Michael Pfeiffer, dirk116
-	Released under the MIT license.
-*/
-
+ * Copyright 1998 dirk116, dirk116@wallace.free.de
+ * Copyright 2003 Michael Pfeiffer
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
 
 #include "BarberPole.h"
 #include <Region.h>
