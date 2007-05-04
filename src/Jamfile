@@ -9,4 +9,6 @@ Library libwalter :
 	general/ComboBox.cpp
 	general/FontPanel.cpp
 	general/Spinner.cpp
+	
+	storage/PathBox.cpp
 	;
