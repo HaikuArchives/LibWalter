@@ -6,15 +6,38 @@
 #include "PathBox.h"
 #include <Messenger.h>
 #include <Window.h>
+#include <Path.h>
+#include <PropertyInfo.h>
+#include <Alert.h>
 
 enum {
 	M_PATHBOX_CHANGED = 'pbch',
-	M_SHOW_FILEPANEL
+	M_SHOW_FILEPANEL,
+	M_ENTRY_CHOSEN
+};
+
+static property_info sProperties[] = {
+	{ "Value", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the whether or not the path box is enabled.", 0, { B_BOOL_TYPE }
+	},
+	
+	{ "Value", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Enables/disables the path box.", 0, { B_BOOL_TYPE }
+	},
+
+	{ "Enabled", { B_GET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0 },
+		"Returns the value for the path box.", 0, { B_STRING_TYPE }
+	},
+	
+	{ "Enabled", { B_SET_PROPERTY, 0 }, { B_DIRECT_SPECIFIER, 0},
+		"Sets the value for the path box.", 0, { B_STRING_TYPE }
+	},
 };
 
 PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 				const char *label, const int32 &resize, const int32 &flags)
- :	BView(frame,name,resize,flags)
+ :	BView(frame,name,resize,flags),
+ 	fValidate(false)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -23,7 +46,9 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 	entry_ref ref;
 	entry.GetRef(&ref);
 	
-	fFilePanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, 0, false);
+	fFilePanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_DIRECTORY_NODE, false,
+								new BMessage(M_ENTRY_CHOSEN));
+	fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON,"Select");
 	
 	fBrowseButton = new BButton(BRect(0,0,1,1),"browse","Browse…",
 								new BMessage(M_SHOW_FILEPANEL),
@@ -31,8 +56,6 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 	fBrowseButton->ResizeToPreferred();
 	fBrowseButton->MoveTo( frame.right - fBrowseButton->Bounds().Width() - 10, 10);
 	AddChild(fBrowseButton);
-	
-	
 	
 	fPathControl = new BTextControl(BRect(10,10,11,11),"path",label,path,
 									new BMessage(M_PATHBOX_CHANGED),
@@ -46,9 +69,8 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 		fPathControl->GetPreferredSize(&w,&h);
 		fPathControl->RemoveSelf();
 		win->Quit();
-	} else {
+	} else
 		fPathControl->GetPreferredSize(&w,&h);
-	}
 	fPathControl->ResizeTo(fBrowseButton->Frame().left - 20, h);
 	AddChild(fPathControl);
 }
@@ -57,11 +79,28 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 PathBox::PathBox(BMessage *data)
  :	BView(data)
 {
+	BString path;
+	
+	if (data->FindString("path",&path) != B_OK)
+		path = "";
+	fPathControl->SetText(path.String());
+	
+	if (data->FindBool("validate",&fValidate) != B_OK)
+		fValidate = false;
 }
 
 
 PathBox::~PathBox(void)
 {
+}
+
+
+void
+PathBox::AttachedToWindow(void)
+{
+	fPathControl->SetTarget(this);
+	fBrowseButton->SetTarget(this);
+	fFilePanel->SetTarget(BMessenger(this));
 }
 
 
@@ -78,6 +117,15 @@ PathBox::Instantiate(BMessage *data)
 status_t
 PathBox::Archive(BMessage *data, bool deep) const
 {
+	status_t status = BView::Archive(data,deep);
+	data->AddString("class","PathBox");
+	
+	if (status == B_OK)
+		status = data->AddString("path",fPathControl->Text());
+	if (status == B_OK)
+		status = data->AddBool("validate",fValidate);
+	
+	return status;
 }
 
 
@@ -129,6 +177,11 @@ PathBox::GetPreferredSize(float *w, float *h)
 status_t
 PathBox::GetSupportedSuites(BMessage *msg)
 {
+	msg->AddString("suites","suite/vnd.DW-pathbox");
+	
+	BPropertyInfo prop_info(sProperties);
+	msg->AddFlat("messages",&prop_info);
+	return BView::GetSupportedSuites(msg);
 }
 
 
@@ -137,24 +190,133 @@ PathBox::ResolveSpecifier(BMessage *msg, int32 index,
 							BMessage *specifier, int32 form,
 							const char *property)
 {
+	BPropertyInfo propInfo(sProperties);
+
+	if (propInfo.FindMatch(msg, 0, specifier, form, property) >= B_OK)
+		return this;
+
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
 void
 PathBox::MessageReceived(BMessage *msg)
 {
+	switch(msg->what) {
+		case M_ENTRY_CHOSEN: {
+			entry_ref ref;
+			if (msg->FindRef("refs",&ref) == B_OK) {
+				BPath path(&ref);
+				fPathControl->SetText(path.Path());
+			}
+			break;
+		}
+		case M_SHOW_FILEPANEL: {
+			if (!fFilePanel->IsShowing())
+				fFilePanel->Show();
+			break;
+		}
+		case M_PATHBOX_CHANGED: {
+			if (IsValidating()) {
+				if (strlen(fPathControl->Text()) < 1)
+					break;
+				
+				BEntry entry(fPathControl->Text());
+				if (entry.InitCheck() != B_OK
+					|| !entry.Exists()) {
+					BAlert *alert = new BAlert("", "The location entered does not exist."
+												" Please check to make sure you have"
+												" entered it correctly.",
+												"OK");
+					alert->Go();
+					fPathControl->MakeFocus();
+				}
+			}
+			break;
+		}
+		case B_SET_PROPERTY:
+		case B_GET_PROPERTY: {
+			BMessage reply(B_REPLY);
+			bool handled = false;
+	
+			BMessage specifier;
+			int32 index;
+			int32 form;
+			const char *property;
+			if (msg->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+				if (strcmp(property, "Value") == 0) {
+					if (msg->what == B_GET_PROPERTY) {
+						reply.AddString("result", fPathControl->Text());
+						handled = true;
+					} else {
+						// B_GET_PROPERTY
+						BString value;
+						if (msg->FindString("data", &value) == B_OK) {
+							SetPath(value.String());
+							reply.AddInt32("error", B_OK);
+							handled = true;
+						}
+					}
+				} else if (strcmp(property, "Enabled") == 0) {
+					if (msg->what == B_GET_PROPERTY) {
+						reply.AddBool("result", IsEnabled());
+						handled = true;
+					} else {
+						// B_GET_PROPERTY
+						bool enabled;
+						if (msg->FindBool("data", &enabled) == B_OK) {
+							SetEnabled(enabled);
+							reply.AddInt32("error", B_OK);
+							handled = true;
+						}
+					}
+				}
+			}
+			
+			if (handled) {
+				msg->SendReply(&reply);
+				return;
+			}
+			break;
+		}
+		default: {
+			BView::MessageReceived(msg);
+			break;
+		}
+	}
+}
+
+
+void
+PathBox::SetEnabled(bool value)
+{
+	if (value == IsEnabled())
+		return;
+	
+	fPathControl->SetEnabled(value);
+	fBrowseButton->SetEnabled(value);
+}
+
+
+bool
+PathBox::IsEnabled(void) const
+{
+	return fPathControl->IsEnabled();
 }
 
 
 void
 PathBox::SetPath(const char *path)
 {
+	fPathControl->SetText(path);
 }
 
 
 void
 PathBox::SetPath(const entry_ref &ref)
 {
+	BPath path(&ref);
+	fPathControl->SetText(path.Path());
 }
 
 
@@ -165,16 +327,22 @@ PathBox::Path(void) const
 }
 
 
+void
+PathBox::MakeValidating(bool value)
+{
+	fValidate = value;
+}
+
+
+bool
+PathBox::IsValidating(void) const
+{
+	return fValidate;
+}
+
+
 BFilePanel *
 PathBox::FilePanel(void) const
 {
 	return fFilePanel;
 }
-
-
-void
-PathBox::_InitObject(void)
-{
-	
-}
-

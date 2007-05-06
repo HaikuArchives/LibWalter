@@ -23,6 +23,11 @@ public:
 							PathBox(BMessage *data);
 	virtual					~PathBox(void);
 	
+	// This method does some internal setup. If you implement this method in
+	// a subclass, make sure that you call the inherited version also or else
+	// your PathBox instance won't do much
+	virtual	void			AttachedToWindow(void);
+	
 	static	BArchivable *	Instantiate(BMessage *data);
 	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
 	
@@ -36,19 +41,26 @@ public:
 			
 	virtual	void			MessageReceived(BMessage *msg);
 	
+	virtual	void			SetEnabled(bool value);
+			bool			IsEnabled(void) const;
+	
 			void			SetPath(const char *path);
 			void			SetPath(const entry_ref &ref);
 			
 			const char *	Path(void) const;
 			
+	// This method toggles whether or not the PathBox instance should check
+	// to make sure that paths typed in actually exist. It defaults to false.
+	virtual	void			MakeValidating(bool value);
+			bool			IsValidating(void) const;
+			
 			BFilePanel *	FilePanel(void) const;
 	
 private:
-			void			_InitObject(void);
-			
 	BFilePanel				*fFilePanel;
 	BTextControl			*fPathControl;
 	BButton					*fBrowseButton;
+	bool					fValidate;
 };
 
 #endif
