@@ -1,0 +1,5 @@
+SubDir LW_TOP ;
+
+HDRS += $(LW_INCLUDE) ;
+
+SubInclude LW_TOP src ;

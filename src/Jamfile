@@ -1,4 +1,6 @@
-Library libwalter :
+SubDir LW_TOP src ;
+
+Library $(LW_TOP)/libwalter :
 	general/AutoTextControl.cpp
 	general/BarberPole.cpp
 	general/BitmapButton.cpp

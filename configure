@@ -1,0 +1,10 @@
+#!/bin/sh
+sourceDir=`pwd`
+
+cat << EOF > Jamrules
+# automatically generated Jamfile
+
+LW_TOP		= ${sourceDir} ;
+LW_INCLUDE	= ${sourceDir}/include ;
+
+EOF
