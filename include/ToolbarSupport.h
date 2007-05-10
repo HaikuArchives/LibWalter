@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbarSupport.cpp
+// libwalter ToolbarSupport.cpp
 //
-// Miscellaneous functions for WToolbar and related classes
+// Miscellaneous functions for Toolbar and related classes
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -15,8 +15,8 @@
 //
 // =============================================================================
 
-#ifndef _W_SUPPORT_H_
-#define _W_SUPPORT_H_
+#ifndef _TOOLBAR_SUPPORT_H_
+#define _TOOLBAR_SUPPORT_H_
 
 // BeOS headers
 #include <Rect.h>
@@ -32,14 +32,14 @@ class BView;
 struct entry_ref;
 
 // =============================================================================
-// WToolbarSupport
+// ToolbarSupport
 // =============================================================================
 
-class WToolbarSupport {
+class ToolbarSupport {
 public:
 	static	BBitmap *		GrayscaleBitmap(BBitmap *bitmap);
 	static	void			Draw3DBorder(BView *view, BRect rect,
 								bool inset = false);
 };
 
-#endif // _W_SUPPORT_H_
+#endif // _TOOLBAR_SUPPORT_H_

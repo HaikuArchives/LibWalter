@@ -1,6 +1,6 @@
 // =============================================================================
 //
-// libwalter WToolbarSeparator.h
+// libwalter ToolbarSeparator.h
 //
 // Separator control for AKToolbar
 //
@@ -15,21 +15,21 @@
 //
 // =============================================================================
 
-#ifndef _W_TOOLBAR_SEPARATOR_H_
-#define _W_TOOLBAR_SEPARATOR_H_
+#ifndef _TOOLBAR_SEPARATOR_H_
+#define _TOOLBAR_SEPARATOR_H_
 
 // libwalter headers
-#include "WToolbarControl.h"
+#include "ToolbarControl.h"
 
 // =============================================================================
-// WToolbarSeparator
+// ToolbarSeparator
 // =============================================================================
 
-class WToolbarSeparator : public WToolbarControl {
+class ToolbarSeparator : public ToolbarControl {
 public:
-							WToolbarSeparator(const char *name = NULL);
-							WToolbarSeparator(BMessage *archive);
-	virtual					~WToolbarSeparator();
+							ToolbarSeparator(const char *name = NULL);
+							ToolbarSeparator(BMessage *archive);
+	virtual					~ToolbarSeparator();
 	// BArchivable hooks
 	virtual	status_t		Archive(BMessage *archive,
 								bool deep = true) const;
@@ -39,4 +39,4 @@ public:
 	virtual	void			GetPreferredSize(float *width, float *height);
 };
 
-#endif // _W_TOOLBAR_SEPARATOR_H_
+#endif // _TOOLBAR_SEPARATOR_H_

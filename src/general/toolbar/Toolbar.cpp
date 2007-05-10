@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbar.Ccpp
+// libwalter Toolbar.Ccpp
 //
-// WToolbar, a toolbar widget
+// Toolbar, a toolbar widget
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -30,15 +30,15 @@
 #include <Window.h>
 
 // libwalter headers
-#include "WToolbar.h"
-#include "WToolbarControl.h"
-#include "WToolbarSupport.h"
+#include "Toolbar.h"
+#include "ToolbarControl.h"
+#include "ToolbarSupport.h"
 
 // =============================================================================
-// WToolbar
+// Toolbar
 // =============================================================================
 
-/*static property_info kWToolbarPropList[] = {
+/*static property_info kToolbarPropList[] = {
 	{ "enabled",
 	  { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 	  { B_DIRECT_SPECIFIER, 0 },
@@ -49,8 +49,8 @@
 
 // Constructors and destructor
 
-WToolbar::WToolbar(BRect frame, const char *name, int style,
-	WToolbarAlignment alignment, bool auto_size, border_style border,
+Toolbar::Toolbar(BRect frame, const char *name, int style,
+	ToolbarAlignment alignment, bool auto_size, border_style border,
 	uint32 resizing_mode, uint32 flags) :
 	BView(frame, name, resizing_mode,
 		flags | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW)
@@ -66,13 +66,13 @@ WToolbar::WToolbar(BRect frame, const char *name, int style,
 	Update();
 }
 
-WToolbar::WToolbar(BMessage *archive) :
+Toolbar::Toolbar(BMessage *archive) :
 	BView(archive)
 {
-	WToolbarLabelPosition labelPosition;
+	ToolbarLabelPosition labelPosition;
 	float margin, padding, picSize;
-	WToolbarAlignment alignment;
-	WToolbarControl *control;
+	ToolbarAlignment alignment;
+	ToolbarControl *control;
 	BArchivable *archivable;
 	bool autoSize, enabled;
 	border_style border;
@@ -85,24 +85,24 @@ WToolbar::WToolbar(BMessage *archive) :
 
 	// Properties
 
-	if (archive->FindBool("WToolbar::autosize", &autoSize) == B_OK)
+	if (archive->FindBool("Toolbar::autosize", &autoSize) == B_OK)
 		SetAutoSize(autoSize);
 
-	if (archive->FindBool("WToolbar::enabled", &enabled) == B_OK)
+	if (archive->FindBool("Toolbar::enabled", &enabled) == B_OK)
 		SetEnabled(enabled);
 
 	// Appearance
 
 	fDisableStyling = true;
-	if (archive->FindInt32("WToolbar::style", (int32*)(&style)) == B_OK)
+	if (archive->FindInt32("Toolbar::style", (int32*)(&style)) == B_OK)
 		SetStyle(style);
 	fDisableStyling = false;
 
-	if (archive->FindInt32("WToolbar::alignment",
+	if (archive->FindInt32("Toolbar::alignment",
 	  (int32*)(&alignment)) == B_OK)
 		SetAlignment(alignment);
 
-	if (archive->FindMessage("WToolbar::background_bitmap",
+	if (archive->FindMessage("Toolbar::background_bitmap",
 	  &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
@@ -118,30 +118,30 @@ WToolbar::WToolbar(BMessage *archive) :
 		}
 	}
 
-	if (archive->FindInt32("WToolbar::border", (int32*)(&border)) == B_OK)
+	if (archive->FindInt32("Toolbar::border", (int32*)(&border)) == B_OK)
 		SetBorder(border);
 
-	if (archive->FindInt32("WToolbar::label_position",
+	if (archive->FindInt32("Toolbar::label_position",
 	  (int32*)(&labelPosition)) == B_OK)
 		SetLabelPosition(labelPosition);
 
-	if (archive->FindFloat("WToolbar::margin", &margin) == B_OK)
+	if (archive->FindFloat("Toolbar::margin", &margin) == B_OK)
 		SetMargin(margin);
 
-	if (archive->FindFloat("WToolbar::padding", &padding) == B_OK)
+	if (archive->FindFloat("Toolbar::padding", &padding) == B_OK)
 		SetPadding(padding);
 
-	if (archive->FindFloat("WToolbar::picture_size", &picSize) == B_OK)
+	if (archive->FindFloat("Toolbar::picture_size", &picSize) == B_OK)
 		SetPictureSize(picSize);
 
 	// Controls
 
 	index = 0;
-	while (archive->FindMessage("WToolbar::control", index,
+	while (archive->FindMessage("Toolbar::control", index,
 	  &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
-			control = dynamic_cast<WToolbarControl*>(archivable);
+			control = dynamic_cast<ToolbarControl*>(archivable);
 			if (control != NULL) {
 				if (!AddControl(control, control->fLine))
 					delete control;
@@ -157,12 +157,12 @@ WToolbar::WToolbar(BMessage *archive) :
 	Update();
 }
 
-WToolbar::~WToolbar()
+Toolbar::~Toolbar()
 {
 	fDisableUpdate = true;
 
 	// Delete all the controls
-	WToolbarControl *control;
+	ToolbarControl *control;
 	while (fControls.size() > 0) {
 		control = fControls[0];
 		RemoveControl(control);
@@ -176,7 +176,7 @@ WToolbar::~WToolbar()
 
 // Private
 
-void WToolbar::_draw_control(unsigned index, BRect updateRect)
+void Toolbar::_draw_control(unsigned index, BRect updateRect)
 {
 	// Beware, this function does not perform any sanity checking!!!
 	// TODO set the clipping region and update rect
@@ -190,7 +190,7 @@ void WToolbar::_draw_control(unsigned index, BRect updateRect)
 	Sync();
 }
 
-void WToolbar::_init_object(void)
+void Toolbar::_init_object(void)
 {
 	// Internals
 	fDisableUpdate = true;
@@ -203,14 +203,14 @@ void WToolbar::_init_object(void)
 	fEnabled = true;
 
 	// Appearance (flat style)
-	fAppearance.fAlignment = W_TOOLBAR_HORIZONTAL;
+	fAppearance.fAlignment = TOOLBAR_HORIZONTAL;
 	fAppearance.fBackBitmap = NULL;
 	fAppearance.fBorder = B_FANCY_BORDER;
-	fAppearance.fLabelPosition = W_TOOLBAR_LABEL_NONE;
+	fAppearance.fLabelPosition = TOOLBAR_LABEL_NONE;
 	fAppearance.fMargin = 0.0;
 	fAppearance.fPadding = 2.0;
-	fAppearance.fPicSize = static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
-	fAppearance.fStyle = W_TOOLBAR_STYLE_FLAT;
+	fAppearance.fPicSize = static_cast<float>(TOOLBAR_PICTURE_XSMALL);
+	fAppearance.fStyle = TOOLBAR_STYLE_FLAT;
 
 	// BView properties
 	SetViewColor(B_TRANSPARENT_32_BIT);
@@ -218,7 +218,7 @@ void WToolbar::_init_object(void)
 
 // Protected
 
-void WToolbar::AssertLocked(void)
+void Toolbar::AssertLocked(void)
 {
 	// Why BView::check_lock() is private and not protected???
 	if (Looper() == NULL) return;
@@ -226,12 +226,12 @@ void WToolbar::AssertLocked(void)
 		debugger("looper must be locked");
 }
 
-float WToolbar::BorderSize(void)
+float Toolbar::BorderSize(void)
 {
 	return 2.0;
 }
 
-void WToolbar::DrawBackground(BRect updateRect)
+void Toolbar::DrawBackground(BRect updateRect)
 {
 	if (fAppearance.fBackBitmap != NULL) {
 		const float kWidth = fAppearance.fBackBitmap->Bounds().Width(),
@@ -250,14 +250,14 @@ void WToolbar::DrawBackground(BRect updateRect)
 		FillRect(updateRect, B_SOLID_LOW);
 }
 
-void WToolbar::DrawBorder(BRect updateRect)
+void Toolbar::DrawBorder(BRect updateRect)
 {
-	WToolbarSupport::Draw3DBorder(this, Bounds());
+	ToolbarSupport::Draw3DBorder(this, Bounds());
 }
 
 // BArchivable hooks
 
-status_t WToolbar::Archive(BMessage *archive, bool deep) const
+status_t Toolbar::Archive(BMessage *archive, bool deep) const
 {
 	status_t status;
 
@@ -267,19 +267,19 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 	// Archive properties
 
 	if (status == B_OK)
-		status = archive->AddBool("WToolbar::autosize", fAutoSize);
+		status = archive->AddBool("Toolbar::autosize", fAutoSize);
 
 	if (status == B_OK)
-		status = archive->AddBool("WToolbar::enabled", fEnabled);
+		status = archive->AddBool("Toolbar::enabled", fEnabled);
 
 	// Archive appearance
 
 	if (status == B_OK)
-		status = archive->AddInt32("WToolbar::alignment",
+		status = archive->AddInt32("Toolbar::alignment",
 			static_cast<int32>(fAppearance.fAlignment));
 
 	if (status == B_OK)
-		status = archive->AddInt32("WToolbar::style", fAppearance.fStyle);
+		status = archive->AddInt32("Toolbar::style", fAppearance.fStyle);
 
 	if (status == B_OK) {
 		if (fAppearance.fBackBitmap != NULL &&
@@ -287,27 +287,27 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 			BMessage bmp;
 			status = fAppearance.fBackBitmap->Archive(&bmp);
 			if (status == B_OK)
-				status = archive->AddMessage("WToolbar::background_bitmap",
+				status = archive->AddMessage("Toolbar::background_bitmap",
 					&bmp);
 		}
 	}
 
 	if (status == B_OK)
-		status = archive->AddInt32("WToolbar::border",
+		status = archive->AddInt32("Toolbar::border",
 			static_cast<int32>(fAppearance.fBorder));
 
 	if (status == B_OK)
-		status = archive->AddInt32("WToolbar::label_position",
+		status = archive->AddInt32("Toolbar::label_position",
 			static_cast<int32>(fAppearance.fLabelPosition));
 
 	if (status == B_OK)
-		status = archive->AddFloat("WToolbar::margin", fAppearance.fMargin);
+		status = archive->AddFloat("Toolbar::margin", fAppearance.fMargin);
 
 	if (status == B_OK)
-		status = archive->AddFloat("WToolbar::padding", fAppearance.fPadding);
+		status = archive->AddFloat("Toolbar::padding", fAppearance.fPadding);
 
 	if (status == B_OK)
-		status = archive->AddFloat("WToolbar::picture_size",
+		status = archive->AddFloat("Toolbar::picture_size",
 			fAppearance.fPicSize);
 
 	// Archive controls
@@ -320,7 +320,7 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 				BMessage control;
 				status = fControls[i]->Archive(&control, true);
 				if (status == B_OK)
-					status = archive->AddMessage("WToolbar::control",
+					status = archive->AddMessage("Toolbar::control",
 						&control);
 			}
 		}
@@ -329,23 +329,23 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 	return status;
 }
 
-BArchivable * WToolbar::Instantiate(BMessage *archive)
+BArchivable * Toolbar::Instantiate(BMessage *archive)
 {
-	return (validate_instantiation(archive, "WToolbar") ?
-		new WToolbar(archive) : NULL);
+	return (validate_instantiation(archive, "Toolbar") ?
+		new Toolbar(archive) : NULL);
 }
 
 // BHandler hooks
 
-/*status_t WToolbar::GetSupportedSuites(BMessage *message)
+/*status_t Toolbar::GetSupportedSuites(BMessage *message)
 {
-	BPropertyInfo pi(kWToolbarPropList);
+	BPropertyInfo pi(kToolbarPropList);
 	message->AddString("suites", "suite/vnd.AKToolkit.Toolbar");
 	message->AddFlat("messages", &pi);
 	return BView::GetSupportedSuites(message);
 }*/
 
-void WToolbar::MessageReceived(BMessage *message)
+void Toolbar::MessageReceived(BMessage *message)
 {
 	BMessage *reply = NULL;
 	bool handled = false;
@@ -388,10 +388,10 @@ void WToolbar::MessageReceived(BMessage *message)
 		BView::MessageReceived(message);
 }
 
-/*BHandler * WToolbar::ResolveSpecifier(BMessage *message, int32 index,
+/*BHandler * Toolbar::ResolveSpecifier(BMessage *message, int32 index,
 	BMessage *specifier, int32 what, const char *property)
 {
-	BPropertyInfo pi(kWToolbarPropList);
+	BPropertyInfo pi(kToolbarPropList);
 	if (pi.FindMatch(message, index, specifier, what, property) >= 0)
 		return this;
 	return BView::ResolveSpecifier(message, index, specifier, what, property);
@@ -399,11 +399,11 @@ void WToolbar::MessageReceived(BMessage *message)
 
 // BView hooks
 
-void WToolbar::AttachedToWindow(void)
+void Toolbar::AttachedToWindow(void)
 {
 	if (!fTarget.IsValid()) {
 		const unsigned kControls = fControls.size();
-		WToolbarControl *control;
+		ToolbarControl *control;
 		unsigned i;
 		SetTarget(Window());
 		for (i = 0; i < kControls; i++) {
@@ -415,12 +415,12 @@ void WToolbar::AttachedToWindow(void)
 	}
 }
 
-void WToolbar::DetachedFromWindow(void)
+void Toolbar::DetachedFromWindow(void)
 {
 	BView::DetachedFromWindow();
 }
 
-void WToolbar::Draw(BRect updateRect)
+void Toolbar::Draw(BRect updateRect)
 {
 	// Background
 	PushState();
@@ -447,11 +447,11 @@ void WToolbar::Draw(BRect updateRect)
 	}
 }
 
-void WToolbar::GetPreferredSize(float *width, float *height)
+void Toolbar::GetPreferredSize(float *width, float *height)
 {
 	unsigned i, visible_controls, visible_lines;
 	float w = 0.0, h = 0.0, max;
-	WToolbarControl *control;
+	ToolbarControl *control;
 	int line;
 
 	// Count visible controls
@@ -468,7 +468,7 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 		line = 0;
 		visible_lines = 1;
 		max = 0.0;
-		if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
+		if (fAppearance.fAlignment == TOOLBAR_VERTICAL) {
 			// Height is the height of the tallest line, line height is the sum
 			// of the heights of its visible controls
 			// Width is the width of any of the control times the visible lines
@@ -539,7 +539,7 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 	if (width != NULL) *width = w - 1.0;
 }
 
-void WToolbar::MouseDown(BPoint point)
+void Toolbar::MouseDown(BPoint point)
 {
 	if (Looper() == NULL) return;
 
@@ -565,7 +565,7 @@ void WToolbar::MouseDown(BPoint point)
 	}
 }
 
-void WToolbar::MouseMoved(BPoint point, uint32 transit,
+void Toolbar::MouseMoved(BPoint point, uint32 transit,
 	const BMessage *message)
 {
 	if (Looper() == NULL) return;
@@ -582,7 +582,7 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 
 		if (buttons == 0) {
 			if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-				WToolbarControl *old_over = fOverControl;
+				ToolbarControl *old_over = fOverControl;
 				fOverControl = ControlAt(point);
 				if (fOverControl != old_over) {
 					// Remove mouse over from previous control
@@ -619,7 +619,7 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 	// pressed control, but not assign it to a new one.
 	else {
 		if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-			WToolbarControl *new_over = ControlAt(point);
+			ToolbarControl *new_over = ControlAt(point);
 			if (new_over != fDownControl) {
 				// Remove mouse over from pressed control
 				fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
@@ -639,11 +639,11 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 	}
 }
 
-void WToolbar::MouseUp(BPoint point)
+void Toolbar::MouseUp(BPoint point)
 {
 	if (Looper() == NULL) return;
 
-	WToolbarControl *new_over;
+	ToolbarControl *new_over;
 	BMessage *msg;
 
 	msg = Looper()->CurrentMessage();
@@ -674,14 +674,14 @@ void WToolbar::MouseUp(BPoint point)
 
 // Controls management
 
-bool WToolbar::AddControl(WToolbarControl *control, int line, int position)
+bool Toolbar::AddControl(ToolbarControl *control, int line, int position)
 {
 	// Controls are stored by line, then by position.
 
 	AssertLocked();
-	if (control->Toolbar() != NULL)
-		return (control->Toolbar() == this);
-	if (fControls.size() >= W_TOOLBAR_MAX_CONTROLS)
+	if (control->ParentToolbar() != NULL)
+		return (control->ParentToolbar() == this);
+	if (fControls.size() >= TOOLBAR_MAX_CONTROLS)
 		return false;
 
 	bool disable_update = fDisableUpdate;
@@ -689,7 +689,7 @@ bool WToolbar::AddControl(WToolbarControl *control, int line, int position)
 
 	if (line >= 0 && line <= CountLines()) {
 		// Insert the control at the given line and, if possible, position
-		WToolbarControls::iterator i;
+		ToolbarControls::iterator i;
 		unsigned _first = 0, _pos = 0;
 		// Find the first control of the line
 		while (_first < fControls.size()) {
@@ -721,7 +721,7 @@ bool WToolbar::AddControl(WToolbarControl *control, int line, int position)
 	return true;
 }
 
-WToolbarControl * WToolbar::ControlAt(BPoint point)
+ToolbarControl * Toolbar::ControlAt(BPoint point)
 {
 	if (fControls.size() == 0) return NULL;
 	unsigned i = 0;
@@ -733,13 +733,13 @@ WToolbarControl * WToolbar::ControlAt(BPoint point)
 	return NULL;
 }
 
-WToolbarControl * WToolbar::ControlAt(int index)
+ToolbarControl * Toolbar::ControlAt(int index)
 {
 	return (index >= 0 && index < (int)(fControls.size()) ?
 		fControls[(unsigned)index] : NULL);
 }
 
-WToolbarControl * WToolbar::ControlAt(int line, int position, bool exact)
+ToolbarControl * Toolbar::ControlAt(int line, int position, bool exact)
 {
 	if (fControls.size() == 0)
 		return NULL;
@@ -783,7 +783,7 @@ WToolbarControl * WToolbar::ControlAt(int line, int position, bool exact)
 	return fControls[_first + _pos];
 }
 
-int WToolbar::ControlsInLine(int line)
+int Toolbar::ControlsInLine(int line)
 {
 	if (line < 0) return 0;
 	int count = 0;
@@ -793,12 +793,12 @@ int WToolbar::ControlsInLine(int line)
 	return count;
 }
 
-int WToolbar::CountControls(void)
+int Toolbar::CountControls(void)
 {
 	return (int)(fControls.size());
 }
 
-int WToolbar::CountLines(void)
+int Toolbar::CountLines(void)
 {
 	int lines = -1;
 	for (unsigned i = 0; i < fControls.size(); i++) {
@@ -808,7 +808,7 @@ int WToolbar::CountLines(void)
 	return lines + 1;
 }
 
-bool WToolbar::DrawControl(WToolbarControl *control)
+bool Toolbar::DrawControl(ToolbarControl *control)
 {
 	AssertLocked();
 	if (control == NULL) return false;
@@ -819,7 +819,7 @@ bool WToolbar::DrawControl(WToolbarControl *control)
 	return true;
 }
 
-WToolbarControl * WToolbar::FindControl(const char *name)
+ToolbarControl * Toolbar::FindControl(const char *name)
 {
 	unsigned i = 0;
 	while (i < fControls.size()) {
@@ -833,10 +833,10 @@ WToolbarControl * WToolbar::FindControl(const char *name)
 	return NULL;
 }
 
-int WToolbar::IndexOf(WToolbarControl *control)
+int Toolbar::IndexOf(ToolbarControl *control)
 {
 	if (control == NULL) return -1;
-	if (control->Toolbar() != this) return -1;
+	if (control->ParentToolbar() != this) return -1;
 	unsigned i = 0;
 	while (i < fControls.size()) {
 		if (fControls[i] == control) return (int)i;
@@ -845,7 +845,7 @@ int WToolbar::IndexOf(WToolbarControl *control)
 	return -1;
 }
 
-bool WToolbar::RemoveControl(WToolbarControl *control)
+bool Toolbar::RemoveControl(ToolbarControl *control)
 {
 	if (control == NULL) return false;
 
@@ -887,17 +887,17 @@ bool WToolbar::RemoveControl(WToolbarControl *control)
 
 // Properties
 
-bool WToolbar::AutoSize(void)
+bool Toolbar::AutoSize(void)
 {
 	return fAutoSize;
 }
 
-bool WToolbar::Enabled(void)
+bool Toolbar::Enabled(void)
 {
 	return fEnabled;
 }
 
-void WToolbar::SetAutoSize(bool auto_size)
+void Toolbar::SetAutoSize(bool auto_size)
 {
 	AssertLocked();
 	if (auto_size == fAutoSize) return;
@@ -905,7 +905,7 @@ void WToolbar::SetAutoSize(bool auto_size)
 	Update();
 }
 
-void WToolbar::SetEnabled(bool enabled)
+void Toolbar::SetEnabled(bool enabled)
 {
 	AssertLocked();
 	if (enabled == fEnabled) return;
@@ -916,52 +916,52 @@ void WToolbar::SetEnabled(bool enabled)
 
 // Appearance
 
-WToolbarAlignment WToolbar::Alignment(void)
+ToolbarAlignment Toolbar::Alignment(void)
 {
 	return fAppearance.fAlignment;
 }
 
-BBitmap * WToolbar::BackgroundBitmap(void)
+BBitmap * Toolbar::BackgroundBitmap(void)
 {
 	return fAppearance.fBackBitmap;
 }
 
-border_style WToolbar::Border(void)
+border_style Toolbar::Border(void)
 {
 	return fAppearance.fBorder;
 }
 
-WToolbarLabelPosition WToolbar::LabelPosition(void)
+ToolbarLabelPosition Toolbar::LabelPosition(void)
 {
 	return fAppearance.fLabelPosition;
 }
 
-float WToolbar::Margin(void)
+float Toolbar::Margin(void)
 {
 	return fAppearance.fMargin;
 }
 
-float WToolbar::Padding(void)
+float Toolbar::Padding(void)
 {
 	return fAppearance.fPadding;
 }
 
-float WToolbar::PictureSize(void)
+float Toolbar::PictureSize(void)
 {
 	return fAppearance.fPicSize;
 }
 
-void WToolbar::SetAlignment(WToolbarAlignment alignment)
+void Toolbar::SetAlignment(ToolbarAlignment alignment)
 {
 	AssertLocked();
 	if (alignment == fAppearance.fAlignment ||
-	  (alignment != W_TOOLBAR_HORIZONTAL && alignment != W_TOOLBAR_VERTICAL))
+	  (alignment != TOOLBAR_HORIZONTAL && alignment != TOOLBAR_VERTICAL))
 		return;
 	fAppearance.fAlignment = alignment;
 	Update();
 }
 
-void WToolbar::SetBackgroundBitmap(BBitmap *bitmap)
+void Toolbar::SetBackgroundBitmap(BBitmap *bitmap)
 {
 	AssertLocked();
 	if (bitmap == fAppearance.fBackBitmap) return;
@@ -976,7 +976,7 @@ void WToolbar::SetBackgroundBitmap(BBitmap *bitmap)
 	Invalidate();
 }
 
-void WToolbar::SetBorder(border_style border)
+void Toolbar::SetBorder(border_style border)
 {
 	AssertLocked();
 	if (border == fAppearance.fBorder || (border != B_FANCY_BORDER &&
@@ -986,19 +986,19 @@ void WToolbar::SetBorder(border_style border)
 	Update();
 }
 
-void WToolbar::SetLabelPosition(WToolbarLabelPosition label_position)
+void Toolbar::SetLabelPosition(ToolbarLabelPosition label_position)
 {
 	AssertLocked();
 	if (label_position == fAppearance.fLabelPosition ||
-	  (label_position != W_TOOLBAR_LABEL_BOTTOM &&
-	  label_position != W_TOOLBAR_LABEL_SIDE &
-	  label_position != W_TOOLBAR_LABEL_NONE))
+	  (label_position != TOOLBAR_LABEL_BOTTOM &&
+	  label_position != TOOLBAR_LABEL_SIDE &
+	  label_position != TOOLBAR_LABEL_NONE))
 		return;
 	fAppearance.fLabelPosition = label_position;
 	Update();
 }
 
-void WToolbar::SetMargin(float margin)
+void Toolbar::SetMargin(float margin)
 {
 	AssertLocked();
 	if (margin == fAppearance.fMargin || floor(margin) < 0.0) return;
@@ -1006,7 +1006,7 @@ void WToolbar::SetMargin(float margin)
 	Update();
 }
 
-void WToolbar::SetPadding(float padding)
+void Toolbar::SetPadding(float padding)
 {
 	AssertLocked();
 	if (padding == fAppearance.fPadding || floor(padding) < 0.0) return;
@@ -1014,57 +1014,57 @@ void WToolbar::SetPadding(float padding)
 	Update();
 }
 
-void WToolbar::SetPictureSize(float picture_size)
+void Toolbar::SetPictureSize(float picture_size)
 {
 	AssertLocked();
 	if (picture_size == fAppearance.fPicSize || picture_size < 0.0 ||
-	  picture_size > static_cast<float>(W_TOOLBAR_PICTURE_MAX))
+	  picture_size > static_cast<float>(TOOLBAR_PICTURE_MAX))
 	  	return;
 	fAppearance.fPicSize = picture_size;
 	Update();
 }
 
-void WToolbar::SetStyle(int style)
+void Toolbar::SetStyle(int style)
 {
 	AssertLocked();
 	fAppearance.fStyle = style;
 	fDisableUpdate = true;
 	switch (style) {
-		case W_TOOLBAR_STYLE_FLAT:
-			fAppearance.fStyle = W_TOOLBAR_STYLE_FLAT;
+		case TOOLBAR_STYLE_FLAT:
+			fAppearance.fStyle = TOOLBAR_STYLE_FLAT;
 			if (fDisableStyling) break;
-			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_NONE;
+			fAppearance.fLabelPosition = TOOLBAR_LABEL_NONE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 2.0;
 			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+				static_cast<float>(TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetFont(be_plain_font);
 			SetHighColor(0, 0, 0);
 			break;
-		case W_TOOLBAR_STYLE_3D:
-			fAppearance.fStyle = W_TOOLBAR_STYLE_3D;
+		case TOOLBAR_STYLE_3D:
+			fAppearance.fStyle = TOOLBAR_STYLE_3D;
 			if (fDisableStyling) break;
-			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_NONE;
+			fAppearance.fLabelPosition = TOOLBAR_LABEL_NONE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 2.0;
 			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+				static_cast<float>(TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			SetFont(be_plain_font);
 			SetHighColor(0, 0, 0);
 			break;
-		case W_TOOLBAR_STYLE_MENU: {
-			fAppearance.fStyle = W_TOOLBAR_STYLE_MENU;
+		case TOOLBAR_STYLE_MENU: {
+			fAppearance.fStyle = TOOLBAR_STYLE_MENU;
 			if (fDisableStyling) break;
 			menu_info mi;
 			BFont font;
 			get_menu_info(&mi);
-			fAppearance.fLabelPosition = W_TOOLBAR_LABEL_SIDE;
+			fAppearance.fLabelPosition = TOOLBAR_LABEL_SIDE;
 			fAppearance.fMargin = 0.0;
 			fAppearance.fPadding = 0.0;
 			fAppearance.fPicSize =
-				static_cast<float>(W_TOOLBAR_PICTURE_XSMALL);
+				static_cast<float>(TOOLBAR_PICTURE_XSMALL);
 			SetLowColor(mi.background_color);
 			// BeBook says that menu_info has a property called "font",
 			// but that's wrong; it has "f_family" and "f_style" instead.
@@ -1081,24 +1081,24 @@ void WToolbar::SetStyle(int style)
 	Update();
 }
 
-int WToolbar::Style(void)
+int Toolbar::Style(void)
 {
 	return fAppearance.fStyle;
 }
 
 // Target - mimic BInvoker
 
-bool WToolbar::IsTargetLocal(void) const
+bool Toolbar::IsTargetLocal(void) const
 {
 	return fTarget.IsTargetLocal();
 }
 
-BMessenger WToolbar::Messenger(void) const
+BMessenger Toolbar::Messenger(void) const
 {
 	return fTarget;
 }
 
-status_t WToolbar::SetControlsTarget(BMessenger messenger)
+status_t Toolbar::SetControlsTarget(BMessenger messenger)
 {
 	AssertLocked();
 	const unsigned kControls = fControls.size();
@@ -1108,7 +1108,7 @@ status_t WToolbar::SetControlsTarget(BMessenger messenger)
 	return B_OK;
 }
 
-status_t WToolbar::SetControlsTarget(const BHandler *handler,
+status_t Toolbar::SetControlsTarget(const BHandler *handler,
 	const BLooper *looper)
 {
 	AssertLocked();
@@ -1127,14 +1127,14 @@ status_t WToolbar::SetControlsTarget(const BHandler *handler,
 	return B_OK;
 }
 
-status_t WToolbar::SetTarget(BMessenger messenger)
+status_t Toolbar::SetTarget(BMessenger messenger)
 {
 	AssertLocked();
 	fTarget = messenger;
 	return B_OK;
 }
 
-status_t WToolbar::SetTarget(const BHandler *handler, const BLooper *looper)
+status_t Toolbar::SetTarget(const BHandler *handler, const BLooper *looper)
 {
 	AssertLocked();
 	if (handler == NULL && looper == NULL)
@@ -1149,20 +1149,20 @@ status_t WToolbar::SetTarget(const BHandler *handler, const BLooper *looper)
 	return B_OK;
 }
 
-BHandler * WToolbar::Target(BLooper **looper) const
+BHandler * Toolbar::Target(BLooper **looper) const
 {
 	return fTarget.Target(looper);
 }
 
 // Other methods
 
-void WToolbar::Update(void)
+void Toolbar::Update(void)
 {
 	if (fDisableUpdate) return;
 	AssertLocked();
 
 	float border, left, top, max, width, height, line, realLine;
-	WToolbarControl *control;
+	ToolbarControl *control;
 	unsigned i;
 	BRect r;
 
@@ -1170,7 +1170,7 @@ void WToolbar::Update(void)
 	max = 0.0;
 	for (i = 0; i < fControls.size(); i++) {
 		if (fControls[i]->fVisible) {
-			if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
+			if (fAppearance.fAlignment == TOOLBAR_VERTICAL) {
 				fControls[i]->GetPreferredSize(&width, NULL);
 				if (width + 1.0 > max) max = width + 1.0;
 			}
@@ -1202,7 +1202,7 @@ void WToolbar::Update(void)
 		if (control->fVisible) {
 			if (line == -1)
 				line = control->fLine;
-			if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
+			if (fAppearance.fAlignment == TOOLBAR_VERTICAL) {
 				if (control->fLine != line) {
 					line = control->fLine;
 					realLine++;
@@ -1256,7 +1256,7 @@ void WToolbar::Update(void)
 	// If the rects have changed the mouse may be over a different
 	// control than before, so we have to simulate a MouseOver() event
 	if (Window() != NULL) {
-		WToolbarControl *new_over;
+		ToolbarControl *new_over;
 		uint32 buttons;
 		BPoint point;
 		GetMouse(&point, &buttons, false);

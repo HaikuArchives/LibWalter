@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbarBitmapButton.h
+// libwalter ToolbarBitmapButton.h
 //
-// Bitmap button control for WToolbar
+// Bitmap button control for Toolbar
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -15,27 +15,27 @@
 //
 // =============================================================================
 
-#ifndef _W_TOOLBAR_BITMAP_BUTTON_H_
-#define _W_TOOLBAR_BITMAP_BUTTON_H_
+#ifndef _TOOLBAR_BITMAP_BUTTON_H_
+#define _TOOLBAR_BITMAP_BUTTON_H_
 
 // Standard C++ headers
 #include <vector>
 
 // libwalter headers
-#include "WToolbarButton.h"
+#include "ToolbarButton.h"
 
 // BeOS classes
 class BBitmap;
 
 // Bitmap set for the button
-class WTBBBitmapSet : public BArchivable {
+class TBBBitmapSet : public BArchivable {
 private:
 			void			_init_object(void);
 public:
-							WTBBBitmapSet(void);
-							WTBBBitmapSet(WTBBBitmapSet &set);
-							WTBBBitmapSet(BMessage *message);
-	virtual					~WTBBBitmapSet();
+							TBBBitmapSet(void);
+							TBBBitmapSet(TBBBitmapSet &set);
+							TBBBitmapSet(BMessage *message);
+	virtual					~TBBBitmapSet();
 	// BArchivable hooks
 	virtual	status_t		Archive(BMessage *archive, bool deep = true) const;
 	static	BArchivable *	Instantiate(BMessage *archive);
@@ -52,25 +52,25 @@ public:
 };
 
 // =============================================================================
-// WToolbarBitmapButton
+// ToolbarBitmapButton
 // =============================================================================
 
-class WToolbarBitmapButton : public WToolbarButton {
+class ToolbarBitmapButton : public ToolbarButton {
 private:
-			typedef std::vector<WTBBBitmapSet*> WTBBBitmapSets;
+			typedef std::vector<TBBBitmapSet*> TBBBitmapSets;
 			void				_init_object(void);
-			WTBBBitmapSets		fBitmaps;
+			TBBBitmapSets		fBitmaps;
 protected:
-	// WToolbarButton hooks
+	// ToolbarButton hooks
 	virtual	void				DrawPicture(BPoint position, BRect updateRect);
 	virtual	void				GetPictureSize(float *width, float *height);
 
 public:
-								WToolbarBitmapButton(const char *name,
+								ToolbarBitmapButton(const char *name,
 									const char *label,
 									BMessage *message = NULL);
-								WToolbarBitmapButton(BMessage *archive);
-	virtual						~WToolbarBitmapButton();
+								ToolbarBitmapButton(BMessage *archive);
+	virtual						~ToolbarBitmapButton();
 	// BArchivable hooks
 	virtual	status_t			Archive(BMessage *archive,
 									bool deep = true) const;
@@ -85,9 +85,9 @@ public:
 									BBitmap *pushed_over = NULL,
 									BBitmap *pushed_over_disabled = NULL);
 			unsigned			CountBitmapSets(void);
-			WTBBBitmapSet *		GetBitmapSet(unsigned size);
-			WTBBBitmapSet *		GetBitmapSetAt(unsigned index);
-			WTBBBitmapSet *		RemoveBitmapSet(unsigned size);
+			TBBBitmapSet *		GetBitmapSet(unsigned size);
+			TBBBitmapSet *		GetBitmapSetAt(unsigned index);
+			TBBBitmapSet *		RemoveBitmapSet(unsigned size);
 };
 
-#endif // _W_TOOLBAR_BITMAP_BUTTON_H_
+#endif // _TOOLBAR_BITMAP_BUTTON_H_

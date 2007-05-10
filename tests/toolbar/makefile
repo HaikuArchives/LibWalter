@@ -32,8 +32,13 @@ TYPE := APP
 #	if two source files with the same name (source.c or source.cpp)
 #	are included from different directories.  Also note that spaces
 #	in folder names do not work well with this makefile.
-SRCS := Test.cpp WToolbar.cpp WToolbarControl.cpp WToolbarSupport.cpp \
-	WToolbarSeparator.cpp WToolbarButton.cpp WToolbarBitmapButton.cpp
+SRCS := Test.cpp \
+	../../src/general/toolbar/Toolbar.cpp \
+	../../src/general/toolbar/ToolbarBitmapButton.cpp \
+	../../src/general/toolbar/ToolbarButton.cpp \
+	../../src/general/toolbar/ToolbarControl.cpp \
+	../../src/general/toolbar/ToolbarSeparator.cpp \
+	../../src/general/toolbar/ToolbarSupport.cpp
 
 #	specify the resource files to use
 #	full path or a relative path to the resource file can be used.
@@ -75,7 +80,7 @@ SYSTEM_INCLUDE_PATHS :=
 #	additional paths to look for local headers
 #	thes use the form: #include "header"
 #	source file directories are automatically included
-LOCAL_INCLUDE_PATHS := 
+LOCAL_INCLUDE_PATHS := ../../include
 
 #	specify the level of optimization that you desire
 #	NONE, SOME, FULL
@@ -105,7 +110,7 @@ SYMBOLS		:=
 DEBUGGER	:= TRUE
 
 #	specify additional compiler flags for all files
-COMPILER_FLAGS	:=
+COMPILER_FLAGS	:= -Wno-unused -Wno-shadow
 
 #	specify additional linker flags
 LINKER_FLAGS	:=

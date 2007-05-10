@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbarBitmapButton.h
+// libwalter ToolbarBitmapButton.h
 //
-// Bitmap button control for WToolbar
+// Bitmap button control for Toolbar
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -16,8 +16,8 @@
 // =============================================================================
 
 /*!
- * \struct WTBBBitmapSet
- * \brief Bitmap set to use with WToolbarBitmapButton.
+ * \struct TBBBitmapSet
+ * \brief Bitmap set to use with ToolbarBitmapButton.
  *
  * These are the rules for a valid set:
  * \li There must be at least the normal bitmap
@@ -28,58 +28,58 @@
  *     version
  */
 /*!
- * \var WTBBBitmapSet::disabled
+ * \var TBBBitmapSet::disabled
  * \brief Bitmap used for disabled button, when it is not pushed.
  */
 /*!
- * \var WTBBBitmapSet::normal
+ * \var TBBBitmapSet::normal
  * \brief Bitmap normally used for the button.
  */
 /*!
- * \var WTBBBitmapSet::over
+ * \var TBBBitmapSet::over
  * \brief Bitmap used for the button when the mouse is over it.
  */
 /*!
- * \var WTBBBitmapSet::over_disabled
+ * \var TBBBitmapSet::over_disabled
  * \brief Bitmap used for disabled button, when the mouse is over it.
  */
 /*!
- * \var WTBBBitmapSet::pushed
+ * \var TBBBitmapSet::pushed
  * \brief Bitmap used for pushed button.
  */
 /*!
- * \var WTBBBitmapSet::pushed_disabled
+ * \var TBBBitmapSet::pushed_disabled
  * \brief Bitmap used for pushed and disabled button, when the mouse is over it.
  */
 /*!
- * \var WTBBBitmapSet::pushed_over
+ * \var TBBBitmapSet::pushed_over
  * \brief Bitmap used for pushed button, when the mouse is over it.
  */
 /*!
- * \var WTBBBitmapSet::pushed_over_disabled
+ * \var TBBBitmapSet::pushed_over_disabled
  * \brief Bitmap used for pushed and disabled button, when the mouse is over it.
  */
 /*!
- * \var WTBBBitmapSet::size
+ * \var TBBBitmapSet::size
  * \brief Size of the bitmaps, in pixels. Width and height are the same.
  */
 
 /*!
- * \class WToolbarBitmapButton
+ * \class ToolbarBitmapButton
  * \brief The classic toolbar button, with a picture and an optional label.
  *
  * \section Bitmaps
  *
- * Like its ancestor WToolbarButton, a bitmap button can be in eight different
+ * Like its ancestor ToolbarButton, a bitmap button can be in eight different
  * states: pushed, with the mouse over it, and disabled, and their combinations.
  * It is possible to assign a different bitmap to each of these states: we call
  * this a \b bitmap \b set, and it is represented by the structure
- * WTBBBitmapSet. All bitmaps in the set have the same size (width and height)
+ * TBBBitmapSet. All bitmaps in the set have the same size (width and height)
  * and the same color space.
  *
  * You can assign to a bitmap button as much sets as you want, as long as they
  * have a different size; the button will choose the bitmap set of the same size
- * of toolbar picture size (see WToolbar::PictureSize()), or the biggest that
+ * of toolbar picture size (see Toolbar::PictureSize()), or the biggest that
  * fits; if there's no such a bitmap set, the button won't display any picture
  * (but it will respect the expected size).
  */
@@ -92,9 +92,9 @@
 #include <Screen.h>
 
 // AK headers
-#include "WToolbar.h"
-#include "WToolbarBitmapButton.h"
-#include "WToolbarSupport.h"
+#include "Toolbar.h"
+#include "ToolbarBitmapButton.h"
+#include "ToolbarSupport.h"
 
 // =============================================================================
 // Internal functions
@@ -111,7 +111,7 @@ void __aktbbbitmapset_unarchive_bitmap(int size, color_space colors,
 
 	// Normal bitmap
 	normal = NULL;
-	strcpy(buffer, "WTBBBitmapSet::");
+	strcpy(buffer, "TBBBitmapSet::");
 	strcat(buffer, normalName);
 	if (archive->FindMessage(buffer, &message) == B_OK) {
 		archivable = instantiate_object(&message);
@@ -138,7 +138,7 @@ void __aktbbbitmapset_unarchive_bitmap(int size, color_space colors,
 	// Disabled bitmap
 	disabled = NULL;
 	if (normal != NULL) {
-		strcpy(buffer, "WTBBBitmapSet::");
+		strcpy(buffer, "TBBBitmapSet::");
 		strcat(buffer, disabledName);
 		if (archive->FindMessage(buffer, &message) == B_OK) {
 			archivable = instantiate_object(&message);
@@ -163,7 +163,7 @@ void __aktbbbitmapset_unarchive_bitmap(int size, color_space colors,
 			}
 		}
 		if (disabled == NULL)
-			disabled = WToolbarSupport::GrayscaleBitmap(normal);
+			disabled = ToolbarSupport::GrayscaleBitmap(normal);
 	}
 	if (disabled == NULL) {
 		delete normal;
@@ -172,7 +172,7 @@ void __aktbbbitmapset_unarchive_bitmap(int size, color_space colors,
 }
 
 // =============================================================================
-// WTBBBitmapSet
+// TBBBitmapSet
 // =============================================================================
 
 // Constructors and destructor
@@ -180,7 +180,7 @@ void __aktbbbitmapset_unarchive_bitmap(int size, color_space colors,
 /*!
  * \brief Creates a new, empty set
  */
-WTBBBitmapSet::WTBBBitmapSet(void)
+TBBBitmapSet::TBBBitmapSet(void)
 {
 	_init_object();
 }
@@ -193,7 +193,7 @@ WTBBBitmapSet::WTBBBitmapSet(void)
  *
  * @param[in] set The set you want to copy
  */
-WTBBBitmapSet::WTBBBitmapSet(WTBBBitmapSet &set)
+TBBBitmapSet::TBBBitmapSet(TBBBitmapSet &set)
 {
 	_init_object();
 	size = set.size;
@@ -224,7 +224,7 @@ WTBBBitmapSet::WTBBBitmapSet(WTBBBitmapSet &set)
  *
  * @param[in] archive The archive wich contains the bitmap set
  */
-WTBBBitmapSet::WTBBBitmapSet(BMessage *archive) :
+TBBBitmapSet::TBBBitmapSet(BMessage *archive) :
 	BArchivable(archive)
 {
 	color_space colors = B_NO_COLOR_SPACE;
@@ -236,7 +236,7 @@ WTBBBitmapSet::WTBBBitmapSet(BMessage *archive) :
 
 	// Normal ------------------------------------------------------------------
 
-	if (archive->FindMessage("WTBBBitmapSet::normal", &message) == B_OK) {
+	if (archive->FindMessage("TBBBitmapSet::normal", &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
 			bitmap = dynamic_cast<BBitmap*>(archivable);
@@ -260,7 +260,7 @@ WTBBBitmapSet::WTBBBitmapSet(BMessage *archive) :
 	if (normal == NULL)			// At least the normal bitmap is required!
 		return;
 
-	if (archive->FindMessage("WTBBBitmapSet::disabled", &message) == B_OK) {
+	if (archive->FindMessage("TBBBitmapSet::disabled", &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
 			bitmap = dynamic_cast<BBitmap*>(archivable);
@@ -282,7 +282,7 @@ WTBBBitmapSet::WTBBBitmapSet(BMessage *archive) :
 		}
 	}
 	if (disabled == NULL) {		// We have the normal, we need the disabled!
-		disabled = WToolbarSupport::GrayscaleBitmap(normal);
+		disabled = ToolbarSupport::GrayscaleBitmap(normal);
 		if (disabled == NULL) {
 			delete normal;
 			normal = NULL;
@@ -310,7 +310,7 @@ WTBBBitmapSet::WTBBBitmapSet(BMessage *archive) :
 /*!
  * \brief Deletes the object and all the bitmaps
  */
-WTBBBitmapSet::~WTBBBitmapSet()
+TBBBitmapSet::~TBBBitmapSet()
 {
 	if (normal != NULL)
 		delete normal;
@@ -332,7 +332,7 @@ WTBBBitmapSet::~WTBBBitmapSet()
 
 // Private or protected
 
-void WTBBBitmapSet::_init_object(void)
+void TBBBitmapSet::_init_object(void)
 {
 	size = 0;
 	normal = NULL;
@@ -359,7 +359,7 @@ void WTBBBitmapSet::_init_object(void)
  *
  * \return Return B_OK if successfull, or some error code if it fails.
  */
-status_t WTBBBitmapSet::Archive(BMessage *archive, bool deep) const
+status_t TBBBitmapSet::Archive(BMessage *archive, bool deep) const
 {
 	status_t status;
 
@@ -369,28 +369,28 @@ status_t WTBBBitmapSet::Archive(BMessage *archive, bool deep) const
 		BMessage bmp;
 		status = normal->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::normal", &bmp);
+			status = archive->AddMessage("TBBBitmapSet::normal", &bmp);
 	}
 
 	if (status == B_OK && disabled != NULL) {
 		BMessage bmp;
 		status = disabled->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::disabled", &bmp);
+			status = archive->AddMessage("TBBBitmapSet::disabled", &bmp);
 	}
 
 	if (status == B_OK && over != NULL) {
 		BMessage bmp;
 		status = over->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::over", &bmp);
+			status = archive->AddMessage("TBBBitmapSet::over", &bmp);
 	}
 
 	if (status == B_OK && over_disabled != NULL) {
 		BMessage bmp;
 		status =  over_disabled->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet:: over_disabled",
+			status = archive->AddMessage("TBBBitmapSet:: over_disabled",
 				&bmp);
 	}
 
@@ -398,14 +398,14 @@ status_t WTBBBitmapSet::Archive(BMessage *archive, bool deep) const
 		BMessage bmp;
 		status = pushed->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::pushed", &bmp);
+			status = archive->AddMessage("TBBBitmapSet::pushed", &bmp);
 	}
 
 	if (status == B_OK && pushed_disabled != NULL) {
 		BMessage bmp;
 		status = pushed_disabled->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::pushed_disabled",
+			status = archive->AddMessage("TBBBitmapSet::pushed_disabled",
 				&bmp);
 	}
 
@@ -413,14 +413,14 @@ status_t WTBBBitmapSet::Archive(BMessage *archive, bool deep) const
 		BMessage bmp;
 		status = pushed_over->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::pushed_over", &bmp);
+			status = archive->AddMessage("TBBBitmapSet::pushed_over", &bmp);
 	}
 
 	if (status == B_OK && pushed_over_disabled != NULL) {
 		BMessage bmp;
 		status = pushed_over_disabled->Archive(&bmp);
 		if (status == B_OK)
-			status = archive->AddMessage("WTBBBitmapSet::pushed_over_disabled",
+			status = archive->AddMessage("TBBBitmapSet::pushed_over_disabled",
 				&bmp);
 	}
 
@@ -435,14 +435,14 @@ status_t WTBBBitmapSet::Archive(BMessage *archive, bool deep) const
  * \return Return the unarchived bitmap set, or  \c NULL if the archive doesn't
  *         contain a bitmap set.
  */
-BArchivable * WTBBBitmapSet::Instantiate(BMessage *archive)
+BArchivable * TBBBitmapSet::Instantiate(BMessage *archive)
 {
-	return (validate_instantiation(archive, "WTBBBitmapSet") ?
-		new WTBBBitmapSet(archive) : NULL);
+	return (validate_instantiation(archive, "TBBBitmapSet") ?
+		new TBBBitmapSet(archive) : NULL);
 }
 
 // =============================================================================
-// WToolbarBitmapButton
+// ToolbarBitmapButton
 // =============================================================================
 
 // Constructors and destructors
@@ -458,9 +458,9 @@ BArchivable * WTBBBitmapSet::Instantiate(BMessage *archive)
  * @param[in] message The message that's sent to the target when the button is
  *                    clicked. Can be \c NULL.
  */
-WToolbarBitmapButton::WToolbarBitmapButton(const char *name,
+ToolbarBitmapButton::ToolbarBitmapButton(const char *name,
 	const char *label, BMessage *message) :
-	WToolbarButton(name, label, message)
+	ToolbarButton(name, label, message)
 {
 	_init_object();
 	SetLabel(label);
@@ -473,11 +473,11 @@ WToolbarBitmapButton::WToolbarBitmapButton(const char *name,
  *
  * @param[in] archive The archive to extract the button from.
  */
-WToolbarBitmapButton::WToolbarBitmapButton(BMessage *archive) :
-	WToolbarButton(archive)
+ToolbarBitmapButton::ToolbarBitmapButton(BMessage *archive) :
+	ToolbarButton(archive)
 {
 	BArchivable *archivable;
-	WTBBBitmapSet *set;
+	TBBBitmapSet *set;
 	BMessage message;
 	unsigned sets, i;
 	int32 index;
@@ -485,13 +485,13 @@ WToolbarBitmapButton::WToolbarBitmapButton(BMessage *archive) :
 	_init_object();
 
 	index = 0;
-	while (archive->FindMessage("WToolbarBitmapButton::bitmap_set", index,
+	while (archive->FindMessage("ToolbarBitmapButton::bitmap_set", index,
 	  &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
-			set = dynamic_cast<WTBBBitmapSet*>(archivable);
+			set = dynamic_cast<TBBBitmapSet*>(archivable);
 			if (set != NULL) {
-				set = (WTBBBitmapSet*)archivable;
+				set = (TBBBitmapSet*)archivable;
 				if (set->size > 0) {
 					sets = fBitmaps.size();
 					i = 0;
@@ -517,7 +517,7 @@ WToolbarBitmapButton::WToolbarBitmapButton(BMessage *archive) :
 /*!
  * \brief Deletes the object and all the bitmaps
  */
-WToolbarBitmapButton::~WToolbarBitmapButton()
+ToolbarBitmapButton::~ToolbarBitmapButton()
 {
 	// Delete all bitmaps
 	while (fBitmaps.size() > 0) {
@@ -528,7 +528,7 @@ WToolbarBitmapButton::~WToolbarBitmapButton()
 
 // Private
 
-void WToolbarBitmapButton::_init_object(void)
+void ToolbarBitmapButton::_init_object(void)
 {
 }
 
@@ -537,9 +537,9 @@ void WToolbarBitmapButton::_init_object(void)
 /*!
  * \brief Draw the bitmap of the button.
  *
- * Reimplemented from WToolbarButton to draw the correct bitmap. Alpha channel
+ * Reimplemented from ToolbarButton to draw the correct bitmap. Alpha channel
  * is respected. If there's no bitmap to draw, the toolbar's style is
- * W_TOOLBAR_MENU, and the button's value is B_CONTROL_ON, then a check mark
+ * TOOLBAR_MENU, and the button's value is B_CONTROL_ON, then a check mark
  * will be drawn in place of the picture.
  *
  * @param[in] position The upper left point of the bitmap, in button's
@@ -549,16 +549,16 @@ void WToolbarBitmapButton::_init_object(void)
  * @param[in] updateRect The rectangle that needs to be updated, in button's
  *                       coordinates.
  */
-void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
+void ToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
 {
-	bool enabled = Enabled() && Toolbar()->Enabled();
+	bool enabled = Enabled() && ParentToolbar()->Enabled();
 	float pic_size = 0.0, pic_x = 0.0, pic_y = 0.0;
 	BBitmap *bitmap = NULL;
-	WTBBBitmapSet *set;
+	TBBBitmapSet *set;
 
 	// Select the picture to use. The picture will always use the toolbar's
 	// picture size; if the bitmap is smaller, we will center it.
-	pic_size = (float)(Toolbar()->PictureSize());
+	pic_size = (float)(ParentToolbar()->PictureSize());
 	set = GetBitmapSet((unsigned)pic_size);
 	if (set != NULL) {
 		bitmap = (enabled ? set->normal : set->disabled);
@@ -578,7 +578,7 @@ void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
 		fCanvas->SetDrawingMode(B_OP_ALPHA);
 
 		// Menus require a bit more handling.
-		if (fStyle == W_TOOLBAR_STYLE_MENU) {
+		if (fStyle == TOOLBAR_STYLE_MENU) {
 			pic_size += 6.0;
 			pic_x += 2.0;
 			pic_y += 2.0;
@@ -588,7 +588,7 @@ void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
 				pushed = true;
 				fCanvas->SetHighColor(255, 255, 255, 128);
 				fCanvas->FillRect(r, B_SOLID_HIGH);
-				WToolbarSupport::Draw3DBorder(fCanvas, r, true);
+				ToolbarSupport::Draw3DBorder(fCanvas, r, true);
 			}
 		}
 		else {
@@ -601,7 +601,7 @@ void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
 		}
 
 		// Is the button pushed?
-		if (fStyle != W_TOOLBAR_STYLE_MENU &&
+		if (fStyle != TOOLBAR_STYLE_MENU &&
 		  ((fMouseOver && fMouseDown) || Value() == B_CONTROL_ON))
 			pushed = true;
 
@@ -615,7 +615,7 @@ void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
 		fCanvas->DrawBitmap(bitmap, BPoint(position.x + pic_x,
 			position.y + pic_y));
 	}
-	else if (fStyle == W_TOOLBAR_STYLE_MENU && Value() == B_CONTROL_ON) {
+	else if (fStyle == TOOLBAR_STYLE_MENU && Value() == B_CONTROL_ON) {
 		// Ok, draw the check mark.
 		BBitmap *mark;
 		float width;
@@ -652,11 +652,11 @@ void WToolbarBitmapButton::DrawPicture(BPoint position, BRect updateRect)
  * @param[out] height The height of the picture in toolbar's units (less 1.0),
  *                    can be \c NULL if you're not interested in it.
  */
-void WToolbarBitmapButton::GetPictureSize(float *width, float *height)
+void ToolbarBitmapButton::GetPictureSize(float *width, float *height)
 {
 	float picSize, w, h;
-	picSize = (float)Toolbar()->PictureSize();
-	if (fStyle == W_TOOLBAR_STYLE_MENU) {
+	picSize = (float)ParentToolbar()->PictureSize();
+	if (fStyle == TOOLBAR_STYLE_MENU) {
 		if (GetBitmapSet((unsigned)picSize) == NULL) {
 			BBitmap *mark = GetMenuCheckMark();
 			w = mark->Bounds().Width() + 1.0;
@@ -691,12 +691,12 @@ void WToolbarBitmapButton::GetPictureSize(float *width, float *height)
  *
  * \return Return \c B_OK if successfull, or some error code if it fails.
  */
-status_t WToolbarBitmapButton::Archive(BMessage *archive, bool deep) const
+status_t ToolbarBitmapButton::Archive(BMessage *archive, bool deep) const
 {
 	const unsigned kBitmaps = fBitmaps.size();
 	status_t status;
 
-	status = WToolbarButton::Archive(archive, deep);
+	status = ToolbarButton::Archive(archive, deep);
 
 	if (status == B_OK && kBitmaps > 0) {
 		for (unsigned i = 0; i < kBitmaps && status == B_OK; i++) {
@@ -704,7 +704,7 @@ status_t WToolbarBitmapButton::Archive(BMessage *archive, bool deep) const
 			status = fBitmaps[i]->Archive(&set);
 			if (status == B_OK)
 				status = archive->AddMessage(
-					"WToolbarBitmapButton::bitmap_set", &set);
+					"ToolbarBitmapButton::bitmap_set", &set);
 		}
 	}
 
@@ -719,10 +719,10 @@ status_t WToolbarBitmapButton::Archive(BMessage *archive, bool deep) const
  * \return Return the unarchived button, or  \c NULL if the archive doesn't
  *         contain a bitmap button.
  */
-BArchivable * WToolbarBitmapButton::Instantiate(BMessage *archive)
+BArchivable * ToolbarBitmapButton::Instantiate(BMessage *archive)
 {
-	return (validate_instantiation(archive, "WToolbarBitmapButton") ?
-		new WToolbarBitmapButton(archive) : NULL);
+	return (validate_instantiation(archive, "ToolbarBitmapButton") ?
+		new ToolbarBitmapButton(archive) : NULL);
 }
 
 // Bitmaps
@@ -752,7 +752,7 @@ void __check_disabled(BBitmap *&bitmap, BBitmap *&disabled_bitmap)
 		return;
 
 	// Ok, time to get that grayscale bitmap
-	disabled_bitmap = WToolbarSupport::GrayscaleBitmap(bitmap);
+	disabled_bitmap = ToolbarSupport::GrayscaleBitmap(bitmap);
 
 	// Something gone bad, delete everything.
 	if (disabled_bitmap == NULL) {
@@ -801,7 +801,7 @@ void __delete_bitmaps(BITMAP_PARAMS)
  *     it will be generated for you by turning the original image in grayscale,
  *     using the same color space of the original (supported color spaces for
  *     this operation are the ones supported by
- *     WToolbarSupport::GrayscaleBitmap())
+ *     ToolbarSupport::GrayscaleBitmap())
  * \li If you specify a "disabled" bitmap but not the corresponding
  *     "non-disabled" bitmap, it will be discarded (deleted).
  * \li If a bitmap set for the specified size is already present, it will be
@@ -813,9 +813,9 @@ void __delete_bitmaps(BITMAP_PARAMS)
  *
  * \todo Support more color spaces.
  */
-bool WToolbarBitmapButton::AddBitmapSet(BITMAP_PARAMS)
+bool ToolbarBitmapButton::AddBitmapSet(BITMAP_PARAMS)
 {
-	WTBBBitmapSet *set, *old_set;
+	TBBBitmapSet *set, *old_set;
 	color_space colors;
 	unsigned size;
 
@@ -846,7 +846,7 @@ bool WToolbarBitmapButton::AddBitmapSet(BITMAP_PARAMS)
 	}
 
 	// Create the new set
-	set = new WTBBBitmapSet();
+	set = new TBBBitmapSet();
 	set->size = size;
 	set->normal = n;
 	set->disabled = d;
@@ -877,7 +877,7 @@ bool WToolbarBitmapButton::AddBitmapSet(BITMAP_PARAMS)
 /*!
  * \brief Return the number of bitmap sets
  */
-unsigned WToolbarBitmapButton::CountBitmapSets(void)
+unsigned ToolbarBitmapButton::CountBitmapSets(void)
 {
 	return fBitmaps.size();
 }
@@ -891,10 +891,10 @@ unsigned WToolbarBitmapButton::CountBitmapSets(void)
  *         it. Can be  \c NULL if no set applies. The returned set belongs to
  *         the object, don't delete it!
  */
-WTBBBitmapSet * WToolbarBitmapButton::GetBitmapSet(unsigned size)
+TBBBitmapSet * ToolbarBitmapButton::GetBitmapSet(unsigned size)
 {
 	if (size == 0) return NULL;
-	WTBBBitmapSet *candidate = NULL;
+	TBBBitmapSet *candidate = NULL;
 	unsigned i = 0;
 	while (i < fBitmaps.size()) {
 		if (fBitmaps[i]->size == size)
@@ -920,7 +920,7 @@ WTBBBitmapSet * WToolbarBitmapButton::GetBitmapSet(unsigned size)
  * \return The bitmap set at index, or  \c NULL if there's no set at the given
  *         index. The returned set belongs to the object, don't delete it!
  */
-WTBBBitmapSet * WToolbarBitmapButton::GetBitmapSetAt(unsigned index)
+TBBBitmapSet * ToolbarBitmapButton::GetBitmapSetAt(unsigned index)
 {
 	return (index < fBitmaps.size() ? fBitmaps[index] : NULL);
 }
@@ -934,9 +934,9 @@ WTBBBitmapSet * WToolbarBitmapButton::GetBitmapSetAt(unsigned index)
  *
  * \return The requested set, or  \c NULL if there's no set of the given size.
  */
-WTBBBitmapSet * WToolbarBitmapButton::RemoveBitmapSet(unsigned size)
+TBBBitmapSet * ToolbarBitmapButton::RemoveBitmapSet(unsigned size)
 {
-	WTBBBitmapSet *set;
+	TBBBitmapSet *set;
 	for (unsigned i = 0; i < fBitmaps.size(); i++) {
 		set = fBitmaps[i];
 		if (set->size == size) {

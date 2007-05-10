@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbarControl.h
+// libwalter ToolbarControl.h
 //
-// Base class for WToolbar controls
+// Base class for Toolbar controls
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -15,8 +15,8 @@
 //
 // =============================================================================
 
-#ifndef _W_TOOLBAR_CONTROL_H_
-#define _W_TOOLBAR_CONTROL_H_
+#ifndef _TOOLBAR_CONTROL_H_
+#define _TOOLBAR_CONTROL_H_
 
 // BeOS headers
 #include <Handler.h>
@@ -28,31 +28,31 @@
 class BView;
 
 // libwalter classes
-class WToolbar;
+class Toolbar;
 
 // =============================================================================
-// WToolbarControl
+// ToolbarControl
 // =============================================================================
 
-class WToolbarControl : public BHandler, public BInvoker {
-friend class WToolbar;
+class ToolbarControl : public BHandler, public BInvoker {
+friend class Toolbar;
 private:
 			void			_init_object(void);
 			bool			fEnabled;
 			BRect			fFrame;
 			float			fHeight;
 			int				fLine;
-			WToolbar *		fToolbar;
+			Toolbar *		fToolbar;
 			bool			fVisible;
 			float			fWidth;
 protected:
 			bool			fMouseDown;
 			bool			fMouseOver;
 public:
-							WToolbarControl(const char *name = NULL,
+							ToolbarControl(const char *name = NULL,
 								BMessage *message = NULL);
-							WToolbarControl(BMessage *archive);
-	virtual					~WToolbarControl();
+							ToolbarControl(BMessage *archive);
+	virtual					~ToolbarControl();
 	// BArchivable hooks
 	virtual	status_t		Archive(BMessage *archive,
 								bool deep = true) const;
@@ -75,8 +75,8 @@ public:
 			int				Position(void);
 			void			SetEnabled(bool enabled);
 			void			SetVisible(bool visible);
-			WToolbar *		Toolbar(void);
+			Toolbar *		ParentToolbar(void);
 			bool			Visible(void);
 };
 
-#endif // _W_TOOLBAR_CONTROL_H_
+#endif // _TOOLBAR_CONTROL_H_

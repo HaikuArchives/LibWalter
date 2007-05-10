@@ -1,8 +1,8 @@
 // =============================================================================
 //
-// libwalter WToolbarButton.h
+// libwalter ToolbarButton.h
 //
-// Simple button control for WToolbar
+// Simple button control for Toolbar
 //
 // Revision: 20070501
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
@@ -15,23 +15,23 @@
 //
 // =============================================================================
 
-#ifndef _W_TOOLBAR_BUTTON_H_
-#define _W_TOOLBAR_BUTTON_H_
+#ifndef _TOOLBAR_BUTTON_H_
+#define _TOOLBAR_BUTTON_H_
 
 // BeOS headers
 #include <Control.h> // For B_CONTROL_ON and B_CONTROL_OFF
 
 // libwalter headers
-#include "WToolbarControl.h"
+#include "ToolbarControl.h"
 
 // BeOS classes
 class BBitmap;
 
 // =============================================================================
-// WToolbarButton
+// ToolbarButton
 // =============================================================================
 
-class WToolbarButton : public WToolbarControl {
+class ToolbarButton : public ToolbarControl {
 private:
 			void				_calc_size(float &lh, float &lw, float &ph,
 									float &pw);
@@ -53,12 +53,12 @@ protected:
 	virtual	void				GetPictureSize(float *width, float *height);
 	virtual	float				Padding(void);
 public:
-								WToolbarButton(const char *name,
+								ToolbarButton(const char *name,
 									const char *label,
 									BMessage *message = NULL,
 									bool switchMode = false);
-								WToolbarButton(BMessage *archive);
-	virtual						~WToolbarButton();
+								ToolbarButton(BMessage *archive);
+	virtual						~ToolbarButton();
 	// BArchivable hooks
 	virtual	status_t			Archive(BMessage *archive,
 									bool deep = true) const;
@@ -77,4 +77,4 @@ public:
 			int32				Value(void);
 };
 
-#endif // _W_TOOLBAR_BUTTON_H_
+#endif // _TOOLBAR_BUTTON_H_
