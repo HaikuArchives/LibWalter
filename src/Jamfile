@@ -12,5 +12,12 @@ Library $(LW_TOP)/libwalter :
 	general/FontPanel.cpp
 	general/Spinner.cpp
 	
+	general/toolbar/Toolbar.cpp
+	general/toolbar/ToolbarBitmapButton.cpp
+	general/toolbar/ToolbarButton.cpp
+	general/toolbar/ToolbarControl.cpp
+	general/toolbar/ToolbarSeparator.cpp
+	general/toolbar/ToolbarSupport.cpp
+	
 	storage/PathBox.cpp
 	;

@@ -1,5 +1,7 @@
 SubDir LW_TOP ;
 
 HDRS += $(LW_INCLUDE) ;
+LINKFLAGS += -lbe -lroot ;
 
 SubInclude LW_TOP src ;
+SubInclude LW_TOP tests ;
