@@ -28,10 +28,10 @@ enum
 class FontPreview : public BView
 {
 public:
-			FontPreview(const BRect &frame);
+					FontPreview(const BRect &frame);
 			
 	void			SetPreviewText(const char *text);
-	const char *	PreviewText(void) const { return fPreviewText.String(); } 
+	const char *	PreviewText(void) const;
 			
 	void			Draw(BRect r);
 	
@@ -52,6 +52,13 @@ FontPreview::SetPreviewText(const char *text)
 {
 	fPreviewText = text ? text : "AaBbCcDdEeFfGg";
 }
+
+
+const char *
+FontPreview::PreviewText(void) const
+{
+	return fPreviewText.String();
+} 
 
 
 void
@@ -207,12 +214,15 @@ FontView::FontView(const BRect &frame, float size)
 	}
 }
 
+
 FontView::~FontView(void)
 {
 	delete fMessenger;
 }
 
-void FontView::AttachedToWindow(void)
+
+void
+FontView::AttachedToWindow(void)
 {
 	Window()->SetDefaultButton(fOK);
 	fOK->SetTarget(this);
@@ -308,9 +318,9 @@ FontView::SelectFont(font_family family, font_style style, float size)
 }
 
 
-void FontView::SelectFont(const BFont &font)
+void
+FontView::SelectFont(const BFont &font)
 {
-
 	font_family fam;
 	font_style sty;
 	font.GetFamilyAndStyle(&fam,&sty);
@@ -319,9 +329,10 @@ void FontView::SelectFont(const BFont &font)
 }
 
 
-void FontView::MessageReceived(BMessage *msg)
+void
+FontView::MessageReceived(BMessage *msg)
 {
-	switch(msg->what) {
+	switch (msg->what) {
 		case M_SIZE_CHANGED: {
 			SetFontSize(fSpinner->Value());
 			break;
@@ -424,7 +435,7 @@ class FontWindow : public BWindow
 {
 public:
 			FontWindow(const BRect &frame, float fontsize);
-			~FontWindow(void) {}
+			~FontWindow(void);
 	bool	QuitRequested(void);
 	void	MessageReceived(BMessage *msg);
 	
@@ -450,12 +461,16 @@ FontWindow::FontWindow(const BRect &frame, float fontsize)
 }
 
 
+FontWindow::~FontWindow(void)
+{
+}
+
+
 bool
 FontWindow::QuitRequested(void)
 {
-	if (!fReallyQuit) {
+	if (!fReallyQuit)
 		PostMessage(M_HIDE_WINDOW);
-	}
 	
 	return fReallyQuit;
 }
