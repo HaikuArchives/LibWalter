@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarButton.h
 //
-// Simple button control for Toolbar
+// Simple button control for WToolbar
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -24,22 +24,22 @@
 #include "ToolbarSupport.h"
 
 // =============================================================================
-// ToolbarButton
+// WToolbarButton
 // =============================================================================
 
 // Constructors and destructors
 
-ToolbarButton::ToolbarButton(const char *name, const char *label,
+WToolbarButton::WToolbarButton(const char *name, const char *label,
 	BMessage *message, bool switchMode) :
-	ToolbarControl(name, message)
+	WToolbarControl(name, message)
 {
 	_init_object();
 	SetLabel(label);
 	SetSwitchMode(switchMode);
 }
 
-ToolbarButton::ToolbarButton(BMessage *archive) :
-	ToolbarControl(archive)
+WToolbarButton::WToolbarButton(BMessage *archive) :
+	WToolbarControl(archive)
 {
 	const char *label;
 	bool switchMode;
@@ -47,17 +47,17 @@ ToolbarButton::ToolbarButton(BMessage *archive) :
 
 	_init_object();
 
-	if (archive->FindString("ToolbarButton::label", &label) == B_OK)
+	if (archive->FindString("WToolbarButton::label", &label) == B_OK)
 		SetLabel(label);
 
-	if (archive->FindBool("ToolbarButton::switch_mode", &switchMode) == B_OK)
+	if (archive->FindBool("WToolbarButton::switch_mode", &switchMode) == B_OK)
 		SetSwitchMode(switchMode);
 
-	if (archive->FindInt32("ToolbarButton::value", (int32*)(&value)) == B_OK)
+	if (archive->FindInt32("WToolbarButton::value", (int32*)(&value)) == B_OK)
 		SetValue(value);
 }	
 
-ToolbarButton::~ToolbarButton()
+WToolbarButton::~WToolbarButton()
 {
 	// Other cleanups
 	if (fLabel != NULL) delete[] fLabel;
@@ -65,7 +65,7 @@ ToolbarButton::~ToolbarButton()
 
 // Private
 
-void ToolbarButton::_calc_size(float &lh, float &lw, float &ph, float &pw)
+void WToolbarButton::_calc_size(float &lh, float &lw, float &ph, float &pw)
 {
 	float w, h;
 
@@ -102,67 +102,67 @@ void ToolbarButton::_calc_size(float &lh, float &lw, float &ph, float &pw)
 	// We report no picture if we should not draw it, as long as we have at
 	// least the label to draw
 	if (pw > 0.0 && lw > 0.0 &&
-	  ParentToolbar()->PictureSize() == TOOLBAR_PICTURE_NONE) {
+	  Toolbar()->PictureSize() == W_TOOLBAR_PICTURE_NONE) {
 		pw = 0.0;
 		ph = 0.0;
 	}
 
 	// As for picture
 	if (lw > 0.0 && pw > 0.0 &&
-	  ParentToolbar()->LabelPosition() == TOOLBAR_LABEL_NONE) {
+	  Toolbar()->LabelPosition() == W_TOOLBAR_LABEL_NONE) {
 		lw = 0.0;
 		lh = 0.0;
 	}
 }
 
-void ToolbarButton::_init_object(void)
+void WToolbarButton::_init_object(void)
 {
 	fLabel = NULL;
 	fCanvas = NULL;
-	fStyle = TOOLBAR_STYLE_FLAT;
+	fStyle = W_TOOLBAR_STYLE_FLAT;
 	fSwitchMode = false;
 	fValue = B_CONTROL_OFF;
 }
 
 // Drawing hooks
 
-float ToolbarButton::BorderSize(void)
+float WToolbarButton::BorderSize(void)
 {
-	return (fStyle == TOOLBAR_STYLE_MENU ? 0.0 : 2.0);
+	return (fStyle == W_TOOLBAR_STYLE_MENU ? 0.0 : 2.0);
 }
 
-void ToolbarButton::DrawBackground(BRect updateRect)
+void WToolbarButton::DrawBackground(BRect updateRect)
 {
 	// Draw the menu selection background
-	if (Enabled() && ParentToolbar()->Enabled() && fMouseOver &&
-	  fStyle == TOOLBAR_STYLE_MENU) {
+	if (Enabled() && Toolbar()->Enabled() && fMouseOver &&
+	  fStyle == W_TOOLBAR_STYLE_MENU) {
 		fCanvas->SetLowColor(ui_color(B_MENU_SELECTION_BACKGROUND_COLOR));
 		fCanvas->FillRect(Bounds(), B_SOLID_LOW);
 	}
 	// Draw the background when value is on
-	if (fStyle != TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
+	if (fStyle != W_TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
 		fCanvas->SetHighColor(255, 255, 255, 128);
 		fCanvas->SetDrawingMode(B_OP_ALPHA);
 		fCanvas->FillRect(Bounds(), B_SOLID_HIGH);
 	}
 }
 
-void ToolbarButton::DrawBorder(BRect updateRect)
+void WToolbarButton::DrawBorder(BRect updateRect)
 {
 	bool do_draw = false;
 	bool pushed = false;
 
 	// Let's see if we have to draw the border, and how ------------------------
 
-	if (fStyle == TOOLBAR_STYLE_FLAT) {
+	if (fStyle == W_TOOLBAR_STYLE_FLAT) {
 		// Flat toolbar: draw only if the mouse is over us or value is on
-		if ((fMouseOver && Enabled() && ParentToolbar()->Enabled()) ||
+		if ((fMouseOver && Enabled() && Toolbar()->Enabled()) ||
 		  fValue == B_CONTROL_ON) {
 			do_draw = true;
 			pushed = (fMouseDown || fValue == B_CONTROL_ON);
 		}
 	}
-	else if (fStyle == TOOLBAR_STYLE_MENU) {
+	else if (fStyle == W_TOOLBAR_STYLE_MENU) {
 		// Menu: just don't do it
 	}
 	else {
@@ -174,10 +174,10 @@ void ToolbarButton::DrawBorder(BRect updateRect)
 	// Draw the border ---------------------------------------------------------
 
 	if (do_draw)
-		ToolbarSupport::Draw3DBorder(fCanvas, Bounds(), pushed);
+		WToolbarSupport::Draw3DBorder(fCanvas, Bounds(), pushed);
 }
 
-void ToolbarButton::DrawLabel(BPoint position, BRect updateRect)
+void WToolbarButton::DrawLabel(BPoint position, BRect updateRect)
 {
 	BPoint realPos(position);
 	bool pushed = false;
@@ -189,7 +189,7 @@ void ToolbarButton::DrawLabel(BPoint position, BRect updateRect)
 	realPos.y += fe.ascent + 1.0;
 
 	// If the button is pushed, draw the label one pixel off
-	if (fStyle != TOOLBAR_STYLE_MENU &&
+	if (fStyle != W_TOOLBAR_STYLE_MENU &&
 	  ((fMouseOver && fMouseDown) || fValue == B_CONTROL_ON))
 		pushed = true;
 	if (pushed) {
@@ -199,9 +199,9 @@ void ToolbarButton::DrawLabel(BPoint position, BRect updateRect)
 
 	// Draw the text
 	fCanvas->SetDrawingMode(B_OP_ALPHA);
-	if (Enabled() && ParentToolbar()->Enabled()) {
-		if (fStyle == TOOLBAR_STYLE_MENU && fMouseOver && Enabled() &&
-		  ParentToolbar()->Enabled())
+	if (Enabled() && Toolbar()->Enabled()) {
+		if (fStyle == W_TOOLBAR_STYLE_MENU && fMouseOver && Enabled() &&
+		  Toolbar()->Enabled())
 			fCanvas->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
 		fCanvas->DrawString(fLabel, realPos);
 	}
@@ -214,10 +214,10 @@ void ToolbarButton::DrawLabel(BPoint position, BRect updateRect)
 	}
 }
 
-void ToolbarButton::DrawPicture(BPoint position, BRect updateRect)
+void WToolbarButton::DrawPicture(BPoint position, BRect updateRect)
 {
 	// Draw the menu check mark
-	if (fStyle == TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
+	if (fStyle == W_TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
 		float picSize, width, x;
 		BBitmap *mark;
 
@@ -225,7 +225,7 @@ void ToolbarButton::DrawPicture(BPoint position, BRect updateRect)
 
 		// Real X position
 		width = mark->Bounds().Width() + 1.0;
-		picSize = (float)(ParentToolbar()->PictureSize());
+		picSize = (float)(Toolbar()->PictureSize());
 		x = (width < picSize ?
 			position.x + floor((picSize - width) / 2.0) :
 			position.x);
@@ -239,16 +239,16 @@ void ToolbarButton::DrawPicture(BPoint position, BRect updateRect)
 	}
 }
 
-void ToolbarButton::GetLabelSize(float *width, float *height)
+void WToolbarButton::GetLabelSize(float *width, float *height)
 {
 	// We reserve one more pixels in each direction for disabled effect, and
 	// one pixel for pushed (but only of we're not in menu style)
 	float w = 1.0, h = 1.0;
 	font_height fe;
-	ParentToolbar()->GetFontHeight(&fe);
-	w += ceil(ParentToolbar()->StringWidth(fLabel));
+	Toolbar()->GetFontHeight(&fe);
+	w += ceil(Toolbar()->StringWidth(fLabel));
 	h += ceil(fe.ascent + fe.descent);
-	if (fStyle != TOOLBAR_STYLE_MENU) {
+	if (fStyle != W_TOOLBAR_STYLE_MENU) {
 		w++;
 		h++;
 	}
@@ -256,19 +256,19 @@ void ToolbarButton::GetLabelSize(float *width, float *height)
 	if (height != NULL) *height = h - 1.0;
 }
 
-void ToolbarButton::GetPictureSize(float *width, float *height)
+void WToolbarButton::GetPictureSize(float *width, float *height)
 {
 	float w = 0.0, h = 0.0;
 	// If style is menu, we have to make sure we have room for the check
-	// mark, and follows the same rules of ToolbarBitmapButton to match style
-	if (fStyle == TOOLBAR_STYLE_MENU) {
+	// mark, and follows the same rules of WToolbarBitmapButton to match style
+	if (fStyle == W_TOOLBAR_STYLE_MENU) {
 		BBitmap *mark;
 		float picSize;
 		mark = GetMenuCheckMark();
 		w = mark->Bounds().Width() + 1.0;
 		h = mark->Bounds().Height() + 1.0;
 		delete mark;
-		picSize = ParentToolbar()->PictureSize();
+		picSize = Toolbar()->PictureSize();
 		if (w < picSize)
 			w = picSize;
 		w += 6.0;
@@ -277,51 +277,51 @@ void ToolbarButton::GetPictureSize(float *width, float *height)
 	if (height != NULL) *height = h - 1.0;
 }
 
-float ToolbarButton::Padding(void)
+float WToolbarButton::Padding(void)
 {
 	return 2.0;
 }
 
 // BArchivable hooks
 
-status_t ToolbarButton::Archive(BMessage *archive, bool deep) const
+status_t WToolbarButton::Archive(BMessage *archive, bool deep) const
 {
 	status_t status;
 
-	status = ToolbarControl::Archive(archive, deep);
+	status = WToolbarControl::Archive(archive, deep);
 
 	if (status == B_OK && fLabel != NULL) {
 		if (strlen(fLabel) > 0)
-			status = archive->AddString("ToolbarButton::label", fLabel);
+			status = archive->AddString("WToolbarButton::label", fLabel);
 	}
 
 	if (status == B_OK)
-		status = archive->AddBool("ToolbarButton::switch_mode", fSwitchMode);
+		status = archive->AddBool("WToolbarButton::switch_mode", fSwitchMode);
 
 	if (status == B_OK)
-		status = archive->AddInt32("ToolbarButton::value", (int32)fValue);
+		status = archive->AddInt32("WToolbarButton::value", (int32)fValue);
 
 	return status;
 }
 
-BArchivable * ToolbarButton::Instantiate(BMessage *archive)
+BArchivable * WToolbarButton::Instantiate(BMessage *archive)
 {
-	return (validate_instantiation(archive, "ToolbarButton") ?
-		new ToolbarButton(archive) : NULL);
+	return (validate_instantiation(archive, "WToolbarButton") ?
+		new WToolbarButton(archive) : NULL);
 }
 
-// ToolbarControl hooks
+// WToolbarControl hooks
 
-void ToolbarButton::Draw(BView *canvas, BRect updateRect)
+void WToolbarButton::Draw(BView *canvas, BRect updateRect)
 {
-	if (ParentToolbar() == NULL) return;
+	if (Toolbar() == NULL) return;
 
 	float lh, lw, ph, pw, border, padding;
 	BPoint lp(0.0, 0.0), pp(0.0, 0.0);
 
 	// Prepare infos for protected drawing hooks
 	fCanvas = canvas;
-	fStyle = ParentToolbar()->Style();
+	fStyle = Toolbar()->Style();
 
 	// Border and padding. We do it after setting infos because BorderSize()
 	// and Padding() may need them
@@ -343,10 +343,10 @@ void ToolbarButton::Draw(BView *canvas, BRect updateRect)
 	if (lw == 0.0 && pw == 0.0) return;
 	if (lw > 0.0 && pw > 0.0) {							// Picture and label
 		float tw, th, ax, ay;
-		if (ParentToolbar()->LabelPosition() == TOOLBAR_LABEL_SIDE) {
+		if (Toolbar()->LabelPosition() == W_TOOLBAR_LABEL_SIDE) {
 			tw = pw + padding + lw;
 			th = (lh > ph ? lh : ph);
-			ax = (fStyle == TOOLBAR_STYLE_MENU ? border + padding :
+			ax = (fStyle == W_TOOLBAR_STYLE_MENU ? border + padding :
 				(Bounds().Width() + 1.0 - tw) / 2.0);
 			ay = (Bounds().Height() + 1.0 - th) / 2.0;
 			lp.x = ax + pw + padding;
@@ -359,7 +359,7 @@ void ToolbarButton::Draw(BView *canvas, BRect updateRect)
 		else {
 			tw = (lw > pw ? lw : pw);
 			th = ph + padding + lh;
-			ax = (fStyle == TOOLBAR_STYLE_MENU ? border + padding :
+			ax = (fStyle == W_TOOLBAR_STYLE_MENU ? border + padding :
 				(Bounds().Width() + 1.0 - tw) / 2.0);
 			ay = (Bounds().Height() + 1.0 - th) / 2.0;
 			lp.x = ax;
@@ -371,12 +371,12 @@ void ToolbarButton::Draw(BView *canvas, BRect updateRect)
 		}
 	}
 	if (lw == 0.0 && pw > 0.0) {						// Picture only
-		pp.x = (fStyle == TOOLBAR_STYLE_MENU ? border + padding :
+		pp.x = (fStyle == W_TOOLBAR_STYLE_MENU ? border + padding :
 			(Bounds().Width() + 1.0 - pw) / 2.0);
 		pp.y = (Bounds().Height() + 1.0 - ph) / 2.0;
 	}
 	if (lw > 0.0 && pw == 0.0) {						// Label only
-		lp.x = (fStyle == TOOLBAR_STYLE_MENU ? border + padding :
+		lp.x = (fStyle == W_TOOLBAR_STYLE_MENU ? border + padding :
 			(Bounds().Width() + 1.0 - lw) / 2.0);
 		lp.y = (Bounds().Height() + 1.0 - lh) / 2.0;
 	}
@@ -417,10 +417,10 @@ void ToolbarButton::Draw(BView *canvas, BRect updateRect)
 	canvas->PopState();*/
 }
 
-void ToolbarButton::GetPreferredSize(float *width, float *height)
+void WToolbarButton::GetPreferredSize(float *width, float *height)
 {
 	// We must be attached to a toolbar
-	if (ParentToolbar() == NULL) {
+	if (Toolbar() == NULL) {
 		if (width != NULL) *width = -1.0;
 		if (height != NULL) *height = -1.0;
 		return;
@@ -429,8 +429,8 @@ void ToolbarButton::GetPreferredSize(float *width, float *height)
 	float border, padding, h = 0.0, w = 0.0, lh, lw, ph, pw;
 
 	// Set infos for protected drawing hooks
-	fCanvas = ParentToolbar();
-	fStyle = ParentToolbar()->Style();
+	fCanvas = Toolbar();
+	fStyle = Toolbar()->Style();
 
 	// Sizes
 	border = BorderSize();
@@ -440,17 +440,17 @@ void ToolbarButton::GetPreferredSize(float *width, float *height)
 	// Size for each possible condition	
 
 	if (lw > 0.0 && pw > 0.0) {					// Picture and label
-		switch (ParentToolbar()->LabelPosition()) {
-			case TOOLBAR_LABEL_SIDE:
+		switch (Toolbar()->LabelPosition()) {
+			case W_TOOLBAR_LABEL_SIDE:
 				w = lw + pw + padding;
 				h = (lh > ph ? lh : ph);
 				break;
-			case TOOLBAR_LABEL_BOTTOM:
+			case W_TOOLBAR_LABEL_BOTTOM:
 				w = (lw > pw ? lw : pw);
 				h = lh + ph + padding;
 				break;
 			default:
-				// TOOLBAR_LABEL_NONE can't be, because _calc_size()
+				// W_TOOLBAR_LABEL_NONE can't be, because _calc_size()
 				// sets lw and lh to 0.0 in this case, or there's no picture.
 				break;
 		}
@@ -479,7 +479,7 @@ void ToolbarButton::GetPreferredSize(float *width, float *height)
 	if (height != NULL) *height = h - 1.0;
 }
 
-void ToolbarButton::MouseUp(BPoint point)
+void WToolbarButton::MouseUp(BPoint point)
 {
 	fMouseDown = false;
 	if (fMouseOver && Enabled()) {
@@ -492,7 +492,7 @@ void ToolbarButton::MouseUp(BPoint point)
 
 // Other methods
 
-BBitmap * ToolbarButton::GetMenuCheckMark(void)
+BBitmap * WToolbarButton::GetMenuCheckMark(void)
 {
 	static const unsigned char kCheckMarkBitmapData[] = {
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -513,12 +513,12 @@ BBitmap * ToolbarButton::GetMenuCheckMark(void)
 	return ret;
 }
 
-const char * ToolbarButton::Label(void)
+const char * WToolbarButton::Label(void)
 {
 	return fLabel;
 }
 
-void ToolbarButton::SetLabel(const char *label)
+void WToolbarButton::SetLabel(const char *label)
 {
 	if (fLabel == NULL && label == NULL) return;
 	if (fLabel != NULL && label != NULL)
@@ -535,7 +535,7 @@ void ToolbarButton::SetLabel(const char *label)
 	Invalidate();
 }
 
-void ToolbarButton::SetValue(int32 value)
+void WToolbarButton::SetValue(int32 value)
 {
 	if ((value != B_CONTROL_ON && value != B_CONTROL_OFF) || (fValue == value))
 		return;
@@ -543,19 +543,19 @@ void ToolbarButton::SetValue(int32 value)
 	Invalidate();
 }
 
-void ToolbarButton::SetSwitchMode(bool switchMode)
+void WToolbarButton::SetSwitchMode(bool switchMode)
 {
 	if (fSwitchMode == switchMode) return;
 	fSwitchMode = switchMode;
 	Invalidate();
 }
 
-bool ToolbarButton::SwitchMode(void)
+bool WToolbarButton::SwitchMode(void)
 {
 	return fSwitchMode;
 }
 
-int32 ToolbarButton::Value(void)
+int32 WToolbarButton::Value(void)
 {
 	return fValue;
 }

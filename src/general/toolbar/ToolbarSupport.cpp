@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarSupport.cpp
 //
-// Miscellaneous functions for Toolbar and related classes
+// Miscellaneous functions for WToolbar and related classes
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -16,7 +16,7 @@
 // =============================================================================
 
 /*!
- * \class ToolbarSupport
+ * \class WToolbarSupport
  * \brief Miscellaneous support methods
  */
 
@@ -41,7 +41,7 @@
 #include "ToolbarSupport.h"
 
 // =============================================================================
-// ToolbarSupport
+// WToolbarSupport
 // =============================================================================
 
 inline uint8 __Yc(uint8 red, uint8 green, uint8 blue)
@@ -70,7 +70,7 @@ inline uint8 __Yc(uint8 red, uint8 green, uint8 blue)
  *         color space is supported, returns a new bitmap. It's up to you to
  *         delete the bitmap when you are done with it.
  */
-BBitmap * ToolbarSupport::GrayscaleBitmap(BBitmap *bitmap)
+BBitmap * WToolbarSupport::GrayscaleBitmap(BBitmap *bitmap)
 {
 	if (bitmap == NULL) return NULL;
 	if (!bitmap->IsValid()) return NULL;
@@ -147,7 +147,7 @@ BBitmap * ToolbarSupport::GrayscaleBitmap(BBitmap *bitmap)
  * @param[in] inset Leave \c false if you want a raised border, \c true for an
  *                  inset border
  */
-void ToolbarSupport::Draw3DBorder(BView *view, BRect rect, bool inset)
+void WToolbarSupport::Draw3DBorder(BView *view, BRect rect, bool inset)
 {
 	if (view == NULL || !(rect.IsValid())) return;
 

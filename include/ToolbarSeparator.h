@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarSeparator.h
 //
-// Separator control for AKToolbar
+// Separator control for WToolbar
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -22,14 +22,14 @@
 #include "ToolbarControl.h"
 
 // =============================================================================
-// ToolbarSeparator
+// WToolbarSeparator
 // =============================================================================
 
-class ToolbarSeparator : public ToolbarControl {
+class WToolbarSeparator : public WToolbarControl {
 public:
-							ToolbarSeparator(const char *name = NULL);
-							ToolbarSeparator(BMessage *archive);
-	virtual					~ToolbarSeparator();
+							WToolbarSeparator(const char *name = NULL);
+							WToolbarSeparator(BMessage *archive);
+	virtual					~WToolbarSeparator();
 	// BArchivable hooks
 	virtual	status_t		Archive(BMessage *archive,
 								bool deep = true) const;

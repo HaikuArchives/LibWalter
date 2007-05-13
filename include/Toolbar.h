@@ -2,9 +2,9 @@
 //
 // libwalter Toolbar.h
 //
-// Toolbar, a toolbar widget
+// WToolbar, a toolbar widget
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -25,89 +25,89 @@
 #include <View.h>
 
 // libwalter classes
-class ToolbarControl;
+class WToolbarControl;
 
 // Toolbar pre-defined styles
 enum {
-	TOOLBAR_STYLE_FLAT	= 0,
-	TOOLBAR_STYLE_3D		= 1,
-	TOOLBAR_STYLE_MENU	= 2
+	W_TOOLBAR_STYLE_FLAT	= 0,
+	W_TOOLBAR_STYLE_3D		= 1,
+	W_TOOLBAR_STYLE_MENU	= 2
 };
 
 // Toolbar alignment
 typedef enum {
-	TOOLBAR_HORIZONTAL,
-	TOOLBAR_VERTICAL
-} ToolbarAlignment;
+	W_TOOLBAR_HORIZONTAL,
+	W_TOOLBAR_VERTICAL
+} WToolbarAlignment;
 
 // Label position
 typedef enum {
-	TOOLBAR_LABEL_NONE,
-	TOOLBAR_LABEL_BOTTOM,
-	TOOLBAR_LABEL_SIDE
-} ToolbarLabelPosition;
+	W_TOOLBAR_LABEL_NONE,
+	W_TOOLBAR_LABEL_BOTTOM,
+	W_TOOLBAR_LABEL_SIDE
+} WToolbarLabelPosition;
 
 // Standard picture sizes
 enum {
-	TOOLBAR_PICTURE_NONE		=   0,
-	TOOLBAR_PICTURE_XSMALL	=  16,
-	TOOLBAR_PICTURE_SMALL		=  24,
-	TOOLBAR_PICTURE_MEDIUM	=  32,
-	TOOLBAR_PICTURE_LARGE		=  48,
-	TOOLBAR_PICTURE_XLARGE	=  64,
-	TOOLBAR_PICTURE_XXLARGE	=  96,
-	TOOLBAR_PICTURE_XXXLARGE	= 128,
-	TOOLBAR_PICTURE_HUGE		= 256,
-	TOOLBAR_PICTURE_MAX		= 512
+	W_TOOLBAR_PICTURE_NONE		=   0,
+	W_TOOLBAR_PICTURE_XSMALL	=  16,
+	W_TOOLBAR_PICTURE_SMALL		=  24,
+	W_TOOLBAR_PICTURE_MEDIUM	=  32,
+	W_TOOLBAR_PICTURE_LARGE		=  48,
+	W_TOOLBAR_PICTURE_XLARGE	=  64,
+	W_TOOLBAR_PICTURE_XXLARGE	=  96,
+	W_TOOLBAR_PICTURE_XXXLARGE	= 128,
+	W_TOOLBAR_PICTURE_HUGE		= 256,
+	W_TOOLBAR_PICTURE_MAX		= 512
 };
 
 // Controls limit
-#define TOOLBAR_MAX_CONTROLS		1024
+#define W_TOOLBAR_MAX_CONTROLS		1024
 
 // Toolbar appearance
 typedef struct {
-	ToolbarAlignment		fAlignment;
+	WToolbarAlignment		fAlignment;
 	border_style			fBorder;
 	BBitmap *				fBackBitmap;
-	ToolbarLabelPosition	fLabelPosition;
+	WToolbarLabelPosition	fLabelPosition;
 	float					fMargin;
 	float					fPadding;
 	float					fPicSize;
 	int						fStyle;
-} ToolbarAppearance;
+} WToolbarAppearance;
 
 // =============================================================================
-// Toolbar
+// WToolbar
 // =============================================================================
 
-class Toolbar : public BView {
+class WToolbar : public BView {
 private:
-	typedef vector<ToolbarControl*> ToolbarControls;
+	typedef vector<WToolbarControl*> WToolbarControls;
 			void					_draw_control(unsigned index,
 										BRect updateRect);
 			void					_init_object(void);
 	// Appearance
-			ToolbarAppearance		fAppearance;
+			WToolbarAppearance		fAppearance;
 	// Properties
 			bool					fAutoSize;
 			bool					fEnabled;
 			BMessenger				fTarget;
 	// Internals
-			ToolbarControls		fControls;
+			WToolbarControls		fControls;
 			bool					fDisableUpdate;
 			bool					fDisableStyling;
-			ToolbarControl *		fDownControl;
-			ToolbarControl *		fOverControl;
+			WToolbarControl *		fDownControl;
+			WToolbarControl *		fOverControl;
 protected:
 			void					AssertLocked(void);
 	virtual	float					BorderSize(void);
 	virtual	void					DrawBackground(BRect updateRect);
 	virtual	void					DrawBorder(BRect updateRect);
 public:
-									Toolbar(BRect frame, const char *name,
-										int style = TOOLBAR_STYLE_FLAT,
-										ToolbarAlignment alignment =
-										TOOLBAR_HORIZONTAL,
+									WToolbar(BRect frame, const char *name,
+										int style = W_TOOLBAR_STYLE_FLAT,
+										WToolbarAlignment alignment =
+										W_TOOLBAR_HORIZONTAL,
 										bool auto_size = true,
 										border_style border =
 										B_FANCY_BORDER,
@@ -116,8 +116,8 @@ public:
 										uint32 flags = B_FRAME_EVENTS |
 										B_FULL_UPDATE_ON_RESIZE |
 										B_WILL_DRAW);
-									Toolbar(BMessage *archive);
-	virtual							~Toolbar();
+									WToolbar(BMessage *archive);
+	virtual							~WToolbar();
 	// BArchivable hooks
 	virtual	status_t				Archive(BMessage *archive,
 										bool deep = true) const;
@@ -139,38 +139,38 @@ public:
 										const BMessage *message);
 	virtual	void					MouseUp(BPoint point);
 	// Controls management
-			bool					AddControl(ToolbarControl *control,
+			bool					AddControl(WToolbarControl *control,
 										int line = -1, int position = -1);
-			ToolbarControl *		ControlAt(BPoint point);
-			ToolbarControl *		ControlAt(int index);
-			ToolbarControl *		ControlAt(int line, int position,
+			WToolbarControl *		ControlAt(BPoint point);
+			WToolbarControl *		ControlAt(int index);
+			WToolbarControl *		ControlAt(int line, int position,
 										bool exact = false);
 			int						ControlsInLine(int line);
 			int						CountControls(void);
 			int						CountLines(void);
-			bool					DrawControl(ToolbarControl *control);
-			ToolbarControl *		FindControl(const char *name);
-			int						IndexOf(ToolbarControl *control);
+			bool					DrawControl(WToolbarControl *control);
+			WToolbarControl *		FindControl(const char *name);
+			int						IndexOf(WToolbarControl *control);
 			bool					RemoveControl(
-										ToolbarControl *control);
+										WToolbarControl *control);
 	// Properties
 			bool					AutoSize(void);
 			bool					Enabled(void);
 			void					SetAutoSize(bool auto_size);
 			void					SetEnabled(bool enabled);
 	// Appearance
-			ToolbarAlignment		Alignment(void);
+			WToolbarAlignment		Alignment(void);
 			BBitmap *				BackgroundBitmap(void);
 			border_style			Border(void);
-			ToolbarLabelPosition	LabelPosition(void);
+			WToolbarLabelPosition	LabelPosition(void);
 			float					Margin(void);
 			float					Padding(void);
 			float					PictureSize(void);
 			void					SetAlignment(
-										ToolbarAlignment alignment);
+										WToolbarAlignment alignment);
 			void					SetBackgroundBitmap(BBitmap *bitmap);
 			void					SetBorder(border_style border);
-			void					SetLabelPosition(ToolbarLabelPosition
+			void					SetLabelPosition(WToolbarLabelPosition
 										label_position);
 			void					SetMargin(float margin);
 			void					SetPadding(float padding);

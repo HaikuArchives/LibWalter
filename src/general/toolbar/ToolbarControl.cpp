@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarControl.cpp
 //
-// Base class for Toolbar controls
+// Base class for WToolbar controls
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -16,14 +16,14 @@
 // =============================================================================
 
 /*!
- * \class ToolbarControl
+ * \class WToolbarControl
  * \brief Base class for toolbar controls
  *
- * ToolbarControl provides all the basic facilities to create an archivable
+ * WToolbarControl provides all the basic facilities to create an archivable
  * and invokable toolbar control.
  *
  * \par How to create your own control
- * Creating your own control by overloading ToolbarControl is not very
+ * Creating your own control by overloading WToolbarControl is not very
  * different than overloading BControl. The most obvious methods you have to
  * overload are Draw() and GetPreferredSize(). If your control needs to send a
  * message after user' action, you may also want to overload MouseUp().
@@ -34,12 +34,12 @@
 #include "ToolbarControl.h"
 
 // =============================================================================
-// ToolbarControl
+// WToolbarControl
 // =============================================================================
 
 // Constructors and destructors
 
-ToolbarControl::ToolbarControl(const char *name, BMessage *message) :
+WToolbarControl::WToolbarControl(const char *name, BMessage *message) :
 	BHandler(name),
 	BInvoker(message, NULL)
 {
@@ -47,7 +47,7 @@ ToolbarControl::ToolbarControl(const char *name, BMessage *message) :
 	SetName(name);
 }
 
-ToolbarControl::ToolbarControl(BMessage *archive) :
+WToolbarControl::WToolbarControl(BMessage *archive) :
 	BHandler(archive)
 {
 	bool enabled, visible;
@@ -56,20 +56,20 @@ ToolbarControl::ToolbarControl(BMessage *archive) :
 
 	_init_object();
 
-	if (archive->FindMessage("ToolbarControl::message", &message) == B_OK)
+	if (archive->FindMessage("WToolbarControl::message", &message) == B_OK)
 		SetMessage(new BMessage(message));
 
-	if (archive->FindBool("ToolbarControl::enabled", &enabled) == B_OK)
+	if (archive->FindBool("WToolbarControl::enabled", &enabled) == B_OK)
 		SetEnabled(enabled);
 
-	if (archive->FindInt32("ToolbarControl::line", (int32*)(&line)) == B_OK)
+	if (archive->FindInt32("WToolbarControl::line", (int32*)(&line)) == B_OK)
 		fLine = line;
 
-	if (archive->FindBool("ToolbarControl::visible", &visible) == B_OK)
+	if (archive->FindBool("WToolbarControl::visible", &visible) == B_OK)
 		SetVisible(visible);
 }
 
-ToolbarControl::~ToolbarControl()
+WToolbarControl::~WToolbarControl()
 {
 	if (fToolbar != NULL)
 		fToolbar->RemoveControl(this);
@@ -77,7 +77,7 @@ ToolbarControl::~ToolbarControl()
 
 // Private
 
-void ToolbarControl::_init_object(void)
+void WToolbarControl::_init_object(void)
 {
 	fEnabled = true;
 	fFrame = BRect(0.0, 0.0, -1.0, -1.0);
@@ -92,7 +92,7 @@ void ToolbarControl::_init_object(void)
 
 // BArchivable hooks
 
-status_t ToolbarControl::Archive(BMessage *archive, bool deep) const
+status_t WToolbarControl::Archive(BMessage *archive, bool deep) const
 {
 	status_t status;
 
@@ -102,65 +102,65 @@ status_t ToolbarControl::Archive(BMessage *archive, bool deep) const
 	// Properties
 
 	if (status == B_OK && Message() != NULL)
-		status = archive->AddMessage("ToolbarControl::message", Message());
+		status = archive->AddMessage("WToolbarControl::message", Message());
 
 	if (status == B_OK)
-		status = archive->AddBool("ToolbarControl::enabled", fEnabled);
+		status = archive->AddBool("WToolbarControl::enabled", fEnabled);
 
 	if (status == B_OK)
-		status = archive->AddInt32("ToolbarControl::line", (int32)fLine);
+		status = archive->AddInt32("WToolbarControl::line", (int32)fLine);
 
 	if (status == B_OK)
-		status = archive->AddBool("ToolbarControl::visible", fVisible);
+		status = archive->AddBool("WToolbarControl::visible", fVisible);
 
 	return status;
 }
 
-BArchivable * ToolbarControl::Instantiate(BMessage *archive)
+BArchivable * WToolbarControl::Instantiate(BMessage *archive)
 {
-	return (validate_instantiation(archive, "ToolbarControl") ?
-		new ToolbarControl(archive) : NULL);
+	return (validate_instantiation(archive, "WToolbarControl") ?
+		new WToolbarControl(archive) : NULL);
 }
 
 // Public
 
-void ToolbarControl::AttachedToToolbar(void)
+void WToolbarControl::AttachedToToolbar(void)
 {
 	if (!(Messenger().IsValid()))
 		SetTarget(fToolbar->Messenger());
 }
 
-BRect ToolbarControl::Bounds(void)
+BRect WToolbarControl::Bounds(void)
 {
 	return fFrame.OffsetToCopy(0.0, 0.0);
 }
 
-void ToolbarControl::DetachedFromToolbar(void)
+void WToolbarControl::DetachedFromToolbar(void)
 {
 }
 
-void ToolbarControl::Draw(BView *canvas, BRect update_rect)
+void WToolbarControl::Draw(BView *canvas, BRect update_rect)
 {
 	// The basic class doesn't draw anything
 }
 
-bool ToolbarControl::Enabled(void)
+bool WToolbarControl::Enabled(void)
 {
 	return fEnabled;
 }
 
-BRect ToolbarControl::Frame(void)
+BRect WToolbarControl::Frame(void)
 {
 	return fFrame;
 }
 
-void ToolbarControl::GetPreferredSize(float *width, float *height)
+void WToolbarControl::GetPreferredSize(float *width, float *height)
 {
 	if (width != NULL) *width = -1.0;
 	if (height != NULL) *height = -1.0;
 }
 
-void ToolbarControl::Invalidate(void)
+void WToolbarControl::Invalidate(void)
 {
 	if (fToolbar == NULL) return;
 	// If size has changed, we've to tell the toolbar to recalculate the
@@ -176,19 +176,19 @@ void ToolbarControl::Invalidate(void)
 		fToolbar->DrawControl(this);
 }
 
-int ToolbarControl::Line(void)
+int WToolbarControl::Line(void)
 {
 	return (fToolbar == NULL ? -1 : fLine);
 }
 
-void ToolbarControl::MouseDown(BPoint point)
+void WToolbarControl::MouseDown(BPoint point)
 {
 	if (fEnabled && fMouseOver)
 		fMouseDown = true;
 	Invalidate();
 }
 
-void ToolbarControl::MouseMoved(BPoint point, uint32 transit,
+void WToolbarControl::MouseMoved(BPoint point, uint32 transit,
 	const BMessage *message)
 {
 	bool old_mouse_over = fMouseOver;
@@ -197,13 +197,13 @@ void ToolbarControl::MouseMoved(BPoint point, uint32 transit,
 		Invalidate();
 }
 
-void ToolbarControl::MouseUp(BPoint point)
+void WToolbarControl::MouseUp(BPoint point)
 {
 	fMouseDown = false;
 	Invalidate();
 }
 
-int ToolbarControl::Position(void)
+int WToolbarControl::Position(void)
 {
 	if (fToolbar == NULL) return -1;
 	int first, pos = 0;
@@ -214,7 +214,7 @@ int ToolbarControl::Position(void)
 	return pos;
 }
 
-void ToolbarControl::SetEnabled(bool enabled)
+void WToolbarControl::SetEnabled(bool enabled)
 {
 	if (fEnabled == enabled) return;
 	fEnabled = enabled;
@@ -223,7 +223,7 @@ void ToolbarControl::SetEnabled(bool enabled)
 	Invalidate();
 }
 
-void ToolbarControl::SetVisible(bool visible)
+void WToolbarControl::SetVisible(bool visible)
 {
 	if (fVisible == visible) return;
 	fVisible = visible;
@@ -235,12 +235,12 @@ void ToolbarControl::SetVisible(bool visible)
 		fToolbar->Update();
 }
 
-Toolbar * ToolbarControl::ParentToolbar(void)
+WToolbar * WToolbarControl::Toolbar(void)
 {
 	return fToolbar;
 }
 
-bool ToolbarControl::Visible(void)
+bool WToolbarControl::Visible(void)
 {
 	return fVisible;
 }

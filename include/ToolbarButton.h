@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarButton.h
 //
-// Simple button control for Toolbar
+// Simple button control for WToolbar
 //
-// Revision: 20070501
+// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -28,10 +28,10 @@
 class BBitmap;
 
 // =============================================================================
-// ToolbarButton
+// WToolbarButton
 // =============================================================================
 
-class ToolbarButton : public ToolbarControl {
+class WToolbarButton : public WToolbarControl {
 private:
 			void				_calc_size(float &lh, float &lw, float &ph,
 									float &pw);
@@ -53,12 +53,12 @@ protected:
 	virtual	void				GetPictureSize(float *width, float *height);
 	virtual	float				Padding(void);
 public:
-								ToolbarButton(const char *name,
+								WToolbarButton(const char *name,
 									const char *label,
 									BMessage *message = NULL,
 									bool switchMode = false);
-								ToolbarButton(BMessage *archive);
-	virtual						~ToolbarButton();
+								WToolbarButton(BMessage *archive);
+	virtual						~WToolbarButton();
 	// BArchivable hooks
 	virtual	status_t			Archive(BMessage *archive,
 									bool deep = true) const;

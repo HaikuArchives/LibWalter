@@ -14,7 +14,7 @@
 
 class MyWindow : public BWindow { // --------------------------------------------------------------
 private:
-	Toolbar *fToolbar;
+	WToolbar *fToolbar;
 public:
 
 MyWindow(void) :
@@ -22,14 +22,14 @@ MyWindow(void) :
 {
 	BView *back = new BView(Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
 	AddChild(back);
-	fToolbar = new Toolbar(BRect(0, 0, 10, 10), "toolbar");
-	fToolbar->SetPictureSize(TOOLBAR_PICTURE_MEDIUM);
+	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar");
+	fToolbar->SetPictureSize(W_TOOLBAR_PICTURE_MEDIUM);
 	back->AddChild(fToolbar);
-	fToolbar->AddControl(new ToolbarButton("button_0", "Hello!"));
-	fToolbar->AddControl(new ToolbarSeparator("separator_2"));
+	fToolbar->AddControl(new WToolbarButton("button_0", "Hello!"));
+	fToolbar->AddControl(new WToolbarSeparator("separator_2"));
 	LoadTrackerIcons();
-	fToolbar->AddControl(new ToolbarSeparator("separator_1"));
-	fToolbar->AddControl(new ToolbarButton("button_1", "Bye!"));
+	fToolbar->AddControl(new WToolbarSeparator("separator_1"));
+	fToolbar->AddControl(new WToolbarButton("button_1", "Bye!"));
 	ResizeTo(fToolbar->Frame().Width(), fToolbar->Frame().Height());
 }
 
@@ -37,7 +37,7 @@ void LoadTrackerIcons(void)
 {
 	const void *data_small, *data_large;
 	size_t size_large, size_small;
-	ToolbarBitmapButton *button;
+	WToolbarBitmapButton *button;
 	BBitmap *small, *large;
 	int32 index, id;
 	BResources res;
@@ -70,7 +70,7 @@ void LoadTrackerIcons(void)
 					large->SetBits(data_large, size_large, 0, B_CMAP8);
 
 					sprintf(name, "bitmap_%d", index);
-					button = new ToolbarBitmapButton(name, name);
+					button = new WToolbarBitmapButton(name, name);
 					button->AddBitmapSet(small);
 					button->AddBitmapSet(large);
 					fToolbar->AddControl(button, index / 10);
@@ -95,7 +95,7 @@ private:
 	MyWindow *fWindow;
 public:
 
-MyApp(void) : BApplication("application/libwalter-toolbar-test")
+MyApp(void) : BApplication("application/toolbar-test")
 {
 	fWindow = new MyWindow();
 }
