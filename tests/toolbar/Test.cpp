@@ -25,11 +25,11 @@ MyWindow(void) :
 	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar");
 	fToolbar->SetPictureSize(W_TOOLBAR_PICTURE_MEDIUM);
 	back->AddChild(fToolbar);
-	fToolbar->AddControl(new WToolbarButton("button_0", "Hello!"));
-	fToolbar->AddControl(new WToolbarSeparator("separator_2"));
+	fToolbar->AddItem(new WToolbarButton("button_0", "Hello!"));
+	fToolbar->AddItem(new WToolbarSeparator("separator_2"));
 	LoadTrackerIcons();
-	fToolbar->AddControl(new WToolbarSeparator("separator_1"));
-	fToolbar->AddControl(new WToolbarButton("button_1", "Bye!"));
+	fToolbar->AddItem(new WToolbarSeparator("separator_1"));
+	fToolbar->AddItem(new WToolbarButton("button_1", "Bye!"));
 	ResizeTo(fToolbar->Frame().Width(), fToolbar->Frame().Height());
 }
 
@@ -73,7 +73,7 @@ void LoadTrackerIcons(void)
 					button = new WToolbarBitmapButton(name, name);
 					button->AddBitmapSet(small);
 					button->AddBitmapSet(large);
-					fToolbar->AddControl(button, index / 10);
+					fToolbar->AddItem(button, index / 10);
 				}
 			}
 		}

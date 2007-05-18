@@ -4,7 +4,7 @@
 //
 // WToolbar, a toolbar widget
 //
-// Revision: 20070513
+// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -72,10 +72,10 @@ WToolbar::WToolbar(BMessage *archive) :
 	WToolbarLabelPosition labelPosition;
 	float margin, padding, picSize;
 	WToolbarAlignment alignment;
-	WToolbarControl *control;
 	BArchivable *archivable;
 	bool autoSize, enabled;
 	border_style border;
+	WToolbarItem *item;
 	BMessage message;
 	BBitmap *backPic;
 	int32 index;
@@ -134,17 +134,17 @@ WToolbar::WToolbar(BMessage *archive) :
 	if (archive->FindFloat("WToolbar::picture_size", &picSize) == B_OK)
 		SetPictureSize(picSize);
 
-	// Controls
+	// Items
 
 	index = 0;
-	while (archive->FindMessage("WToolbar::control", index,
+	while (archive->FindMessage("WToolbar::item", index,
 	  &message) == B_OK) {
 		archivable = instantiate_object(&message);
 		if (archivable != NULL) {
-			control = dynamic_cast<WToolbarControl*>(archivable);
-			if (control != NULL) {
-				if (!AddControl(control, control->fLine))
-					delete control;
+			item = dynamic_cast<WToolbarItem*>(archivable);
+			if (item != NULL) {
+				if (!AddItem(item, item->fLine))
+					delete item;
 			}
 			else
 				delete archivable;
@@ -161,12 +161,12 @@ WToolbar::~WToolbar()
 {
 	fDisableUpdate = true;
 
-	// Delete all the controls
-	WToolbarControl *control;
-	while (fControls.size() > 0) {
-		control = fControls[0];
-		RemoveControl(control);
-		delete control;
+	// Delete all the items
+	WToolbarItem *item;
+	while (fItems.size() > 0) {
+		item = fItems[0];
+		RemoveItem(item);
+		delete item;
 	}
 
 	// Other cleanups
@@ -176,15 +176,15 @@ WToolbar::~WToolbar()
 
 // Private
 
-void WToolbar::_draw_control(unsigned index, BRect updateRect)
+void WToolbar::_draw_item(unsigned index, BRect updateRect)
 {
 	// Beware, this function does not perform any sanity checking!!!
 	// TODO set the clipping region and update rect
 	BPoint origin;
 	origin = Origin();
-	SetOrigin(fControls[index]->Frame().LeftTop());
+	SetOrigin(fItems[index]->Frame().LeftTop());
 	PushState();
-	fControls[index]->Draw(this, fControls[index]->Bounds());
+	fItems[index]->Draw(this, fItems[index]->Bounds());
 	PopState();
 	SetOrigin(origin);
 	Sync();
@@ -195,8 +195,8 @@ void WToolbar::_init_object(void)
 	// Internals
 	fDisableUpdate = true;
 	fDisableStyling = false;
-	fDownControl = NULL;
-	fOverControl = NULL;
+	fMouseDownItem = NULL;
+	fMouseOverItem = NULL;
 
 	// Properties
 	fAutoSize = false;
@@ -310,18 +310,17 @@ status_t WToolbar::Archive(BMessage *archive, bool deep) const
 		status = archive->AddFloat("WToolbar::picture_size",
 			fAppearance.fPicSize);
 
-	// Archive controls
+	// Archive items
 
 	if (deep) {
-		const unsigned kControls = fControls.size();
+		const unsigned kItems = fItems.size();
 		unsigned i;
-		for (i = 0; i < kControls; i++) {
+		for (i = 0; i < kItems; i++) {
 			if (status == B_OK) {
-				BMessage control;
-				status = fControls[i]->Archive(&control, true);
+				BMessage item;
+				status = fItems[i]->Archive(&item, true);
 				if (status == B_OK)
-					status = archive->AddMessage("WToolbar::control",
-						&control);
+					status = archive->AddMessage("WToolbar::item", &item);
 			}
 		}
 	}
@@ -402,15 +401,14 @@ void WToolbar::MessageReceived(BMessage *message)
 void WToolbar::AttachedToWindow(void)
 {
 	if (!fTarget.IsValid()) {
-		const unsigned kControls = fControls.size();
+		const unsigned kItems = fItems.size();
 		WToolbarControl *control;
 		unsigned i;
 		SetTarget(Window());
-		for (i = 0; i < kControls; i++) {
-			control = fControls[i];
-			if (!(control->Messenger().IsValid())) {
+		for (i = 0; i < kItems; i++) {
+			control = dynamic_cast<WToolbarControl*>(fItems[i]);
+			if (control != NULL && !(control->Messenger().IsValid()))
 				control->SetTarget(fTarget);
-			}
 		}
 	}
 }
@@ -440,51 +438,51 @@ void WToolbar::Draw(BRect updateRect)
 			break;
 	}		
 
-	for (unsigned i = 0; i < fControls.size(); i++) {
-		if (fControls[i]->fFrame.Intersects(updateRect) &&
-		  fControls[i]->fVisible)
-			_draw_control(i, updateRect);
+	for (unsigned i = 0; i < fItems.size(); i++) {
+		if (fItems[i]->fFrame.Intersects(updateRect) &&
+		  fItems[i]->fVisible)
+			_draw_item(i, updateRect);
 	}
 }
 
 void WToolbar::GetPreferredSize(float *width, float *height)
 {
-	unsigned i, visible_controls, visible_lines;
+	unsigned i, visible_items, visible_lines;
 	float w = 0.0, h = 0.0, max;
-	WToolbarControl *control;
+	WToolbarItem *item;
 	int line;
 
-	// Count visible controls
-	visible_controls = 0;
-	if (fControls.size() > 0) {
-		for (i = 0; i < fControls.size(); i++) {
-			if (fControls[i]->fVisible)
-				visible_controls++;
+	// Count visible items
+	visible_items = 0;
+	if (fItems.size() > 0) {
+		for (i = 0; i < fItems.size(); i++) {
+			if (fItems[i]->fVisible)
+				visible_items++;
 		}
 	}
 
 	// Calculate width and height
-	if (visible_controls > 0) {
+	if (visible_items > 0) {
 		line = 0;
 		visible_lines = 1;
 		max = 0.0;
 		if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
 			// Height is the height of the tallest line, line height is the sum
-			// of the heights of its visible controls
-			// Width is the width of any of the control times the visible lines
-			for (i = 0; i < fControls.size(); i++) {
-				control = fControls[i];
-				if (control->fVisible) {
-					if (control->fLine != line) {
+			// of the heights of its visible items
+			// Width is the width of any of the item times the visible lines
+			for (i = 0; i < fItems.size(); i++) {
+				item = fItems[i];
+				if (item->fVisible) {
+					if (item->fLine != line) {
 						visible_lines++;
-						line = control->fLine;
+						line = item->fLine;
 						if (h > max)
 							max = h;
 						h = 0.0;
 					}
-					h += control->fFrame.Height() + 1.0 + fAppearance.fMargin;
+					h += item->fFrame.Height() + 1.0 + fAppearance.fMargin;
 					if (w == 0.0)
-						w = fControls[i]->fFrame.Width() + 1.0;
+						w = fItems[i]->fFrame.Width() + 1.0;
 				}
 			}
 			h = (h > max ? h : max) + fAppearance.fMargin;
@@ -493,22 +491,22 @@ void WToolbar::GetPreferredSize(float *width, float *height)
 		}
 		else {
 			// Width is the width of the widest line, line width is the sum
-			// of the widths of its visible controls
-			// Height is the height of any of the control times the visible
+			// of the widths of its visible items
+			// Height is the height of any of the item times the visible
 			// lines
-			for (i = 0; i < fControls.size(); i++) {
-				control = fControls[i];
-				if (control->fVisible) {
-					if (control->fLine != line) {
+			for (i = 0; i < fItems.size(); i++) {
+				item = fItems[i];
+				if (item->fVisible) {
+					if (item->fLine != line) {
 						visible_lines++;
-						line = control->fLine;
+						line = item->fLine;
 						if (w > max)
 							max = w;
 						w = 0.0;
 					}
-					w += control->fFrame.Width() + 1.0 + fAppearance.fMargin;
+					w += item->fFrame.Width() + 1.0 + fAppearance.fMargin;
 					if (h == 0.0)
-						h = fControls[i]->fFrame.Height() + 1.0;
+						h = fItems[i]->fFrame.Height() + 1.0;
 				}
 			}
 			w = (w > max ? w : max) + fAppearance.fMargin;
@@ -557,10 +555,10 @@ void WToolbar::MouseDown(BPoint point)
 	// Left button
 	if (button == B_PRIMARY_MOUSE_BUTTON) {
 
-		// If the mouse is over a control, tell the control about this
-		if (fOverControl != NULL && fEnabled) {
-			fOverControl->MouseDown(point - fOverControl->fFrame.LeftTop());
-			fDownControl = fOverControl;
+		// If the mouse is over a item, tell the item about this
+		if (fMouseOverItem != NULL && fEnabled) {
+			fMouseOverItem->MouseDown(point - fMouseOverItem->fFrame.LeftTop());
+			fMouseDownItem = fMouseOverItem;
 		}
 	}
 }
@@ -570,7 +568,7 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 {
 	if (Looper() == NULL) return;
 
-	if (fDownControl == NULL) {
+	if (fMouseDownItem == NULL) {
 
 		int32 buttons = 0;
 		BMessage *msg;
@@ -582,58 +580,58 @@ void WToolbar::MouseMoved(BPoint point, uint32 transit,
 
 		if (buttons == 0) {
 			if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-				WToolbarControl *old_over = fOverControl;
-				fOverControl = ControlAt(point);
-				if (fOverControl != old_over) {
-					// Remove mouse over from previous control
+				WToolbarItem *old_over = fMouseOverItem;
+				fMouseOverItem = ItemAt(point);
+				if (fMouseOverItem != old_over) {
+					// Remove mouse over from previous item
 					if (old_over != NULL)
 						old_over->MouseMoved(point - old_over->fFrame.LeftTop(),
 							B_EXITED_VIEW, message);
-					// Assign mouse over to new control
-					if (fOverControl != NULL)
-						fOverControl->MouseMoved(
-							point - fOverControl->fFrame.LeftTop(),
+					// Assign mouse over to new item
+					if (fMouseOverItem != NULL)
+						fMouseOverItem->MouseMoved(
+							point - fMouseOverItem->fFrame.LeftTop(),
 							B_ENTERED_VIEW, message);
 				}
 				else {
-					// Tell the control that the mouse has moved
-					if (fOverControl != NULL)
-						fOverControl->MouseMoved(
-							point - fOverControl->fFrame.LeftTop(),
+					// Tell the item that the mouse has moved
+					if (fMouseOverItem != NULL)
+						fMouseOverItem->MouseMoved(
+							point - fMouseOverItem->fFrame.LeftTop(),
 							B_INSIDE_VIEW, message);
 				}
 			}
 			else {
 				// B_EXITED_VIEW or B_OUTSIDE_VIEW, remove focus
-				if (fOverControl != NULL) {
-					fOverControl->MouseMoved(
-						point - fOverControl->fFrame.LeftTop(),
+				if (fMouseOverItem != NULL) {
+					fMouseOverItem->MouseMoved(
+						point - fMouseOverItem->fFrame.LeftTop(),
 						B_EXITED_VIEW, message);
-					fOverControl = NULL;
+					fMouseOverItem = NULL;
 				}
 			}
 		}
 	}
 
 	// If the mouse is down, we need to remove the mouse over from the currently
-	// pressed control, but not assign it to a new one.
+	// pressed item, but not assign it to a new one.
 	else {
 		if (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW) {
-			WToolbarControl *new_over = ControlAt(point);
-			if (new_over != fDownControl) {
-				// Remove mouse over from pressed control
-				fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
-					B_EXITED_VIEW, message);
+			WToolbarItem *new_over = ItemAt(point);
+			if (new_over != fMouseDownItem) {
+				// Remove mouse over from pressed item
+				fMouseDownItem->MouseMoved(point -
+					fMouseDownItem->fFrame.LeftTop(), B_EXITED_VIEW, message);
 			}
 			else {
-				// Tell the control that the mouse has moved
-				fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
-					B_INSIDE_VIEW, message);
+				// Tell the item that the mouse has moved
+				fMouseDownItem->MouseMoved(point -
+					fMouseDownItem->fFrame.LeftTop(), B_INSIDE_VIEW, message);
 			}
 		}
 		else {
 			// B_EXITED_VIEW or B_OUTSIDE_VIEW, remove focus
-			fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
+			fMouseDownItem->MouseMoved(point - fMouseDownItem->fFrame.LeftTop(),
 				B_EXITED_VIEW, message);
 		}
 	}
@@ -643,109 +641,171 @@ void WToolbar::MouseUp(BPoint point)
 {
 	if (Looper() == NULL) return;
 
-	WToolbarControl *new_over;
+	WToolbarItem *new_over;
 	BMessage *msg;
 
 	msg = Looper()->CurrentMessage();
 
-	// If a control is pressed, tell it what is happening
-	if (fDownControl != NULL) {
-		fDownControl->MouseUp(point - fDownControl->fFrame.LeftTop());
-		fDownControl = NULL;
+	// If an item is pressed, tell it what is happening
+	if (fMouseDownItem != NULL) {
+		fMouseDownItem->MouseUp(point - fMouseDownItem->fFrame.LeftTop());
+		fMouseDownItem = NULL;
 	}
 
-	// Check which control the mouse is over
-	new_over = ControlAt(point);
-	if (new_over != fOverControl) {
-		if (fOverControl != NULL)
-			fOverControl->MouseMoved(point - fOverControl->fFrame.LeftTop(),
+	// Check which item the mouse is over
+	new_over = ItemAt(point);
+	if (new_over != fMouseOverItem) {
+		if (fMouseOverItem != NULL)
+			fMouseOverItem->MouseMoved(point - fMouseOverItem->fFrame.LeftTop(),
 				B_EXITED_VIEW, msg);
 		if (new_over != NULL)
 			new_over->MouseMoved(point - new_over->fFrame.LeftTop(),
 				B_ENTERED_VIEW, msg);
-		fOverControl = new_over;
+		fMouseOverItem = new_over;
 	}
 	else {
-		if (fOverControl != NULL)
-			fOverControl->MouseMoved(point - fOverControl->fFrame.LeftTop(),
+		if (fMouseOverItem != NULL)
+			fMouseOverItem->MouseMoved(point - fMouseOverItem->fFrame.LeftTop(),
 				B_INSIDE_VIEW, msg);
 	}
 }
 
-// Controls management
+// Items management
 
-bool WToolbar::AddControl(WToolbarControl *control, int line, int position)
+bool WToolbar::AddItem(WToolbarItem *item, int line, int position)
 {
-	// Controls are stored by line, then by position.
+	// Items are stored by line, then by position.
 
 	AssertLocked();
-	if (control->Toolbar() != NULL)
-		return (control->Toolbar() == this);
-	if (fControls.size() >= W_TOOLBAR_MAX_CONTROLS)
+	if (item->Toolbar() != NULL)
+		return (item->Toolbar() == this);
+	if (fItems.size() >= W_TOOLBAR_MAX_ITEMS)
 		return false;
 
 	bool disable_update = fDisableUpdate;
 	fDisableUpdate = true;
 
 	if (line >= 0 && line <= CountLines()) {
-		// Insert the control at the given line and, if possible, position
-		WToolbarControls::iterator i;
+		// Insert the item at the given line and, if possible, position
+		WToolbarItems::iterator i;
 		unsigned _first = 0, _pos = 0;
-		// Find the first control of the line
-		while (_first < fControls.size()) {
-			if (fControls[_first]->fLine == line) break;
+		// Find the first item of the line
+		while (_first < fItems.size()) {
+			if (fItems[_first]->fLine == line) break;
 			_first++;
 		}
-		// Find the control at position, if any
-		while (_first + _pos < fControls.size()) {
+		// Find the item at position, if any
+		while (_first + _pos < fItems.size()) {
 			if ((int)_pos == position) break;
-			if (fControls[_first + _pos]->fLine == line + 1) break;
+			if (fItems[_first + _pos]->fLine == line + 1) break;
 			_pos++;
 		}
-		// Insert the control
-		control->fLine = line;
-		i = fControls.begin() + _first + _pos;
-		fControls.insert(i, control);
+		// Insert the item
+		item->fLine = line;
+		i = fItems.begin() + _first + _pos;
+		fItems.insert(i, item);
 	}
 	else {
-		// Insert the control at the end of the last line
-		control->fLine = (CountLines() > 0 ? CountLines() - 1 : 0);
-		fControls.push_back(control);
+		// Insert the item at the end of the last line
+		item->fLine = (CountLines() > 0 ? CountLines() - 1 : 0);
+		fItems.push_back(item);
 	}
 
-	control->fToolbar = this;
-	control->AttachedToToolbar();
+	item->fToolbar = this;
+	item->AttachedToToolbar();
 
 	fDisableUpdate = disable_update;
 	Update();
 	return true;
 }
 
-WToolbarControl * WToolbar::ControlAt(BPoint point)
+int WToolbar::CountItems(void)
 {
-	if (fControls.size() == 0) return NULL;
+	return (int)(fItems.size());
+}
+
+int WToolbar::CountItemsInLine(int line)
+{
+	if (line < 0) return 0;
+	int count = 0;
+	for (unsigned i = 0; i < fItems.size(); i++) {
+		if (fItems[i]->fLine == line) count++;
+	}
+	return count;
+}
+
+int WToolbar::CountLines(void)
+{
+	int lines = -1;
+	for (unsigned i = 0; i < fItems.size(); i++) {
+		if (fItems[i]->fLine > lines)
+			lines = fItems[i]->fLine;
+	}
+	return lines + 1;
+}
+
+bool WToolbar::DrawItem(WToolbarItem *item)
+{
+	AssertLocked();
+	if (item == NULL) return false;
+	int index = IndexOf(item);
+	if (index == -1) return false;
+	if (Window() == NULL) return true;
+	Invalidate(item->Frame());
+	return true;
+}
+
+WToolbarItem * WToolbar::FindItem(const char *name)
+{
 	unsigned i = 0;
-	while (i < fControls.size()) {
-		if (fControls[i]->fVisible && fControls[i]->fFrame.Contains(point))
-			return fControls[i];
+	while (i < fItems.size()) {
+		if (name == NULL) {
+			if (fItems[i]->Name() == NULL) return fItems[i];
+		}
+		else
+			if (strcmp(name, fItems[i]->Name()) == 0) return fItems[i];
 		i++;
 	}
 	return NULL;
 }
 
-WToolbarControl * WToolbar::ControlAt(int index)
+int WToolbar::IndexOf(WToolbarItem *item)
 {
-	return (index >= 0 && index < (int)(fControls.size()) ?
-		fControls[(unsigned)index] : NULL);
+	if (item == NULL) return -1;
+	if (item->Toolbar() != this) return -1;
+	unsigned i = 0;
+	while (i < fItems.size()) {
+		if (fItems[i] == item) return (int)i;
+		i++;
+	}
+	return -1;
 }
 
-WToolbarControl * WToolbar::ControlAt(int line, int position, bool exact)
+WToolbarItem * WToolbar::ItemAt(BPoint point)
 {
-	if (fControls.size() == 0)
+	if (fItems.size() == 0) return NULL;
+	unsigned i = 0;
+	while (i < fItems.size()) {
+		if (fItems[i]->fVisible && fItems[i]->fFrame.Contains(point))
+			return fItems[i];
+		i++;
+	}
+	return NULL;
+}
+
+WToolbarItem * WToolbar::ItemAt(int index)
+{
+	return (index >= 0 && index < (int)(fItems.size()) ?
+		fItems[(unsigned)index] : NULL);
+}
+
+WToolbarItem * WToolbar::ItemAt(int line, int position, bool exact)
+{
+	if (fItems.size() == 0)
 		return NULL;
 
 	// If exact, exclude impossible values
-	if (exact && (position < 0 || position >= (int)(fControls.size()) ||
+	if (exact && (position < 0 || position >= (int)(fItems.size()) ||
 	  line < 0 || line >= CountLines()))
 		return NULL;
 
@@ -760,122 +820,60 @@ WToolbarControl * WToolbar::ControlAt(int line, int position, bool exact)
 	else
 		_line = line;
 
-	// Find the first control of the line
-	while (_first < fControls.size()) {
-		if (fControls[_first]->fLine == _line) break;
+	// Find the first item of the line
+	while (_first < fItems.size()) {
+		if (fItems[_first]->fLine == _line) break;
 		_first++;
 	}
 
-	// Look for the requested control
+	// Look for the requested item
 	if (position > 0) {
 		while (true) {
-			if (fControls[_first + _pos]->fLine != _line) {
+			if (fItems[_first + _pos]->fLine != _line) {
 				if (exact) return NULL;
 				_pos--;
 				break;
 			}
 			if ((int)_pos == position) break;
-			if (_first + _pos == fControls.size() - 1) break;
+			if (_first + _pos == fItems.size() - 1) break;
 			_pos++;
 		}
 	}
 
-	return fControls[_first + _pos];
+	return fItems[_first + _pos];
 }
 
-int WToolbar::ControlsInLine(int line)
+bool WToolbar::RemoveItem(WToolbarItem *item)
 {
-	if (line < 0) return 0;
-	int count = 0;
-	for (unsigned i = 0; i < fControls.size(); i++) {
-		if (fControls[i]->fLine == line) count++;
-	}
-	return count;
-}
-
-int WToolbar::CountControls(void)
-{
-	return (int)(fControls.size());
-}
-
-int WToolbar::CountLines(void)
-{
-	int lines = -1;
-	for (unsigned i = 0; i < fControls.size(); i++) {
-		if (fControls[i]->fLine > lines)
-			lines = fControls[i]->fLine;
-	}
-	return lines + 1;
-}
-
-bool WToolbar::DrawControl(WToolbarControl *control)
-{
-	AssertLocked();
-	if (control == NULL) return false;
-	int index = IndexOf(control);
-	if (index == -1) return false;
-	if (Window() == NULL) return true;
-	Invalidate(control->Frame());
-	return true;
-}
-
-WToolbarControl * WToolbar::FindControl(const char *name)
-{
-	unsigned i = 0;
-	while (i < fControls.size()) {
-		if (name == NULL) {
-			if (fControls[i]->Name() == NULL) return fControls[i];
-		}
-		else
-			if (strcmp(name, fControls[i]->Name()) == 0) return fControls[i];
-		i++;
-	}
-	return NULL;
-}
-
-int WToolbar::IndexOf(WToolbarControl *control)
-{
-	if (control == NULL) return -1;
-	if (control->Toolbar() != this) return -1;
-	unsigned i = 0;
-	while (i < fControls.size()) {
-		if (fControls[i] == control) return (int)i;
-		i++;
-	}
-	return -1;
-}
-
-bool WToolbar::RemoveControl(WToolbarControl *control)
-{
-	if (control == NULL) return false;
+	if (item == NULL) return false;
 
 	AssertLocked();
 
 	bool disable_update;
 	int index, line;
 
-	// Index of the control
-	index = IndexOf(control);
+	// Index of the item
+	index = IndexOf(item);
 	if (index == -1) return false;
 
 	// Make sure no updates are performed
 	disable_update = fDisableUpdate;
 	fDisableUpdate = true;
 
-	// Remove the control
-	if (fDownControl == control)
-		fDownControl = NULL;
-	line = control->fLine;
-	control->fToolbar = NULL;
-	control->fFrame = BRect(0.0, 0.0, -1.0, -1.0);
-	control->fLine = -1;
-	control->DetachedFromToolbar();
-	fControls.erase(fControls.begin() + (unsigned)index);
+	// Remove the item
+	if (fMouseDownItem == item)
+		fMouseDownItem = NULL;
+	line = item->fLine;
+	item->fToolbar = NULL;
+	item->fFrame = BRect(0.0, 0.0, -1.0, -1.0);
+	item->fLine = -1;
+	item->DetachedFromToolbar();
+	fItems.erase(fItems.begin() + (unsigned)index);
 
 	// Make sure we don't leave empty lines
-	if (ControlsInLine(line) == 0) {
-		while (fControls.size() > (unsigned)index) {
-			fControls[index]->fLine--;
+	if (CountItemsInLine(line) == 0) {
+		while (fItems.size() > (unsigned)index) {
+			fItems[index]->fLine--;
 			index++;
 		}
 	}
@@ -1101,10 +1099,14 @@ BMessenger WToolbar::Messenger(void) const
 status_t WToolbar::SetControlsTarget(BMessenger messenger)
 {
 	AssertLocked();
-	const unsigned kControls = fControls.size();
+	const unsigned kItems = fItems.size();
+	WToolbarControl *control;
 	unsigned i;
-	for (i = 0; i < kControls; i++)
-		fControls[i]->SetTarget(messenger);
+	for (i = 0; i < kItems; i++) {
+		control = dynamic_cast<WToolbarControl*>(fItems[i]);
+		if (control != NULL)
+			control->SetTarget(messenger);
+	}
 	return B_OK;
 }
 
@@ -1112,7 +1114,8 @@ status_t WToolbar::SetControlsTarget(const BHandler *handler,
 	const BLooper *looper)
 {
 	AssertLocked();
-	const unsigned kControls = fControls.size();
+	const unsigned kItems = fItems.size();
+	WToolbarControl *control;
 	unsigned i;
 	if (handler == NULL && looper == NULL)
 		return B_BAD_VALUE;
@@ -1122,8 +1125,11 @@ status_t WToolbar::SetControlsTarget(const BHandler *handler,
 		if (looper != NULL && handler->Looper() != looper)
 			return B_MISMATCHED_VALUES;
 	}
-	for (i = 0; i < kControls; i++)
-		fControls[i]->SetTarget(handler, looper);
+	for (i = 0; i < kItems; i++) {
+		control = dynamic_cast<WToolbarControl*>(fItems[i]);
+		if (control != NULL)
+			control->SetTarget(handler, looper);
+	}
 	return B_OK;
 }
 
@@ -1162,26 +1168,26 @@ void WToolbar::Update(void)
 	AssertLocked();
 
 	float border, left, top, max, width, height, line, realLine;
-	WToolbarControl *control;
+	WToolbarItem *item;
 	unsigned i;
 	BRect r;
 
-	// Search for the largest (or tallest) control
+	// Search for the largest (or tallest) item
 	max = 0.0;
-	for (i = 0; i < fControls.size(); i++) {
-		if (fControls[i]->fVisible) {
+	for (i = 0; i < fItems.size(); i++) {
+		if (fItems[i]->fVisible) {
 			if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
-				fControls[i]->GetPreferredSize(&width, NULL);
+				fItems[i]->GetPreferredSize(&width, NULL);
 				if (width + 1.0 > max) max = width + 1.0;
 			}
 			else {
-				fControls[i]->GetPreferredSize(NULL, &height);
+				fItems[i]->GetPreferredSize(NULL, &height);
 				if (height + 1.0 > max) max = height + 1.0;
 			}
 		}
 	}
 
-	// Assign each control its rectangle
+	// Assign each item its rectangle
 	switch (fAppearance.fBorder) {
 		case B_FANCY_BORDER:
 			border = BorderSize();
@@ -1197,14 +1203,14 @@ void WToolbar::Update(void)
 	top = border + fAppearance.fPadding + fAppearance.fMargin;
 	realLine = 0;
 	line = -1;
-	for (i = 0; i < fControls.size(); i++) {
-		control = fControls[i];
-		if (control->fVisible) {
+	for (i = 0; i < fItems.size(); i++) {
+		item = fItems[i];
+		if (item->fVisible) {
 			if (line == -1)
-				line = control->fLine;
+				line = item->fLine;
 			if (fAppearance.fAlignment == W_TOOLBAR_VERTICAL) {
-				if (control->fLine != line) {
-					line = control->fLine;
+				if (item->fLine != line) {
+					line = item->fLine;
 					realLine++;
 					top = border + fAppearance.fPadding + fAppearance.fMargin;
 					left = border + fAppearance.fPadding + max * realLine +
@@ -1212,14 +1218,14 @@ void WToolbar::Update(void)
 				}
 				r.top = top;
 				r.left = left;
-				fControls[i]->GetPreferredSize(NULL, &height);
+				fItems[i]->GetPreferredSize(NULL, &height);
 				r.bottom = r.top + height;
 				r.right = r.left + max - 1.0;
 				top = r.bottom + fAppearance.fMargin + 1.0;
 			}
 			else {
-				if (control->fLine != line) {
-					line = control->fLine;
+				if (item->fLine != line) {
+					line = item->fLine;
 					realLine++;
 					top = border + fAppearance.fPadding + max * realLine +
 						fAppearance.fMargin * (realLine + 1.0);
@@ -1227,12 +1233,12 @@ void WToolbar::Update(void)
 				}
 				r.top = top;
 				r.left = left;
-				fControls[i]->GetPreferredSize(&width, NULL);
+				fItems[i]->GetPreferredSize(&width, NULL);
 				r.bottom = r.top + max - 1.0;
 				r.right = r.left + width;
 				left = r.right + fAppearance.fMargin + 1.0;
 			}
-			fControls[i]->fFrame = r;
+			fItems[i]->fFrame = r;
 		}
 	}
 
@@ -1254,40 +1260,40 @@ void WToolbar::Update(void)
 	}
 
 	// If the rects have changed the mouse may be over a different
-	// control than before, so we have to simulate a MouseOver() event
+	// item than before, so we have to simulate a MouseOver() event
 	if (Window() != NULL) {
-		WToolbarControl *new_over;
+		WToolbarItem *new_over;
 		uint32 buttons;
 		BPoint point;
 		GetMouse(&point, &buttons, false);
-		new_over = ControlAt(point);
-		if (fDownControl == NULL) {
-			if (new_over != fOverControl) {
-				if (fOverControl != NULL) {
-					fOverControl->MouseMoved(
-						point - fOverControl->fFrame.LeftTop(),
+		new_over = ItemAt(point);
+		if (fMouseDownItem == NULL) {
+			if (new_over != fMouseOverItem) {
+				if (fMouseOverItem != NULL) {
+					fMouseOverItem->MouseMoved(
+						point - fMouseOverItem->fFrame.LeftTop(),
 						B_EXITED_VIEW, NULL);
 				}
 				if (new_over != NULL) {
 					new_over->MouseMoved(point - new_over->fFrame.LeftTop(),
 						B_ENTERED_VIEW, NULL);
 				}
-				fOverControl = new_over;
+				fMouseOverItem = new_over;
 			}
 			else {
-				if (fOverControl != NULL) {
-					fOverControl->MouseMoved(
-						point - fOverControl->fFrame.LeftTop(),
+				if (fMouseOverItem != NULL) {
+					fMouseOverItem->MouseMoved(
+						point - fMouseOverItem->fFrame.LeftTop(),
 						B_INSIDE_VIEW, NULL);
 				}
 			}
 		}
 		else {
-			if (new_over != fDownControl)
-				fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
+			if (new_over != fMouseDownItem)
+				fMouseDownItem->MouseMoved(point - fMouseDownItem->fFrame.LeftTop(),
 					B_EXITED_VIEW, NULL);
 			else
-				fDownControl->MouseMoved(point - fDownControl->fFrame.LeftTop(),
+				fMouseDownItem->MouseMoved(point - fMouseDownItem->fFrame.LeftTop(),
 					B_INSIDE_VIEW, NULL);
 		}
 	}

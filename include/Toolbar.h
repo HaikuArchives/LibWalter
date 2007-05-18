@@ -4,7 +4,7 @@
 //
 // WToolbar, a toolbar widget
 //
-// Revision: 20070513
+// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -25,7 +25,7 @@
 #include <View.h>
 
 // libwalter classes
-class WToolbarControl;
+class WToolbarItem;
 
 // Toolbar pre-defined styles
 enum {
@@ -62,7 +62,7 @@ enum {
 };
 
 // Controls limit
-#define W_TOOLBAR_MAX_CONTROLS		1024
+#define W_TOOLBAR_MAX_ITEMS		1024
 
 // Toolbar appearance
 typedef struct {
@@ -82,8 +82,8 @@ typedef struct {
 
 class WToolbar : public BView {
 private:
-	typedef vector<WToolbarControl*> WToolbarControls;
-			void					_draw_control(unsigned index,
+	typedef vector<WToolbarItem*> WToolbarItems;
+			void					_draw_item(unsigned index,
 										BRect updateRect);
 			void					_init_object(void);
 	// Appearance
@@ -93,11 +93,11 @@ private:
 			bool					fEnabled;
 			BMessenger				fTarget;
 	// Internals
-			WToolbarControls		fControls;
+			WToolbarItems			fItems;
 			bool					fDisableUpdate;
 			bool					fDisableStyling;
-			WToolbarControl *		fDownControl;
-			WToolbarControl *		fOverControl;
+			WToolbarItem *			fMouseDownItem;
+			WToolbarItem *			fMouseOverItem;
 protected:
 			void					AssertLocked(void);
 	virtual	float					BorderSize(void);
@@ -138,21 +138,21 @@ public:
 	virtual	void					MouseMoved(BPoint point, uint32 transit,
 										const BMessage *message);
 	virtual	void					MouseUp(BPoint point);
-	// Controls management
-			bool					AddControl(WToolbarControl *control,
+	// Items management
+			bool					AddItem(WToolbarItem *item,
 										int line = -1, int position = -1);
-			WToolbarControl *		ControlAt(BPoint point);
-			WToolbarControl *		ControlAt(int index);
-			WToolbarControl *		ControlAt(int line, int position,
+			WToolbarItem *			ItemAt(BPoint point);
+			WToolbarItem *			ItemAt(int index);
+			WToolbarItem *			ItemAt(int line, int position,
 										bool exact = false);
-			int						ControlsInLine(int line);
-			int						CountControls(void);
+			int						CountItemsInLine(int line);
+			int						CountItems(void);
 			int						CountLines(void);
-			bool					DrawControl(WToolbarControl *control);
-			WToolbarControl *		FindControl(const char *name);
-			int						IndexOf(WToolbarControl *control);
-			bool					RemoveControl(
-										WToolbarControl *control);
+			bool					DrawItem(WToolbarItem *item);
+			WToolbarItem *			FindItem(const char *name);
+			int						IndexOf(WToolbarItem *item);
+			bool					RemoveItem(
+										WToolbarItem *item);
 	// Properties
 			bool					AutoSize(void);
 			bool					Enabled(void);
