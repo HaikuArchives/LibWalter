@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <File.h>
@@ -11,6 +12,8 @@
 #include "Toolbar.h"
 #include "ToolbarBitmapButton.h"
 #include "ToolbarSeparator.h"
+
+#define TEST_MESSAGE 'test'
 
 class MyWindow : public BWindow { // --------------------------------------------------------------
 private:
@@ -25,11 +28,11 @@ MyWindow(void) :
 	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar");
 	fToolbar->SetPictureSize(W_TOOLBAR_PICTURE_MEDIUM);
 	back->AddChild(fToolbar);
-	fToolbar->AddItem(new WToolbarButton("button_0", "Hello!"));
+	fToolbar->AddItem(new WToolbarButton("button_0", "Hello!", new BMessage(TEST_MESSAGE)));
 	fToolbar->AddItem(new WToolbarSeparator("separator_2"));
 	LoadTrackerIcons();
 	fToolbar->AddItem(new WToolbarSeparator("separator_1"));
-	fToolbar->AddItem(new WToolbarButton("button_1", "Bye!"));
+	fToolbar->AddItem(new WToolbarButton("button_1", "Bye!", new BMessage(TEST_MESSAGE)));
 	ResizeTo(fToolbar->Frame().Width(), fToolbar->Frame().Height());
 }
 
@@ -70,7 +73,7 @@ void LoadTrackerIcons(void)
 					large->SetBits(data_large, size_large, 0, B_CMAP8);
 
 					sprintf(name, "bitmap_%d", index);
-					button = new WToolbarBitmapButton(name, name);
+					button = new WToolbarBitmapButton(name, name, new BMessage(TEST_MESSAGE));
 					button->AddBitmapSet(small);
 					button->AddBitmapSet(large);
 					fToolbar->AddItem(button, index / 10);
@@ -79,6 +82,13 @@ void LoadTrackerIcons(void)
 		}
 		index++;
 	}
+}
+
+void MessageReceived(BMessage *message)
+{
+	if (message->what == TEST_MESSAGE)
+		(new BAlert("Hello!", "Hello!", "OK"))->Go();
+	BWindow::MessageReceived(message);
 }
 
 bool QuitRequested(void)

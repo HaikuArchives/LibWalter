@@ -141,16 +141,16 @@ public:
 	// Items management
 			bool					AddItem(WToolbarItem *item,
 										int line = -1, int position = -1);
-			WToolbarItem *			ItemAt(BPoint point);
-			WToolbarItem *			ItemAt(int index);
-			WToolbarItem *			ItemAt(int line, int position,
-										bool exact = false);
 			int						CountItemsInLine(int line);
 			int						CountItems(void);
 			int						CountLines(void);
 			bool					DrawItem(WToolbarItem *item);
 			WToolbarItem *			FindItem(const char *name);
 			int						IndexOf(WToolbarItem *item);
+			WToolbarItem *			ItemAt(BPoint point);
+			WToolbarItem *			ItemAt(int index);
+			WToolbarItem *			ItemAt(int line, int position,
+										bool exact = false);
 			bool					RemoveItem(
 										WToolbarItem *item);
 	// Properties
