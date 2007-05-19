@@ -4,7 +4,7 @@
 //
 // Separator control for WToolbar
 //
-// Revision: 20070513
+// Revision: 20070519
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -19,13 +19,13 @@
 #define _TOOLBAR_SEPARATOR_H_
 
 // libwalter headers
-#include "ToolbarControl.h"
+#include "ToolbarItem.h"
 
 // =============================================================================
 // WToolbarSeparator
 // =============================================================================
 
-class WToolbarSeparator : public WToolbarControl {
+class WToolbarSeparator : public WToolbarItem {
 public:
 							WToolbarSeparator(const char *name = NULL);
 							WToolbarSeparator(BMessage *archive);
@@ -34,9 +34,13 @@ public:
 	virtual	status_t		Archive(BMessage *archive,
 								bool deep = true) const;
 	static	BArchivable *	Instantiate(BMessage *archive);
-	// AKToolbarControl hooks
+	// WToolbarItem hooks
 	virtual	void			Draw(BView *canvas, BRect updateRect);
 	virtual	void			GetPreferredSize(float *width, float *height);
+	virtual	void			MouseDown(BPoint point);
+	virtual	void			MouseMoved(BPoint point, uint32 transit,
+								const BMessage *message);
+	virtual	void			MouseUp(BPoint point);
 };
 
 #endif // _TOOLBAR_SEPARATOR_H_

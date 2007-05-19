@@ -2,9 +2,9 @@
 //
 // libwalter ToolbarSeparator.cpp
 //
-// Separator control for AKToolbar
+// Separator control for WToolbar
 //
-// Revision: 20070513
+// Revision: 20070519
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -43,12 +43,12 @@
  *                 constructor.
  */
 WToolbarSeparator::WToolbarSeparator(const char *name) :
-	WToolbarControl(name, NULL)
+	WToolbarItem(name)
 {
 }
 
 WToolbarSeparator::WToolbarSeparator(BMessage *archive) :
-	WToolbarControl(archive)
+	WToolbarItem(archive)
 {
 	// Nothing to do here!
 }
@@ -62,7 +62,7 @@ WToolbarSeparator::~WToolbarSeparator()
 status_t WToolbarSeparator::Archive(BMessage *archive, bool deep) const
 {
 	// We don't have nothing to archive
-	return WToolbarControl::Archive(archive, deep);
+	return WToolbarItem::Archive(archive, deep);
 }
 
 BArchivable * WToolbarSeparator::Instantiate(BMessage *archive)
@@ -141,4 +141,17 @@ void WToolbarSeparator::GetPreferredSize(float *width, float *height)
 	}
 	if (width != NULL) *width = w;
 	if (height != NULL) *height = h;
+}
+
+void WToolbarSeparator::MouseDown(BPoint point)
+{
+}
+
+void WToolbarSeparator::MouseMoved(BPoint point, uint32 transit,
+	const BMessage *message)
+{
+}
+
+void WToolbarSeparator::MouseUp(BPoint point)
+{
 }
