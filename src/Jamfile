@@ -21,4 +21,5 @@ Library $(LW_TOP)/libwalter :
 	general/toolbar/ToolbarSupport.cpp
 	
 	storage/PathBox.cpp
+	storage/TextFile.cpp
 	;
