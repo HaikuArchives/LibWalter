@@ -3,3 +3,11 @@ SubDir LW_TOP tests ;
 LinkLibraries ToolbarTest : $(LW_TOP)/libwalter.a ;
 Main ToolbarTest :
 	toolbar/Test.cpp ;
+
+LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
+Main SplitPanelTest :
+	SplitPanel/LayeringTestApp.cpp
+	SplitPanel/main.cpp
+	SplitPanel/MainView.cpp
+	SplitPanel/TestWindow.cpp
+;

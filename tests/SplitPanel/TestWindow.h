@@ -6,7 +6,7 @@
 #include <Bitmap.h>
 
 #include "MainView.h"
-#include "BViewSplitter.h"
+#include "SplitterView.h"
 
 class TestWindow : public BWindow
 {
@@ -20,7 +20,7 @@ public:
 private:
 
 	MainView *mainView;
-	BViewSplitter *splitView;
+	SplitterView *splitView;
 	BBitmap *frontBitmap;
 };
 

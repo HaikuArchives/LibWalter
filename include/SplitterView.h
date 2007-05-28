@@ -9,10 +9,10 @@
 #include <View.h>
 #include "Divider.h"
 
-class BViewSplitter:public BView{
+class SplitterView:public BView{
  public:
-//					BViewSplitter(BRect frame,uint anz,BView *vws[],orientation dr,uint32 resizingMode,uint32 flags);
-					BViewSplitter(BRect frame,orientation dr,uint32 resizingMode,uint32 flags);
+//					SplitterView(BRect frame,uint anz,BView *vws[],orientation dr,uint32 resizingMode,uint32 flags);
+					SplitterView(BRect frame,orientation dr,uint32 resizingMode,uint32 flags);
 		void		AddChild(BView *view);
 		bool		RemoveChild(BView *view);
 		BView*      GetView(uint32 indx);

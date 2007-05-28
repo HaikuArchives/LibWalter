@@ -1,8 +1,4 @@
-#ifndef _MainView_
 #include "MainView.h"
-#endif
-
-
 #include <TranslationUtils.h>
 #include <stdio.h>
 #include <Message.h>

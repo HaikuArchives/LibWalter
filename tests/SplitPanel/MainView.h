@@ -2,6 +2,7 @@
 #define _MainView_
 
 #include <View.h>
+#include <Button.h>
 #include <Cursor.h>
 
 class MainView : public BView

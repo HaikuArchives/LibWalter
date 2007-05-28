@@ -3,11 +3,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "BViewSplitter.h"
+#include "SplitterView.h"
 #include <Message.h>
 #include <stdio.h>
 
-BViewSplitter::BViewSplitter(BRect frame,orientation dr,uint32 resizingMode,uint32 flags): BView(frame,"ViewSplitter", resizingMode,flags)
+SplitterView::SplitterView(BRect frame,orientation dr,uint32 resizingMode,uint32 flags): BView(frame,"ViewSplitter", resizingMode,flags)
 {
   direction=dr;
   anz=0;
@@ -15,7 +15,7 @@ BViewSplitter::BViewSplitter(BRect frame,orientation dr,uint32 resizingMode,uint
 }
 
 void 
-BViewSplitter::AddChild(BView *view)
+SplitterView::AddChild(BView *view)
 {
     uint32 i;
     anz++;
@@ -58,7 +58,7 @@ BViewSplitter::AddChild(BView *view)
 
 
 bool 
-BViewSplitter::ForceRemove(int32 i)
+SplitterView::ForceRemove(int32 i)
 {
     bool ok = false;
     float d;
@@ -99,7 +99,7 @@ BViewSplitter::ForceRemove(int32 i)
 }
 
 bool 
-BViewSplitter::RemoveChild(BView *view)
+SplitterView::RemoveChild(BView *view)
 {
     bool ok=false,found=false;
     uint i=0;
@@ -152,7 +152,7 @@ BViewSplitter::RemoveChild(BView *view)
 
 
 BView*
-BViewSplitter::GetView(uint32 indx)
+SplitterView::GetView(uint32 indx)
 {
     if (indx<anz) {
         return ChildAt(indx*2);
@@ -162,7 +162,7 @@ BViewSplitter::GetView(uint32 indx)
 }
 
 
-orientation	BViewSplitter::GetDirection()
+orientation	SplitterView::GetDirection()
 {
     printf("B_HORIZONTAL ist %d\n",B_HORIZONTAL);
     printf("B_VERTICAL ist %d\n",B_VERTICAL);
@@ -173,7 +173,7 @@ orientation	BViewSplitter::GetDirection()
 
 
 void 
-BViewSplitter::SetDivPos(uint32 indx,float location)
+SplitterView::SetDivPos(uint32 indx,float location)
 {
     if (indx<(anz-1)){
         ((Divider *)ChildAt((indx*2)+1))->SetLocation(location);
@@ -182,7 +182,7 @@ BViewSplitter::SetDivPos(uint32 indx,float location)
 
 
 void
-BViewSplitter::SetDirection(orientation dr)
+SplitterView::SetDirection(orientation dr)
 {
     uint i;
     BView* tmpView;
