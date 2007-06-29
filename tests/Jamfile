@@ -6,8 +6,8 @@ Main ToolbarTest :
 
 LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
 Main SplitPanelTest :
-	SplitPanel/LayeringTestApp.cpp
-	SplitPanel/main.cpp
-	SplitPanel/MainView.cpp
-	SplitPanel/TestWindow.cpp
+	SplitterView/LayeringTestApp.cpp
+	SplitterView/main.cpp
+	SplitterView/MainView.cpp
+	SplitterView/TestWindow.cpp
 ;

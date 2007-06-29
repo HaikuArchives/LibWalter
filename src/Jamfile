@@ -20,8 +20,8 @@ Library $(LW_TOP)/libwalter :
 	general/toolbar/ToolbarSeparator.cpp
 	general/toolbar/ToolbarSupport.cpp
 	
-	general/SplitPanel/Divider.cpp
-	general/SplitPanel/SplitterView.cpp
+	general/SplitterView/Divider.cpp
+	general/SplitterView/SplitterView.cpp
 	
 	storage/PathBox.cpp
 	storage/TextFile.cpp
