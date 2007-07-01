@@ -9,21 +9,26 @@
 #include <View.h>
 #include "Divider.h"
 
-class SplitterView:public BView{
- public:
-//					SplitterView(BRect frame,uint anz,BView *vws[],orientation dr,uint32 resizingMode,uint32 flags);
-					SplitterView(BRect frame,orientation dr,uint32 resizingMode,uint32 flags);
+class SplitterView : public BView
+{
+public:
+					SplitterView(const BRect &frame, const orientation &dir,
+								const uint32 &resizingMode,
+								const uint32 &flags);
 		void		AddChild(BView *view);
 		bool		RemoveChild(BView *view);
-		BView*      GetView(uint32 indx);
-		orientation	GetDirection();
-		void		SetDivPos(uint32 indx,float location);
-		void		SetDirection(orientation dr);
- private:
+		BView *		ViewAt(const uint32 &index);
+		void		SetDivider(const uint32 &index, const float &location);
+		
+		void		SetDirection(const orientation &dir);
+		orientation	GetDirection(void) const;
+		
+private:
         bool		ForceRemove(int32 i);
-  		orientation	direction;
-  		uint32		anz;
-  		float 		stepWidth;
+  		
+  		orientation	fDirection;
+  		uint32		fAnz;
+  		float 		fStepWidth;
 };
 
 #endif
