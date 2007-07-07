@@ -39,7 +39,7 @@ SplitterView::AddChild(BView *view)
 	
 	if (fAnz == 1) {
 		view->MoveTo(0,0);
-		// Korrektur weil wir ja bei dem ersten keinen Divider haben...
+		// adjustment because with only one view, there is no Divider
 		if (fDirection == B_HORIZONTAL)
 			view->ResizeBy(0,10);
 		else
@@ -47,10 +47,9 @@ SplitterView::AddChild(BView *view)
 		
 		BView::AddChild(view);
 	} else {
-		/* alle vorhergehenden kleiner machen... 
-		Die Divider haben immer einen Index der ab 1 anfängt und dann
-		in Zweierschritten hochgeht (es liegt ja immer ein BView zwischen den
-		Dividern */
+        /* we need to shrink every View before
+        The Divider Index always start´s with 1 and then the index is incrementet by two
+        (because between every Divider there is a BView) */
 		for (i = 0; i < (fAnz - 2); i++)
 			((Divider *)ChildAt((i * 2) + 1))->SetLocation((i + 1) * fStepWidth);
 		
@@ -67,34 +66,34 @@ SplitterView::ForceRemove(int32 i)
 	bool ok = false;
 	float d;
 	
-	//wir berechnen nun mal wieviel jeder View dazubekommt  
+	// calculate how much space should added to every View  
 	if (fDirection == B_HORIZONTAL)
 		d = ChildAt(i * 2)->Bounds().Height() / fAnz;
 	else
 		d = ChildAt(i * 2)->Bounds().Width() / fAnz;
 	
-	//entfernen alles nötige: View und Divider
+    // delete Diverder and View
 	ok = BView::RemoveChild(ChildAt(i * 2)); //test obs geklappt hat
 	
-	//da der Divider jetz eine Stelle vorgerückt ist ist er auf dem selben Index... Fehlersuche ca 1/2 Tag!!!!!
+	// because of the RemoveChild before the Divider is now on the same Index...
 	if (ok)
 		ok = BView::RemoveChild(ChildAt(i * 2));
 	
-	//wenns ordentlich entfernt wurde dann teilen wir jetzt neu zu..
+	// if it was deletet sucsessfully then we add the free space to the remaining Views
 	if (ok) {
-		//wenn alle geklappt hat, dann haben wir ersteinmal ein View weniger
+		// first of all we have one View less
 		fAnz--;
 
 		for (uint q = 0;q < fAnz;q++) {
-			//View holen und entsprechend der akt Ausrichtung den freigeworden Platz aufteilen
+			//took a View and give him his portion of more space
 			if (fDirection == B_HORIZONTAL)
 				ChildAt(q * 2)->ResizeBy(0,d);
 			else
 				ChildAt(q * 2)->ResizeBy(d,0);
 		}
 
-		/* So jetzt müssen wir aber noch die Divider updaten.. das machen wir über einen Trick
-		SetDirection macht das für uns.. ;-)*/
+		/* now we need to update the Divider we use a "tick"
+           SetDirection is doing the job for us.. ;-) */
 		for (uint32 i = 0; i < (fAnz - 1); i++) 
 			((Divider *)ChildAt((i * 2) + 1))->SetDirection(fDirection);
 	}
@@ -107,25 +106,25 @@ SplitterView::RemoveChild(BView *view)
 {
 	bool ok = false,found = false;
 	uint i = 0;
-	//den Index des zu entferndenden Views suchen..
 
+	// search the Index of the View wich we need to delete
 	while ((!found) && (i < fAnz))
 	{
 		found = (ChildAt(i * 2) == view);
 		i++;
 	}
 
-	// wenn es gefunden wurde
+	// if we have found the Index
 	if (found) {
-		//Korrektur da wir ja immer am Ende +1 gerechtet haben..
+		// little correction of the i index because we always increased the nuber by one at the end of the loop
 		i--;
-		//so dann testen wir ob die zu entfernenden View das erste oder das letzte View ist wenn nicht dann
+		// check if the View is the last or the first
 		if ((i > 1) && (i < (fAnz - 1))) {
 			((Divider *)ChildAt((i * 2) - 1))->SetSecondView(ChildAt((i * 2) + 2));
 			ok = ForceRemove(i);
 		}
 		else{
-			//wir brauchen nur ne Korrektur falls mehr als ein BView noch existiert
+			// we only need a adjustment if there is more than one View
 			if (fAnz > 1) {
 
 				if (i == 0) {
@@ -133,10 +132,10 @@ SplitterView::RemoveChild(BView *view)
 					ok = ForceRemove(i);
 				}
 				else{
-					/*kleiner Trick... wenn wir das letze löschen muss ja der Divider davor auch gelöscht werden
-					unser ForceRemove löscht aber immer i und das View i+1 also müssen wir nur View und Divider 
-					vertauschen und dann "normal" mit ForceRemove(index) löschen. Erspart viel Ärger und
-					Programmieraufwand*/
+                    /* little trick ... if we delete the last we also need to delete the Divider before.
+                    our ForceRemove deletes always i, and the View i+1 so we only need too swap Divider and View to delete
+                    all the Stuff with ForceRemove(index) saves a lot of trouble and work :)
+                    */
 					BView *tmp1 = ChildAt((i * 2) - 2);
 					BView *tmp2 = ChildAt((i * 2) - 1);
 					BView::RemoveChild(tmp1);
@@ -147,7 +146,7 @@ SplitterView::RemoveChild(BView *view)
 				}
 			}
 			else
-				// wenn wir nur noch ein View haben brauchen wir nur das entfernen
+				// if there is only one view left we only need to delete this view
 				BView::RemoveChild(view);
 			}
 	}
@@ -183,27 +182,27 @@ SplitterView::SetDirection(const orientation &dir)
 	uint i;
 	BView *tmpView;
 	float px,py;
-	//alle Views "umarbeiten" entsprechend ihrer Größe und Position
+	// recalculate every View to the correspondending Size and Position
 	if (fDirection != dir) {
 		fDirection = dir;
 		
 		if (fDirection == B_HORIZONTAL) {
 			for (i = 0; i < fAnz; i++) {
 				tmpView = ChildAt(i * 2);
-				//relative x Position bestimmen
+				// calculate the relative Position from the x position
 				px = tmpView->Frame().left / Bounds().Width();
-				//umrechen in eine entsprechende relative y Position umrechen
+				// convert the relative Postition into a y position
 				py = Bounds().Height() * px;
-				//und unser View dahin bewegen
+				// move the view to this position
 				tmpView->MoveTo(0,py);
-				//relative Größe ermitteln
+				// calculate the relative width
 				px = tmpView->Frame().Width() / Bounds().Width();
-				// umrechnen und setzen
+				// recalculate the new height and set this height
 				py = Bounds().Height() * px;
 				tmpView->ResizeTo(Bounds().Width(),py);
 			}
 		} else {
-			//Erklärung siehe oben
+			// explanation see above
 			for (i = 0; i < fAnz; i++) {
 				tmpView = ChildAt(i * 2);
 				py = tmpView->Frame().top / Bounds().Height();
@@ -214,7 +213,7 @@ SplitterView::SetDirection(const orientation &dir)
 				tmpView->ResizeTo(px,Bounds().Height());
 			}
 		}
-		//so jetzt noch allen Dividern sagen, das sich die Richtung geändert hat!
+		// tell the Divider that the direction has changed
 		for (i = 0; i < (fAnz - 1); i++)
 			((Divider *)ChildAt((i * 2) + 1))->SetDirection(fDirection);
 	}

@@ -47,8 +47,8 @@ private:
 		orientation	fDirection;
 		bool		fMove;
 
-		// Dieses Flag wird benutzt, um der MouseMoved()-Methode mitzuteilen, 
-		// dass sich die Direction geändert hat, und sie den Cursor neu setzen soll
+		// This flag will be used in the method MouseMoved() to let know, 
+		// that the direction has changed, therefore the cursor as well
 		bool		fDirectionModified;
 		float		relative,max,min,mx,my;
 		BView		*fFirstView;

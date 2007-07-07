@@ -23,13 +23,14 @@ Divider::Divider(BView *first, BView *second, orientation dir)
 	fHorizontalCursor(NULL),
 	fVerticalCursor(NULL)
 {
-	// Hier auf true setzen, damit der Cursor beim ersten Aufruf der MouseMoved()-Methode gesetzt wird.
+	// Set it true, so that the cursor with the first call of the method 
+    // MouseMoved() will handle
 	fDirectionModified = true;
 
 	if (fDirection == B_HORIZONTAL) {
-		// Erzeugen des Horizontal-Cursors, dieser bleibt in alle Ewigkeit in fHorizontalCursor gespeichert
-		// fDragCursor ist der aktuelle Cursor, den MouseMoved() später verwenden soll
-		// ob wir einen Vertical Cursor noch einmal brauchen, wissen wir hier noch nicht, deshalb wird er noch nicht erzeugt.
+        // Create the Horizontal-Cursors, they remain permanently in _horizontalCursor stored.
+        // _dragCursor is the current cursor, therefore MouseMoved() would later move it
+        // if we a need again a Vertical Cursor(we still dont know here, because it is still not created).
 		fHorizontalCursor = new BCursor(sHorizontalCursorData);
 		fDragCursor = fHorizontalCursor;
 
@@ -40,9 +41,9 @@ Divider::Divider(BView *first, BView *second, orientation dir)
 		fSecondView->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT);
 	} else {
-		// Erzeugen des Vertical-Cursors, dieser bleibt in alle Ewigkeit in fVerticalCursor gespeichert
-		// fDragCursor ist der aktuelle Cursor, den MouseMoved() später verwenden soll
-		// ob wir einen HorizontalCursor noch einmal brauchen, wissen wir hier noch nicht, deshalb wird er noch nicht erzeugt.
+        // Create the Vertical-Cursors, they remain permanently _verticalCursor stored
+        // _dragCursor is the current cursor, therefore MouseMoved() would later move it
+        // if we need again a HorizontalCursor(we still dont know here, because it is still not created).
 		fVerticalCursor = new BCursor(sVerticalCursorData);
 		fDragCursor = fVerticalCursor;
 		
@@ -189,13 +190,15 @@ Divider::SetDirection(orientation dir)
 		fSecondView->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT);
 
-		// Falls der fHorizontalCursor noch nicht im Konstruktor gesetzt wurde, tun wir es hier
+		// In the case _horizontalCursor is not set in the constructor 
+        // set it here
 		if (!fHorizontalCursor)
 			fHorizontalCursor = new BCursor(sHorizontalCursorData);
 
-		// und setzten den aktuellen Cursor auf den fHorizontalCursor 
+		// and set the current cursor from the _horizontalCursor
 		fDragCursor = fHorizontalCursor;
-		// und setzen das fDirectionModified-Flag damit MouseMoved() beim nächsten mal den Cursor ändert
+		// and set the _directionModified-Flag so that MouseMoved() 
+        // can make the next cursor change
 		fDirectionModified = true;
 
 	} else {
@@ -208,13 +211,15 @@ Divider::SetDirection(orientation dir)
 		fSecondView->SetResizingMode(B_FOLLOW_TOP_BOTTOM);
 		SetResizingMode(B_FOLLOW_TOP_BOTTOM);
 
-		// Falls der fVerticalCursor noch nicht im Konstruktor gesetzt wurde, tun wir es hier
+		// In the case _verticalCursor is not set in the constructor 
+        // set it here
 		if (!fVerticalCursor)
 			fVerticalCursor = new BCursor(sVerticalCursorData);
 		
-		// und setzten den aktuellen Cursor auf den fVerticalCursor 
+		// and set the current cursor from the _horizontalCursor
 		fDragCursor = fVerticalCursor;
-		// und setzen das fDirectionModified-Flag damit MouseMoved() beim nächsten mal den Cursor ändert
+		// and set the _directionModified-Flag so that MouseMoved() 
+        // can make the next cursor change
 		fDirectionModified = true;
 	}
 }
@@ -234,20 +239,20 @@ void
 Divider::MoveBy(float x, float y)
 {
 	if (x != 0) {
-		//werden bei x die Grenzen überschritten oder soll überhaupt nichts gemacht werden???
+		// Is the limit on X to be exceeded or nothing to do
 		if (((Frame().left + (x - 1)) > fFirstView->Frame().left)&&((Frame().right + x + 1) < fSecondView->Frame().right)) {
-			//erst Pointer selber bewegen..
-			BBox::MoveBy(x,0);	//dann unser ersten View kleiner machen...
+			// First move the pointer
+			BBox::MoveBy(x,0);	// Then make our first View smaller
 			fFirstView->ResizeBy(((Frame().left - 2) - fFirstView->Frame().right),0);
-			//zweiten View kleiner machen
+			// make smaller second view
 			fSecondView->ResizeBy((fSecondView->Frame().left - (Frame().right + 1)),0);
-			//und entsprechend verschieben
+			// and move it
 			fSecondView->MoveTo(Frame().right + 1,0);
 		}
 	}
 	
 	if (y != 0) {
-		//Erklärung siehe MoveByX;
+		// Look MoveByX for explanations
 		if (((Frame().top + (y - 1)) > fFirstView->Frame().top)&&((Frame().bottom + y + 1) < fSecondView->Frame().bottom)) {
 			BBox::MoveBy(0,y);
 			Frame().bottom = Frame().bottom + y;
@@ -277,7 +282,7 @@ Divider::MouseDown(BPoint point)
 void
 Divider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
-	//Nur wenn sich die Richtung geändert hat, setzten wir den Cursor
+	// Just when the direction has changed, set the cursor
 	if ( fDirectionModified ) {
 		SetViewCursor(fDragCursor, true);
 		fDirectionModified = false;
