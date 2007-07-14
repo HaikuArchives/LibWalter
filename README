@@ -43,3 +43,6 @@ SplitterView
 TextFile
 	Many times reading a text file one line at a time, is needed for one reason or another. This BFile-derived class adds one method: ReadLine(), which spits back the next \n terminated line using buffered disk access and removes the linefeed for you. Wildly convenient for reading config files. :-)
 
+Toolbar
+	BeOS misses a powerful and easy to use toolbar view. WToolbar aims to be a collection of classes that will make the most powerful
+toolbar ever seen on BeOS-like operating systems! SVG, multi-level drop downs, detachable toolbars, tooltips, multi-line arrangement, various alignment, high apperance customizability, and many more features are in devlopment!
