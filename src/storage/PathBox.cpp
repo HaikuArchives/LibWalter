@@ -9,6 +9,7 @@
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <Alert.h>
+#include <String.h>
 
 enum {
 	M_PATHBOX_CHANGED = 'pbch',

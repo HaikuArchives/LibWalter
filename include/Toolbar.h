@@ -23,6 +23,7 @@
 
 // BeOS headers
 #include <View.h>
+#include <Messenger.h>
 
 // libwalter classes
 class WToolbarItem;
