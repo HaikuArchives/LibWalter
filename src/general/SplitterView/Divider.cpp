@@ -1,5 +1,6 @@
 /*
  * Copyright 2007 Matthias Lindner, aka Paradoxon
+ * Copyright 2007 Oliver Ruiz Dorantes
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -276,6 +277,8 @@ Divider::MouseDown(BPoint point)
 		fMove = true;
 		SetMouseEventMask(B_POINTER_EVENTS,B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 	}
+	/* Keep were we started the movement */
+	fStartingMovement = GetLocation();
 }
 
 
@@ -298,8 +301,19 @@ Divider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 
 void Divider::MouseUp(BPoint point)
 {
+	printf("up %f:%f\n",point.x,point.y);
+	
 	if (fMove) {
 		fMove = false;
 		// 	 SetMouseEventMask(B_POINTER_EVENTS,B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+	}
+	if (fStartingMovement == GetLocation()) {
+		/* We have not moved anything... seems to be a click 
+		   move to the previous stored location */
+		SetLocation(fWhereWere);
+		/* And the starting one now is the previous */
+		fWhereWere = fStartingMovement;
+	} else {
+		fWhereWere = fStartingMovement;
 	}
 }

@@ -57,6 +57,10 @@ private:
 		BCursor		*fHorizontalCursor;
 		BCursor		*fVerticalCursor;
 		BCursor		*fDragCursor;
+		
+		float		fStartingMovement;
+		float		fWhereWere;		
+		
 };
 
 #endif
