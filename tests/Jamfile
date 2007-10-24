@@ -4,6 +4,19 @@ LinkLibraries ToolbarTest : $(LW_TOP)/libwalter.a ;
 Main ToolbarTest :
 	toolbar/Test.cpp ;
 
+LinkLibraries ColorWellTest : $(LW_TOP)/libwalter.a ;
+Main ColorWellTest :
+	ColorWell/Test.cpp ;
+
+LinkLibraries ComboBoxTest : $(LW_TOP)/libwalter.a ;
+Main ComboBoxTest :
+	ComboBox/Test.cpp ;
+
+LinkLibraries DialogPaneTest : $(LW_TOP)/libwalter.a ;
+Main DialogPaneTest :
+	DialogPane/Test.cpp ;
+
+
 LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
 Main SplitPanelTest :
 	SplitterView/LayeringTestApp.cpp
