@@ -1,6 +1,7 @@
 SubDir LW_TOP ;
 
 HDRS += $(LW_INCLUDE) ;
+HDRS += $(LW_INCLUDE_PRIV) ;
 LINKFLAGS += -lbe -lroot ;
 
 SubInclude LW_TOP src ;

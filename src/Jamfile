@@ -11,6 +11,8 @@ Library $(LW_TOP)/libwalter :
 	general/ComboBox.cpp
 	general/FontPanel.cpp
 	general/Spinner.cpp
+	general/DialogPane.cpp
+	general/Utilities.cpp
 	
 	general/toolbar/Toolbar.cpp
 	general/toolbar/ToolbarBitmapButton.cpp
