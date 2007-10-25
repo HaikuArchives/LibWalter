@@ -20,7 +20,6 @@ Library $(LW_TOP)/libwalter :
 	general/toolbar/ToolbarControl.cpp
 	general/toolbar/ToolbarItem.cpp
 	general/toolbar/ToolbarSeparator.cpp
-	general/toolbar/ToolbarDragger.cpp
 	general/toolbar/ToolbarSupport.cpp
 
 	
