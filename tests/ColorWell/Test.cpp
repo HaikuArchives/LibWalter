@@ -52,7 +52,7 @@ private:
 	MyWindow *fWindow;
 public:
 
-MyApp(void) : BApplication("application/libwlater-general-test")
+MyApp(void) : BApplication("application/libwalter-ColorWell-test")
 {
 	fWindow = new MyWindow();
 }
