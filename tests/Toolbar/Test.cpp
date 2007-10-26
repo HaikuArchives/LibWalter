@@ -105,7 +105,7 @@ private:
 	MyWindow *fWindow;
 public:
 
-MyApp(void) : BApplication("application/toolbar-test")
+MyApp(void) : BApplication("application/libwalter-Toolbar-test")
 {
 	fWindow = new MyWindow();
 }

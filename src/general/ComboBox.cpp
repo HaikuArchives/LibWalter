@@ -11,7 +11,7 @@
 #include <string.h>
 #include <Bitmap.h>
 #include <Picture.h>
-#include <PictureButton.h>
+#include <interface/PictureButton.h>
 #include <Polygon.h>
 #include <ClassInfo.h>
 #include <Debug.h>

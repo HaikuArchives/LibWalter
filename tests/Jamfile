@@ -23,3 +23,7 @@ Main SplitPanelTest :
 	SplitterView/MainView.cpp
 	SplitterView/TestWindow.cpp
 ;
+
+LinkLibraries PictureButtonTest : $(LW_TOP)/libwalter.a ;
+Main PictureButtonTest :
+	PictureButton/Test.cpp ;

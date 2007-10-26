@@ -6,10 +6,13 @@ Library $(LW_TOP)/libwalter :
 	general/BitmapButton.cpp
 	general/BitmapListItem.cpp
 	general/BitmapMenuItem.cpp
+	general/BitmapUtils.cpp
 	general/BitmapView.cpp
+	general/ButtonDecorator.cpp
 	general/ColorWell.cpp
 	general/ComboBox.cpp
 	general/FontPanel.cpp
+	general/PictureButton.cpp
 	general/Spinner.cpp
 	general/DialogPane.cpp
 	general/Utilities.cpp
@@ -21,7 +24,6 @@ Library $(LW_TOP)/libwalter :
 	general/toolbar/ToolbarItem.cpp
 	general/toolbar/ToolbarSeparator.cpp
 	general/toolbar/ToolbarSupport.cpp
-
 	
 	general/SplitterView/Divider.cpp
 	general/SplitterView/SplitterView.cpp
