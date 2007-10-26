@@ -16,6 +16,7 @@ Library $(LW_TOP)/libwalter :
 	general/Spinner.cpp
 	general/DialogPane.cpp
 	general/Utilities.cpp
+	general/PaneSwitch.cpp
 	
 	general/toolbar/Toolbar.cpp
 	general/toolbar/ToolbarBitmapButton.cpp

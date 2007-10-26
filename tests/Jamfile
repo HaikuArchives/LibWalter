@@ -16,6 +16,10 @@ LinkLibraries DialogPaneTest : $(LW_TOP)/libwalter.a ;
 Main DialogPaneTest :
 	DialogPane/Test.cpp ;
 
+LinkLibraries PaneSwitchTest : $(LW_TOP)/libwalter.a ;
+Main PaneSwitchTest :
+	PaneSwitch/Test.cpp ;
+
 LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
 Main SplitPanelTest :
 	SplitterView/LayeringTestApp.cpp
