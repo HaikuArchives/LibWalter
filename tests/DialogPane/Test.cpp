@@ -9,7 +9,7 @@
 #include <Resources.h>
 #include <Window.h>
 
-#include "DialogPane.h"
+#include <PaneSwitch.h>
 
 #define TEST_MESSAGE 'test'
 
