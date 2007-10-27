@@ -32,8 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#ifndef _DIALOG_PANE_
-#define _DIALOG_PANE_
+#ifndef _PANE_SWITCH_
+#define _PANE_SWITCH_
 
 #include <Control.h>
 
