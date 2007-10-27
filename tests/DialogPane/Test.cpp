@@ -10,23 +10,36 @@
 #include <Window.h>
 
 #include <PaneSwitch.h>
+#include <DialogPane.h>
+
 
 #define TEST_MESSAGE 'test'
 
 class MyWindow : public BWindow { // --------------------------------------------------------------
 private:
-	PaneSwitch* fPermissionsSwitch;
+	DialogPane* fMoreOptionsPane;
+	PaneSwitch* fLatch;
 public:
 
 MyWindow(void) :
-	BWindow(BRect(100, 100, 400, 400), "DiaglogPane test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	BWindow(BRect(100, 100, 300, 300), "DiaglogPane test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	BView *back = new BView(Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
-	AddChild(back);
+	fMoreOptionsPane = new DialogPane(BRect(0,0,300,200), BRect(0,200,300,300),0,
+		               "moreOptions", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	AddChild(fMoreOptionsPane);
 
-	fPermissionsSwitch = new PaneSwitch(BRect(20,20,160,160), "Permissions");
-	fPermissionsSwitch->SetMessage(new BMessage(TEST_MESSAGE));
-	back->AddChild(fPermissionsSwitch);
+
+	fMoreOptionsPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fMoreOptionsPane->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+
+	fLatch = new PaneSwitch(BRect(05,75,30,90), "moreOptionsLatch", true, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
+	fLatch->SetTarget(fMoreOptionsPane);
+	fMoreOptionsPane->SetSwitch(fLatch);
+	fMoreOptionsPane->AddChild(fLatch);
+
+	fMoreOptionsPane->SetMode(0, true);
+
 
 }
 
