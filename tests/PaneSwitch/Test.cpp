@@ -19,7 +19,7 @@ private:
 public:
 
 MyWindow(void) :
-	BWindow(BRect(100, 100, 400, 400), "DiaglogPane test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	BWindow(BRect(100, 100, 400, 400), "PaneSwitch test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BView *back = new BView(Bounds(), NULL, B_FOLLOW_ALL_SIDES, 0);
 	AddChild(back);
@@ -52,7 +52,7 @@ private:
 	MyWindow *fWindow;
 public:
 
-MyApp(void) : BApplication("application/libwalter-DialogPane-test")
+MyApp(void) : BApplication("application/libwalter-PaneSwitch-test")
 {
 	fWindow = new MyWindow();
 }
