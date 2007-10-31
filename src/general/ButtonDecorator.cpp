@@ -190,9 +190,9 @@ void ButtonDecorator::_delete_bitmap_set(int num)
 int ButtonDecorator::_get_real_pic_index(int status)
 {
 	if (fPictureType == BD_PICTURE_BITMAP && fCurrentSet != NULL) {
-		int s = (status | BD_STATUS_DISABLED ? status - 1 : status);
+		int s = (status & BD_STATUS_DISABLED ? status - 1 : status);
 		while (fCurrentSet->bitmap[s] == NULL) s -= 2;
-		if (status | BD_STATUS_DISABLED) s++;
+		if (status & BD_STATUS_DISABLED) s++;
 		return s;
 	}
 	else if (fPictureType == BD_PICTURE_SVG) {
@@ -254,9 +254,15 @@ void ButtonDecorator::DrawLabel(BView *view, BRect rect, int status)
 
 void ButtonDecorator::DrawPicture(BView *view, BRect rect, int status)
 {
+	// TODO SVG
+
 	if (fCurrentSet == NULL) return;
 
-	BBitmap *bitmap = fCurrentSet->bitmap[_get_real_pic_index(status)];
+	int index = _get_real_pic_index(status);
+
+	if (index == -1) return;
+
+	BBitmap *bitmap = fCurrentSet->bitmap[index];
 	BPoint realPos(rect.LeftTop());
 
 	// Fancy alpha blending!
@@ -280,7 +286,7 @@ void ButtonDecorator::DrawPicture(BView *view, BRect rect, int status)
 // ============================================================================
 
 ButtonDecorator::ButtonDecorator(const char *label, BBitmap *picture,
-	BDPosition position, bool generateDisabled)
+	BDPosition position)
 {
 	BDBitmapSet *set;
 	BRect r;
@@ -299,9 +305,9 @@ ButtonDecorator::ButtonDecorator(const char *label, BBitmap *picture,
 	set = new BDBitmapSet;
 	set->size = r.IntegerWidth() + 1;
 	set->bitmap[0] = picture;
-	for (i = 2; i < 8; i++) set->bitmap[i] = NULL;
-	if (generateDisabled)
-		set->bitmap[1] = BitmapUtils::Grayscale(picture);
+	set->bitmap[1] = BitmapUtils::Grayscale(picture);
+	for (i = 2; i < 8; i++)
+		set->bitmap[i] = NULL;
 
 	fBitmaps.push_back(set);
 	fCurrentSet = set;
@@ -532,11 +538,13 @@ void ButtonDecorator::DeletePicture(void)
 
 void ButtonDecorator::Draw(BView *view, BRect rect, int status)
 {
-	if (view == NULL || !rect.IsValid() || (status != BD_STATUS_NORMAL &&
-	  status != BD_STATUS_DISABLED && status != BD_STATUS_PUSHED &&
-	  status != BD_STATUS_PUSHED_DISABLED && status != BD_STATUS_OVER &&
-	  status != BD_STATUS_OVER_DISABLED && status != BD_STATUS_OVER_PUSHED &&
-	  status != BD_STATUS_OVER_PUSHED_DISABLED))
+	if (view == NULL || !rect.IsValid())
+		return;
+	if (!(status == BD_STATUS_NORMAL || status == BD_STATUS_DISABLED ||
+	  status == BD_STATUS_PUSHED || status == BD_STATUS_PUSHED_DISABLED ||
+	  status == BD_STATUS_OVER || status == BD_STATUS_OVER_DISABLED ||
+	  status == BD_STATUS_OVER_PUSHED ||
+	  status == BD_STATUS_OVER_PUSHED_DISABLED))
 		return;
 
 	BRect *picture, *label;
@@ -815,6 +823,7 @@ bool ButtonDecorator::SetPicture(BBitmap *picture[8])
 			fBitmaps.push_back(set);
 			break;
 		}
+		i++;
 	}
 	if (i == fBitmaps.size())
 		fBitmaps.push_back(set);

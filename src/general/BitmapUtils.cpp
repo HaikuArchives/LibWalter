@@ -212,7 +212,7 @@ BBitmap * BitmapUtils::LoadFromResource(int32 id)
 	if (be_app->GetAppInfo(&info) != B_OK) return NULL;
 	if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK) return NULL;
 	if (resources.SetTo(&file, false) != B_OK) return NULL;
-	data = resources.LoadResource('BBMP', 1, &len);
+	data = resources.LoadResource('BBMP', id, &len);
 	if (data == NULL || len <= 0) return NULL;
 	if (message.Unflatten((const char *)data) != B_OK) return NULL;
 	archivable = BBitmap::Instantiate(&message);

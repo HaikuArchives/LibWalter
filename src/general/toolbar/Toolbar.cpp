@@ -1,10 +1,9 @@
 // =============================================================================
 //
-// libwalter Toolbar.Ccpp
+// libwalter Toolbar.cpp
 //
 // WToolbar, a toolbar widget
 //
-// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -21,7 +20,7 @@
 // Standard C headers
 #include <string.h>
 
-// BeOS headers
+// Haiku headers
 #include <Bitmap.h>
 #include <Handler.h>
 #include <Looper.h>
@@ -1171,6 +1170,10 @@ void WToolbar::Update(void)
 	WToolbarItem *item;
 	unsigned i;
 	BRect r;
+
+	// Tell the items that the toolbar properties may have changed
+	for (i = 0; i < fItems.size(); i++)
+		fItems[i]->Update();
 
 	// Search for the largest (or tallest) item
 	max = 0.0;

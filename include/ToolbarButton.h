@@ -2,9 +2,8 @@
 //
 // libwalter ToolbarButton.h
 //
-// Simple button control for WToolbar
+// Button control for WToolbar
 //
-// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -18,13 +17,17 @@
 #ifndef _TOOLBAR_BUTTON_H_
 #define _TOOLBAR_BUTTON_H_
 
-// BeOS headers
+// Standard C++ headers
+#include <vector>
+
+// Haiku headers
 #include <Control.h> // For B_CONTROL_ON and B_CONTROL_OFF
 
 // libwalter headers
+#include "ButtonDecorator.h"
 #include "ToolbarControl.h"
 
-// BeOS classes
+// Haiku classes
 class BBitmap;
 
 // =============================================================================
@@ -33,48 +36,76 @@ class BBitmap;
 
 class WToolbarButton : public WToolbarControl {
 private:
-			void				_calc_size(float &lh, float &lw, float &ph,
-									float &pw);
+
+	//		void				_calc_size(float &lh, float &lw, float &ph,
+	//								float &pw);
 			void				_init_object(void);
-			char *				fLabel;
+			ButtonDecorator *	fDecorator;
 			bool				fSwitchMode;
 			int32				fValue;
+
 protected:
+
 	// Infos for drawing hooks
 			BView *				fCanvas;
 			int					fStyle;
+
 	// Drawing hooks
 	virtual	float				BorderSize(void);
+	virtual	void				ContentSize(float *width, float *height);
 	virtual	void				DrawBackground(BRect updateRect);
 	virtual	void				DrawBorder(BRect updateRect);
-	virtual	void				DrawLabel(BPoint position, BRect updateRect);
-	virtual	void				DrawPicture(BPoint position, BRect updateRect);
-	virtual	void				GetLabelSize(float *width, float *height);
-	virtual	void				GetPictureSize(float *width, float *height);
+	virtual	void				DrawContent(BPoint position, BRect updateRect);
 	virtual	float				Padding(void);
+
 public:
+
 								WToolbarButton(const char *name,
 									const char *label,
+									BBitmap *picture,
 									BMessage *message = NULL,
 									bool switchMode = false);
 								WToolbarButton(BMessage *archive);
+
 	virtual						~WToolbarButton();
+
 	// BArchivable hooks
 	virtual	status_t			Archive(BMessage *archive,
 									bool deep = true) const;
 	static	BArchivable *		Instantiate(BMessage *archive);
-	// AKToolbarControl hooks
-			void				Draw(BView *canvas, BRect updateRect);
-			void				GetPreferredSize(float *width, float *height);
-			void				MouseUp(BPoint point);
-	// Other methods
-	static	BBitmap *			GetMenuCheckMark(void);
+
+	// WToolbarControl hooks
+	virtual	void				Draw(BView *canvas, BRect updateRect);
+	virtual	void				GetPreferredSize(float *width, float *height);
+	virtual	void				MouseUp(BPoint point);
+	virtual	void				Update(void);
+
+	// Picture
+			void				GetPicture(BBitmap *picture[8]);
+	virtual	bool				SetPicture(BBitmap *picture[8]);
+	virtual	void				DeletePicture(void);
+
+	// Special for bitmaps
+			unsigned			CountBitmapSets(void);
+			int					IndexOfBitmapSet(BDBitmapSet *set);
+			BDBitmapSet *		GetBitmapSet(unsigned size);
+			BDBitmapSet *		GetBitmapSetAt(unsigned index);
+			bool				DeleteBitmapSet(unsigned size);
+			bool				DeleteBitmapSetAt(unsigned index);
+
+	// Label
 			const char *		Label(void);
-			void				SetLabel(const char *label);
-			void				SetValue(int32 value);
-			void				SetSwitchMode(bool switchMode);
-			bool				SwitchMode(void);
+	virtual	void				SetLabel(const char *label);
+
+	// Value
 			int32				Value(void);
+	virtual	void				SetValue(int32 value);
+
+	// Other methods
+			ButtonDecorator *	Decorator(void);
+	static	BBitmap *			GetMenuCheckMark(void);
+	virtual	void				SetSwitchMode(bool switchMode);
+			bool				SwitchMode(void);
 };
 
 #endif // _TOOLBAR_BUTTON_H_

@@ -4,7 +4,6 @@
 //
 // WToolbar, a toolbar widget
 //
-// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -21,7 +20,7 @@
 // Standard C++ headers
 #include <vector>
 
-// BeOS headers
+// Haiku headers
 #include <View.h>
 #include <Messenger.h>
 
@@ -87,23 +86,28 @@ private:
 			void					_draw_item(unsigned index,
 										BRect updateRect);
 			void					_init_object(void);
+
 	// Appearance
 			WToolbarAppearance		fAppearance;
+
 	// Properties
 			bool					fAutoSize;
 			bool					fEnabled;
 			BMessenger				fTarget;
+
 	// Internals
 			WToolbarItems			fItems;
 			bool					fDisableUpdate;
 			bool					fDisableStyling;
 			WToolbarItem *			fMouseDownItem;
 			WToolbarItem *			fMouseOverItem;
+
 protected:
 			void					AssertLocked(void);
 	virtual	float					BorderSize(void);
 	virtual	void					DrawBackground(BRect updateRect);
 	virtual	void					DrawBorder(BRect updateRect);
+
 public:
 									WToolbar(BRect frame, const char *name,
 										int style = W_TOOLBAR_STYLE_FLAT,
@@ -119,16 +123,19 @@ public:
 										B_WILL_DRAW);
 									WToolbar(BMessage *archive);
 	virtual							~WToolbar();
+
 	// BArchivable hooks
 	virtual	status_t				Archive(BMessage *archive,
 										bool deep = true) const;
 	static	BArchivable *			Instantiate(BMessage *archive);
+
 	// BHandler hooks
 	//virtual	status_t			GetSupportedSuites(BMessage *message);
 	virtual	void					MessageReceived(BMessage *message);
 	//virtual	BHandler *			ResolveSpecifier(BMessage *message,
 	//									int32 index, BMessage *specifier,
 	//									int32 what, const char *property);
+
 	// BView hooks
 	virtual	void					AttachedToWindow(void);
 	virtual	void					DetachedFromWindow(void);
@@ -139,6 +146,7 @@ public:
 	virtual	void					MouseMoved(BPoint point, uint32 transit,
 										const BMessage *message);
 	virtual	void					MouseUp(BPoint point);
+
 	// Items management
 			bool					AddItem(WToolbarItem *item,
 										int line = -1, int position = -1);
@@ -154,11 +162,13 @@ public:
 										bool exact = false);
 			bool					RemoveItem(
 										WToolbarItem *item);
+
 	// Properties
 			bool					AutoSize(void);
 			bool					Enabled(void);
 			void					SetAutoSize(bool auto_size);
 			void					SetEnabled(bool enabled);
+
 	// Appearance
 			WToolbarAlignment		Alignment(void);
 			BBitmap *				BackgroundBitmap(void);
@@ -178,6 +188,7 @@ public:
 			void					SetPictureSize(float picture_size);
 	virtual	void					SetStyle(int style);
 			int						Style(void);
+
 	// Target
 			bool					IsTargetLocal(void) const;
 			BMessenger				Messenger(void) const;
@@ -188,6 +199,7 @@ public:
 			status_t				SetTarget(const BHandler *handler,
 										const BLooper *looper = NULL);
 			BHandler *				Target(BLooper **looper = NULL) const;
+
 	// Other methods
 			void					Update(void);
 };

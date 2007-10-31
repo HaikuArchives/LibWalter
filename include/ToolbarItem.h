@@ -4,7 +4,6 @@
 //
 // Base class for WToolbar items
 //
-// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -18,12 +17,12 @@
 #ifndef _TOOLBAR_ITEM_H_
 #define _TOOLBAR_ITEM_H_
 
-// BeOS headers
+// Haiku headers
 #include <Handler.h>
 #include <Point.h>
 #include <Rect.h>
 
-// BeOS classes
+// Haiku classes
 class BView;
 
 // libwalter classes
@@ -43,17 +42,21 @@ private:
 			WToolbar *		fToolbar;
 			bool			fVisible;
 			float			fWidth;
+
 protected:
 			bool			fMouseDown;
 			bool			fMouseOver;
+
 public:
 							WToolbarItem(const char *name = NULL);
 							WToolbarItem(BMessage *archive);
 	virtual					~WToolbarItem();
+
 	// BArchivable hooks
 	virtual	status_t		Archive(BMessage *archive,
 								bool deep = true) const;
 	static	BArchivable *	Instantiate(BMessage *archive);
+
 	// Other methods
 	virtual	void			AttachedToToolbar(void);
 			BRect			Bounds();
@@ -72,6 +75,7 @@ public:
 			int				Position(void);
 			void			SetVisible(bool visible);
 			WToolbar *		Toolbar(void);
+	virtual	void			Update(void);
 			bool			Visible(void);
 };
 

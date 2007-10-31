@@ -4,7 +4,6 @@
 //
 // Base class for WToolbar items
 //
-// Revision: 20070518
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -222,6 +221,10 @@ void WToolbarItem::SetVisible(bool visible)
 WToolbar * WToolbarItem::Toolbar(void)
 {
 	return fToolbar;
+}
+
+void WToolbarItem::Update(void)
+{
 }
 
 bool WToolbarItem::Visible(void)

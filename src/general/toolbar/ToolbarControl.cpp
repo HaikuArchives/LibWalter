@@ -158,3 +158,7 @@ void WToolbarControl::SetEnabled(bool enabled)
 		fMouseDown = false;
 	Invalidate();
 }
+
+void WToolbarControl::Update(void)
+{
+}

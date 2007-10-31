@@ -19,7 +19,6 @@ Library $(LW_TOP)/libwalter :
 	general/PaneSwitch.cpp
 	
 	general/toolbar/Toolbar.cpp
-	general/toolbar/ToolbarBitmapButton.cpp
 	general/toolbar/ToolbarButton.cpp
 	general/toolbar/ToolbarControl.cpp
 	general/toolbar/ToolbarItem.cpp

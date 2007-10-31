@@ -61,6 +61,7 @@ typedef enum {
 #define BD_STATUS_OVER_PUSHED			BD_STATUS_OVER | BD_STATUS_PUSHED
 #define BD_STATUS_OVER_PUSHED_DISABLED	BD_STATUS_OVER | BD_STATUS_PUSHED | \
 										BD_STATUS_DISABLED
+
 // Picture type
 typedef enum {
 	BD_PICTURE_NONE = -1,
@@ -113,7 +114,7 @@ protected:
 public:
 
 			ButtonDecorator(const char *label, BBitmap *picture,
-				BDPosition position, bool generateDisabled = true);
+				BDPosition position);
 			ButtonDecorator(BMessage *archive);
 	virtual	~ButtonDecorator();
 
