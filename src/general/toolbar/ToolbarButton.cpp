@@ -52,11 +52,27 @@ WToolbarButton::WToolbarButton(const char *name, const char *label,
 WToolbarButton::WToolbarButton(BMessage *archive) :
 	WToolbarControl(archive)
 {
-	const char *label;
+	BMessage decArchive;
 	bool switchMode;
 	int value;
 
 	_init_object();
+
+	if (archive->FindMessage("WToolbarButton::decorator",
+	  &decArchive) == B_OK) {
+		BArchivable *archivable;
+		archivable = ButtonDecorator::Instantiate(&decArchive);
+		if (archivable != NULL) {
+			ButtonDecorator *decorator =
+				static_cast<ButtonDecorator*>(archivable);
+			if (decorator != NULL) {
+				delete fDecorator;
+				fDecorator = decorator;
+			}
+			else
+				delete archivable;
+		}
+	}
 
 	if (archive->FindBool("WToolbarButton::switch_mode", &switchMode) == B_OK)
 		SetSwitchMode(switchMode);
@@ -183,6 +199,12 @@ status_t WToolbarButton::Archive(BMessage *archive, bool deep) const
 	status_t status;
 
 	status = WToolbarControl::Archive(archive, deep);
+
+	if (status == B_OK) {
+		BMessage decorator;
+		fDecorator->Archive(&decorator);
+		status = archive->AddMessage("WToolbarButton::decorator", &decorator);
+	}
 
 	if (status == B_OK && fSwitchMode == false)
 		status = archive->AddBool("WToolbarButton::switch_mode", fSwitchMode);

@@ -15,7 +15,10 @@
 #include "ToolbarButton.h"
 #include "ToolbarSeparator.h"
 
+//#define DEBUG_ARCHIVE 1
+
 #define MSG_TEST			'test'
+#define MSG_ARCHIVE			'arch'
 #define MSG_LABELS_NO		'nola'
 #define MSG_LABELS_BOTTOM	'bott'
 #define MSG_LABELS_SIDE		'side'
@@ -23,6 +26,8 @@
 #define MSG_PICS_SMALL		'smal'
 #define MSG_PICS_LARGE		'larg'
 #define MSG_ENABLE			'enab'
+#define MSG_HORIZONTAL		'hori'
+#define MSG_VERTICAL		'vert'
 
 class MyWindow : public BWindow { // --------------------------------------------------------------
 private:
@@ -34,10 +39,14 @@ MyWindow(void) :
 	BWindow(BRect(100, 100, 400, 400), "Toolbar test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BMenuBar *bar;
+	BMenu *menu;
 	BView *back;
 	BRect r;
 
 	bar = new BMenuBar(Bounds(), "menubar");
+	menu = new BMenu("Actions");
+	menu->AddItem(new BMenuItem("Archive", new BMessage(MSG_ARCHIVE)));
+	bar->AddItem(menu);
 	fMenu = new BMenu("Customize");
 	fMenu->AddItem(new BMenuItem("No labels", new BMessage(MSG_LABELS_NO)));
 	fMenu->AddItem(new BMenuItem("Labels on bottom", new BMessage(MSG_LABELS_BOTTOM)));
@@ -49,9 +58,13 @@ MyWindow(void) :
 	bar->AddItem(fMenu);
 	fMenu->AddSeparatorItem();
 	fMenu->AddItem(new BMenuItem("Enabled", new BMessage(MSG_ENABLE)));
+	fMenu->AddSeparatorItem();
+	fMenu->AddItem(new BMenuItem("Horizontal", new BMessage(MSG_HORIZONTAL)));
+	fMenu->AddItem(new BMenuItem("Vertical", new BMessage(MSG_VERTICAL)));
 	fMenu->ItemAt(0)->SetMarked(true);
 	fMenu->ItemAt(6)->SetMarked(true);
 	fMenu->ItemAt(8)->SetMarked(true);
+	fMenu->ItemAt(10)->SetMarked(true);
 	AddChild(bar);
 
 	r = Bounds();
@@ -59,14 +72,19 @@ MyWindow(void) :
 	back = new BView(r, NULL, B_FOLLOW_ALL_SIDES, 0);
 	AddChild(back);
 
+#ifdef DEBUG_ARCHIVE
+	BFile file("/boot/home/ToolbarArchive", B_READ_ONLY);
+	BMessage archive;
+	archive.Unflatten(&file);
+	BArchivable *archivable = WToolbar::Instantiate(&archive);
+	fToolbar = static_cast<WToolbar*>(archivable);
+#else
 	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar");
 	fToolbar->SetPictureSize(W_TOOLBAR_PICTURE_MEDIUM);
-	back->AddChild(fToolbar);
-	fToolbar->AddItem(new WToolbarButton("hello_button", "Hello!", NULL, new BMessage(MSG_TEST)));
-	fToolbar->AddItem(new WToolbarSeparator("separator_1"));
 	LoadTrackerIcons();
-	fToolbar->AddItem(new WToolbarSeparator("separator_2"));
-	fToolbar->AddItem(new WToolbarButton("bye_button", "Bye!", NULL, new BMessage(MSG_TEST)));
+#endif
+
+	back->AddChild(fToolbar);
 
 	ResizeTo(fToolbar->Frame().Width(), fToolbar->Frame().Height() + bar->Frame().Height() + 1);
 }
@@ -114,6 +132,8 @@ void LoadTrackerIcons(void)
 					button = new WToolbarButton(name, name, NULL, new BMessage(MSG_TEST));
 					button->SetPicture(small);
 					button->SetPicture(large);
+					if ((index - 5) % 10 == 0)
+						fToolbar->AddItem(new WToolbarSeparator(), index / 10);
 					fToolbar->AddItem(button, index / 10);
 				}
 			}
@@ -128,6 +148,16 @@ void MessageReceived(BMessage *message)
 		case MSG_TEST:
 			(new BAlert("Hello!", "Hello!", "OK"))->Go();
 			break;
+		case MSG_ARCHIVE: {
+			BMessage archive;
+			BFile file("/boot/home/ToolbarArchive", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+			if (file.InitCheck() == B_OK) {
+				fToolbar->Archive(&archive);
+				if (archive.Flatten(&file) == B_OK)
+					(new BAlert("Archive", "Toolbar archived in /boot/home/ToolbarArchive", "OK"))->Go();
+			} else
+				(new BAlert("Archive", "Error creating /boot/home/ToolbarArchive", "OK"))->Go();
+			} break;
 		case MSG_LABELS_NO:
 			fToolbar->SetLabelPosition(W_TOOLBAR_LABEL_NONE);
 			fMenu->ItemAt(0)->SetMarked(true);
@@ -169,6 +199,16 @@ void MessageReceived(BMessage *message)
 			fToolbar->SetEnabled(!enabled);
 			fMenu->ItemAt(8)->SetMarked(!enabled);
 			} break;
+		case MSG_HORIZONTAL:
+			fToolbar->SetAlignment(W_TOOLBAR_HORIZONTAL);
+			fMenu->ItemAt(10)->SetMarked(true);
+			fMenu->ItemAt(11)->SetMarked(false);
+			break;
+		case MSG_VERTICAL:
+			fToolbar->SetAlignment(W_TOOLBAR_VERTICAL);
+			fMenu->ItemAt(10)->SetMarked(false);
+			fMenu->ItemAt(11)->SetMarked(true);
+			break;
 	}
 	BWindow::MessageReceived(message);
 }
