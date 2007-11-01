@@ -4,7 +4,6 @@
 //
 // Miscellaneous functions for WToolbar and related classes
 //
-// Revision: 20070513
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -18,18 +17,11 @@
 #ifndef _SUPPORT_H_
 #define _SUPPORT_H_
 
-// BeOS headers
+// Haiku headers
 #include <Rect.h>
-#include <SupportDefs.h>
 
-// BeOS classes
-class BBitmap;
-class BDirectory;
-class BFile;
-class BMenu;
-class BTextView;
+// Haiku classes
 class BView;
-struct entry_ref;
 
 // =============================================================================
 // WToolbarSupport
@@ -37,7 +29,6 @@ struct entry_ref;
 
 class WToolbarSupport {
 public:
-	static	BBitmap *		GrayscaleBitmap(BBitmap *bitmap);
 	static	void			Draw3DBorder(BView *view, BRect rect,
 								bool inset = false);
 };
