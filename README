@@ -1,8 +1,17 @@
-LibWalter v0.1
+LibWalter v0.1 README
+---------------------
 
-LibWalter is a code collection which aims to fill in the gaps in the BeOS API, released under the MIT license.
+LibWalter is a code collection which aims to fill in the gaps in the BeOS API, released under the MIT license. Designed to be compatible with BeOS R5, Zeta 1.x, and Haiku.
 
-Below is a listing of all the classes included in the library and usage notes for each.
+Index:
+
+1. Included classes and usage notes
+2. How to use LibWalter
+3. How to contribute
+
+
+1. Included classes and usage notes
+-----------------------------------
 
 AutoTextControl
 	BTextControl is simply inadequate for some purposes, such as sending update messages every time the user changes the text. AutoTextControl fixes this and is designed to be a drop-in replacement for BTextControl. You shouldn't need to call SetFilter, but the method is there should you need to do so. In addition to better change notification, AutoTextControl can set a limit on the number of characters in the text box, which is probably more often what you really want to do instead of limiting by byte count.
@@ -19,6 +28,9 @@ BitmapMenuItem
 
 BitmapView
 	This class is mostly meant to be able to show a picture with the right shape. It also comes with some whistles and bells which may come in handy in some instances. It can accept (or refuse) drops from ShowImage and Tracker. The user can paste in a picture from the clipboard. The BitmapView control can also resize dropped/pasted pictures (and keep the aspect ratio) so that they are no larger than a specified size. SetStyle allows you to have (or not have) a border around the image. It can also send a message to a target when the user modifies its picture by removing it or dropping/pasting a new picture into it. This class does NOT take ownership of bitmaps passed to it, so please take care to respond to these messages if you allow the user to change drop/paste images or you will have a memory leak on your hands.
+
+ButtonDecorator
+	This class is useful to draw a picture with a label inside a BView. Support various alignment options and can store different pictures of different size and different states (e.g., normal, disabled, mouse over...). Other classes such ToolbarButton or PictureButton are based on this class.
 
 ColorWell
 	Now you have a simple BControl-based class which accepts color drops. Note that this class does not have its own color picker in order to allow you, the developer, the opportunity to customize color selection to your app.
@@ -44,5 +56,25 @@ TextFile
 	Many times reading a text file one line at a time, is needed for one reason or another. This BFile-derived class adds one method: ReadLine(), which spits back the next \n terminated line using buffered disk access and removes the linefeed for you. Wildly convenient for reading config files. :-)
 
 Toolbar
-	BeOS misses a powerful and easy to use toolbar view. WToolbar aims to be a collection of classes that will make the most powerful
-toolbar ever seen on BeOS-like operating systems! SVG, multi-level drop downs, detachable toolbars, tooltips, multi-line arrangement, various alignment, high apperance customizability, and many more features are in devlopment!
+ToolbarItem
+ToolbarControl
+ToolbarButton
+ToolbarSeparator
+	A classic toolbar view. Can contain several items such as buttons and separators, and you can design your own by subclassing the appropriate class. Items can be arranged in rows or columns (also in multiple lines) and there are several options for both the developer and the final user.
+
+
+2. How to use LibWalter
+-----------------------
+
+LibWalter is in a pre-alpha state, so we don't provide a precompiled library to avoid confusion. However, you can compile LibWalter and link it with your application executable, or just take only the classes you need. To get the LibWalter source code from OSDrawer you can download the Nightly SVN Tree Snapshot, or pull it via anonymous SVN.
+
+Once you obtained the source, to compile the library you need Jam (downlaod it from the Haiku website). Open a Terminal window, go to the directory where you placed the sources, run ./configure and then jam; this will make both the library and the test applications.
+After you have the library (libwalter.a) compiled, it is recommended to copy it and its source to your application's source directory to avoid incompatibility with future versions of the library. If you're using BeIDE, add the library to your project by dropping it into the project window, then add the path to the header files to the project build options.
+
+Alternatively, you can add only the classes you need by adding the relative sources to your project.  Dependings by your compiler options, you may get some warnings; it is usually safe to ignore them.
+
+
+3. How to contribute
+--------------------
+
+If you want to help improve LibWalter, you can simply add a message to the forums on OSDrawer. If you want to join the project, contact the administrators!
