@@ -30,7 +30,7 @@ BitmapView
 	This class is mostly meant to be able to show a picture with the right shape. It also comes with some whistles and bells which may come in handy in some instances. It can accept (or refuse) drops from ShowImage and Tracker. The user can paste in a picture from the clipboard. The BitmapView control can also resize dropped/pasted pictures (and keep the aspect ratio) so that they are no larger than a specified size. SetStyle allows you to have (or not have) a border around the image. It can also send a message to a target when the user modifies its picture by removing it or dropping/pasting a new picture into it. This class does NOT take ownership of bitmaps passed to it, so please take care to respond to these messages if you allow the user to change drop/paste images or you will have a memory leak on your hands.
 
 ButtonDecorator
-	This class is useful to draw a picture with a label inside a BView. Support various alignment options and can store different pictures of different size and different states (e.g., normal, disabled, mouse over...). Other classes such ToolbarButton or PictureButton are based on this class.
+	This class is useful to draw a picture with a label inside a BView. Support various alignment options and can store different pictures of different size and different states (e.g., normal, disabled, mouse over...). Currently supports only bitmaps, but SVG support is planned; widgets based on this class (like PictureButton or ToolbarButton) will get SVG support "automatically".
 
 ColorWell
 	Now you have a simple BControl-based class which accepts color drops. Note that this class does not have its own color picker in order to allow you, the developer, the opportunity to customize color selection to your app.
@@ -45,6 +45,9 @@ FontPanel
 
 PathBox
 	This is merely a control, comprised of a BTextControl, a BButton, and a BFilePanel, which provides a simple way for a user to specify a path either by typing one in or browsing for one and optionally validating the user input for you.
+
+PictureButton
+	A button which can show a picture and a label, with various options. Based on ButtonDecorator.
 
 Spinner
 	A Spinner control is a combination of text box and vertical arrow buttons to increment and decrement numbers, such as the font size in the FontPanel. While Zeta has one, R5 and Haiku do not. This control provides cross-platform consistency and API simplicity.
