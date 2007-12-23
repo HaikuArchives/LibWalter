@@ -36,6 +36,7 @@ class WToolbarItem : public BHandler {
 friend class WToolbar;
 private:
 			void			_init_object(void);
+			bool			fFlexible;
 			BRect			fFrame;
 			float			fHeight;
 			int				fLine;
@@ -62,6 +63,7 @@ public:
 			BRect			Bounds();
 	virtual	void			DetachedFromToolbar(void);
 	virtual	void			Draw(BView *canvas, BRect updateRect);
+			bool			Flexible(void);
 			BRect			Frame(void);
 	virtual	void			GetPreferredSize(float *width,
 								float *height);
@@ -73,6 +75,7 @@ public:
 								const BMessage *message);
 	virtual	void			MouseUp(BPoint point);
 			int				Position(void);
+	virtual	void			SetFlexible(bool flexible);
 			void			SetVisible(bool visible);
 			WToolbar *		Toolbar(void);
 	virtual	void			Update(void);

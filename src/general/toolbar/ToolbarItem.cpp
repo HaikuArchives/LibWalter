@@ -59,11 +59,14 @@ WToolbarItem::WToolbarItem(const char *name) :
 WToolbarItem::WToolbarItem(BMessage *archive) :
 	BHandler(archive)
 {
-	bool enabled, visible;
+	bool enabled, visible, flexible;
 	BMessage message;
 	int line;
 
 	_init_object();
+
+	if (archive->FindBool("WToolbarItem::flexible", &flexible) == B_OK)
+		SetFlexible(flexible);
 
 	if (archive->FindInt32("WToolbarItem::line", (int32*)(&line)) == B_OK)
 		fLine = line;
@@ -82,6 +85,7 @@ WToolbarItem::~WToolbarItem()
 
 void WToolbarItem::_init_object(void)
 {
+	fFlexible = false;
 	fFrame = BRect(0.0, 0.0, -1.0, -1.0);
 	fHeight = 0.0;
 	fLine = -1;
@@ -102,6 +106,9 @@ status_t WToolbarItem::Archive(BMessage *archive, bool deep) const
 	status = BHandler::Archive(archive, deep);
 
 	// Properties
+
+	if (status == B_OK)
+		status = archive->AddBool("WToolbarItem::flexible", fFlexible);
 
 	if (status == B_OK)
 		status = archive->AddInt32("WToolbarItem::line", (int32)fLine);
@@ -136,6 +143,11 @@ void WToolbarItem::DetachedFromToolbar(void)
 void WToolbarItem::Draw(BView *canvas, BRect update_rect)
 {
 	// The basic class doesn't draw anything
+}
+
+bool WToolbarItem::Flexible(void)
+{
+	return fFlexible;
 }
 
 BRect WToolbarItem::Frame(void)
@@ -177,6 +189,7 @@ int WToolbarItem::Line(void)
 
 void WToolbarItem::MouseDown(BPoint point)
 {
+	if (fToolbar == NULL) return;
 	if (fMouseOver)
 		fMouseDown = true;
 	Invalidate();
@@ -185,26 +198,35 @@ void WToolbarItem::MouseDown(BPoint point)
 void WToolbarItem::MouseMoved(BPoint point, uint32 transit,
 	const BMessage *message)
 {
+	if (fToolbar == NULL) return;
 	bool old_mouse_over = fMouseOver;
 	fMouseOver = (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW);
-	if (fMouseOver != old_mouse_over)
+	if (fMouseOver != old_mouse_over) {
 		Invalidate();
+		fToolbar->DrawItem(this);
+	}
 }
 
 void WToolbarItem::MouseUp(BPoint point)
 {
 	fMouseDown = false;
+	if (fToolbar == NULL) return;
 	Invalidate();
 }
 
 int WToolbarItem::Position(void)
 {
 	if (fToolbar == NULL) return -1;
-	int pos = 0;
-	while (fToolbar->ItemAt(fLine, pos) != this)
-		pos++;
-	return pos;
+	return fToolbar->PositionOf(this);
 }
+
+void WToolbarItem::SetFlexible(bool flexible)
+{
+	if (fFlexible == flexible) return;
+	fFlexible = flexible;
+	if (fToolbar != NULL)
+		fToolbar->Update();
+}	
 
 void WToolbarItem::SetVisible(bool visible)
 {

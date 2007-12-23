@@ -61,19 +61,22 @@ enum {
 	W_TOOLBAR_PICTURE_MAX		= 512
 };
 
-// Controls limit
-#define W_TOOLBAR_MAX_ITEMS		1024
+// Items limits
+#define W_TOOLBAR_MAX_LINES					  256
+#define W_TOOLBAR_MAX_ITEMS_PER_LINE		  256
+#define W_TOOLBAR_LAST_LINE					0x100
+#define W_TOOLBAR_LAST_POSITION				0x100
 
 // Toolbar appearance
 typedef struct {
-	WToolbarAlignment		fAlignment;
-	border_style			fBorder;
-	BBitmap *				fBackBitmap;
-	WToolbarLabelPosition	fLabelPosition;
-	float					fMargin;
-	float					fPadding;
-	float					fPicSize;
-	int						fStyle;
+	WToolbarAlignment		fAlignment;		// Horizontal or vertical
+	border_style			fBorder;		// As defined in View.h
+	BBitmap *				fBackBitmap;	// Background bitmap
+	WToolbarLabelPosition	fLabelPosition;	// Bottom or side
+	float					fMargin;		// Free space around each item
+	float					fPadding;		// Distance between border and items
+	float					fPicSize;		// Picture size (0 = no pic)
+	int						fStyle;			// One of the pre-defined styles
 } WToolbarAppearance;
 
 // =============================================================================
@@ -82,8 +85,8 @@ typedef struct {
 
 class WToolbar : public BView {
 private:
-	typedef vector<WToolbarItem*> WToolbarItems;
-			void					_draw_item(unsigned index,
+	typedef vector<WToolbarItem*> WToolbarLine;
+			void					_draw_item(unsigned line, unsigned position,
 										BRect updateRect);
 			void					_init_object(void);
 
@@ -96,7 +99,7 @@ private:
 			BMessenger				fTarget;
 
 	// Internals
-			WToolbarItems			fItems;
+			vector<WToolbarLine*>	fLines;
 			bool					fDisableUpdate;
 			bool					fDisableStyling;
 			WToolbarItem *			fMouseDownItem;
@@ -104,7 +107,7 @@ private:
 
 protected:
 			void					AssertLocked(void);
-	virtual	float					BorderSize(void);
+	virtual	float					BorderThickness(void);
 	virtual	void					DrawBackground(BRect updateRect);
 	virtual	void					DrawBorder(BRect updateRect);
 
@@ -139,8 +142,9 @@ public:
 	// BView hooks
 	virtual	void					AttachedToWindow(void);
 	virtual	void					DetachedFromWindow(void);
-			void					Draw(BRect updateRect);
-			void					GetPreferredSize(float *width,
+	virtual	void					Draw(BRect updateRect);
+	virtual	void					FrameResized(float width, float height);
+	virtual	void					GetPreferredSize(float *width,
 										float *height);
 	virtual	void					MouseDown(BPoint point);
 	virtual	void					MouseMoved(BPoint point, uint32 transit,
@@ -149,19 +153,30 @@ public:
 
 	// Items management
 			bool					AddItem(WToolbarItem *item,
-										int line = -1, int position = -1);
-			int						CountItemsInLine(int line);
-			int						CountItems(void);
-			int						CountLines(void);
-			bool					DrawItem(WToolbarItem *item);
+										int line = W_TOOLBAR_LAST_LINE,
+										int position = W_TOOLBAR_LAST_POSITION);
+			unsigned				CountItems(bool visibleOnly = false);
+			unsigned				CountItemsInLine(unsigned line,
+										bool visibleOnly = false);
+			unsigned				CountLines(bool visibleOnly = false);
+			void					DeleteLine(unsigned line);
+			void					DrawItem(WToolbarItem *item);
+			WToolbarItem *			FindFlexibleItem(unsigned line = 0);
 			WToolbarItem *			FindItem(const char *name);
 			int						IndexOf(WToolbarItem *item);
 			WToolbarItem *			ItemAt(BPoint point);
 			WToolbarItem *			ItemAt(int index);
-			WToolbarItem *			ItemAt(int line, int position,
-										bool exact = false);
-			bool					RemoveItem(
-										WToolbarItem *item);
+			WToolbarItem *			ItemAt(unsigned line, unsigned position,
+										bool visibleOnly = false);
+			bool					LineEnabled(unsigned line);
+			bool					LineVisible(unsigned line);
+			bool					MoveItem(WToolbarItem *item, 
+										int line,
+										int position = W_TOOLBAR_LAST_POSITION);
+			int						PositionOf(WToolbarItem *item);
+			bool					RemoveItem(WToolbarItem *item);
+			void					SetLineEnabled(unsigned line, bool enabled);
+			void					SetLineVisible(unsigned line, bool visible);
 
 	// Properties
 			bool					AutoSize(void);

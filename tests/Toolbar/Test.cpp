@@ -28,10 +28,13 @@
 #define MSG_ENABLE			'enab'
 #define MSG_HORIZONTAL		'hori'
 #define MSG_VERTICAL		'vert'
+#define MSG_AUTOSIZE		'auto'
+#define MSG_RESIZE			'resi'
 
 class MyWindow : public BWindow { // --------------------------------------------------------------
 private:
 	WToolbar *fToolbar;
+	BView *fBack;
 	BMenu *fMenu;
 public:
 
@@ -40,7 +43,6 @@ MyWindow(void) :
 {
 	BMenuBar *bar;
 	BMenu *menu;
-	BView *back;
 	BRect r;
 
 	bar = new BMenuBar(Bounds(), "menubar");
@@ -61,16 +63,20 @@ MyWindow(void) :
 	fMenu->AddSeparatorItem();
 	fMenu->AddItem(new BMenuItem("Horizontal", new BMessage(MSG_HORIZONTAL)));
 	fMenu->AddItem(new BMenuItem("Vertical", new BMessage(MSG_VERTICAL)));
+	fMenu->AddSeparatorItem();
+	fMenu->AddItem(new BMenuItem("Auto size", new BMessage(MSG_AUTOSIZE)));
+	fMenu->AddItem(new BMenuItem("Resize to preferred", new BMessage(MSG_RESIZE)));
 	fMenu->ItemAt(0)->SetMarked(true);
 	fMenu->ItemAt(6)->SetMarked(true);
 	fMenu->ItemAt(8)->SetMarked(true);
 	fMenu->ItemAt(10)->SetMarked(true);
+	fMenu->ItemAt(13)->SetMarked(true);
 	AddChild(bar);
 
 	r = Bounds();
 	r.top = bar->Frame().bottom + 1;
-	back = new BView(r, NULL, B_FOLLOW_ALL_SIDES, 0);
-	AddChild(back);
+	fBack = new BView(r, NULL, B_FOLLOW_ALL_SIDES, 0);
+	AddChild(fBack);
 
 #ifdef DEBUG_ARCHIVE
 	BFile file("/boot/home/ToolbarArchive", B_READ_ONLY);
@@ -79,12 +85,12 @@ MyWindow(void) :
 	BArchivable *archivable = WToolbar::Instantiate(&archive);
 	fToolbar = static_cast<WToolbar*>(archivable);
 #else
-	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar");
+	fToolbar = new WToolbar(BRect(0, 0, 10, 10), "toolbar", W_TOOLBAR_STYLE_FLAT);
 	fToolbar->SetPictureSize(W_TOOLBAR_PICTURE_MEDIUM);
 	LoadTrackerIcons();
 #endif
 
-	back->AddChild(fToolbar);
+	fBack->AddChild(fToolbar);
 
 	ResizeTo(fToolbar->Frame().Width(), fToolbar->Frame().Height() + bar->Frame().Height() + 1);
 }
@@ -128,13 +134,15 @@ void LoadTrackerIcons(void)
 					small[0]->SetBits(data_small, size_small, 0, B_CMAP8);
 					large[0] = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
 					large[0]->SetBits(data_large, size_large, 0, B_CMAP8);
-					sprintf(name, "bitmap_%d", index);
+					sprintf(name, "bitmap_%d", (int)index);
 					button = new WToolbarButton(name, name, NULL, new BMessage(MSG_TEST));
 					button->SetPicture(small);
 					button->SetPicture(large);
 					if ((index - 5) % 10 == 0)
 						fToolbar->AddItem(new WToolbarSeparator(), index / 10);
-					fToolbar->AddItem(button, index / 10);
+					fToolbar->AddItem(button, (index % 10 == 0 ? -1 : index / 10));
+					if (index % 10 == 9)
+						button->SetFlexible(true);
 				}
 			}
 		}
@@ -203,11 +211,57 @@ void MessageReceived(BMessage *message)
 			fToolbar->SetAlignment(W_TOOLBAR_HORIZONTAL);
 			fMenu->ItemAt(10)->SetMarked(true);
 			fMenu->ItemAt(11)->SetMarked(false);
+			if (!fToolbar->AutoSize()) {
+				float height;
+				fToolbar->GetPreferredSize(NULL, &height);
+				fToolbar->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+				fToolbar->ResizeTo(fBack->Frame().Width(), height);
+			}
 			break;
 		case MSG_VERTICAL:
 			fToolbar->SetAlignment(W_TOOLBAR_VERTICAL);
 			fMenu->ItemAt(10)->SetMarked(false);
 			fMenu->ItemAt(11)->SetMarked(true);
+			if (!fToolbar->AutoSize()) {
+				float width;
+				fToolbar->GetPreferredSize(&width, NULL);
+				fToolbar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
+				fToolbar->ResizeTo(width, fBack->Frame().Height());
+			}
+			break;
+		case MSG_AUTOSIZE:
+			if (fMenu->ItemAt(13)->IsMarked()) {
+				float width, height;
+				fToolbar->SetAutoSize(false);
+				fMenu->ItemAt(13)->SetMarked(false);
+				if (fToolbar->Alignment() == W_TOOLBAR_HORIZONTAL) {
+					width = fBack->Frame().Width();
+					fToolbar->GetPreferredSize(NULL, &height);
+					fToolbar->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+				}
+				else {
+					fToolbar->GetPreferredSize(&width, NULL);
+					height = fBack->Frame().Height();
+					fToolbar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
+				}
+				fToolbar->ResizeTo(width, height);
+			}
+			else {
+				fToolbar->SetResizingMode(B_FOLLOW_LEFT | B_FOLLOW_TOP);
+				fToolbar->SetAutoSize(true);
+				fMenu->ItemAt(13)->SetMarked(true);
+			}
+			break;
+		case MSG_RESIZE:
+			if (!fToolbar->AutoSize()) {
+				float width, height;
+				fToolbar->GetPreferredSize(&width, &height);
+				if (fToolbar->Alignment() == W_TOOLBAR_HORIZONTAL)
+					width = fBack->Frame().Width();
+				else
+					height = fBack->Frame().Height();
+				fToolbar->ResizeTo(width, height);
+			}
 			break;
 	}
 	BWindow::MessageReceived(message);
