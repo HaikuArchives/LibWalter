@@ -7,7 +7,7 @@
 #include "Divider.h"
 #include <Message.h>
 #include <Locker.h>
-#include <Cursor.h>
+#include <app/Cursor.h>
 #include <stdio.h>
 
 const uint32 B_DIVIDER_MOVED	= 'BDM';

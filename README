@@ -40,6 +40,9 @@ If you do decide to implement a popup color picker for the ColorWell object in y
 ComboBox
 	For the longest time, BeOS has not had a dropdown list which works like Windows. We developers have had to make do with BMenuField, which is not an ideal substitution. This is the ComboBox class that has been floating around the Internet for years, but with bugfixes.
 
+Cursor
+	This is not a class, but a set of functions to help you give a custom cursor to any view, window, or the whole app. They track the mouse moviment and automatically change the mouse cursor. There's an option to "impose" the window cursor to all the window's views, or the app cursor to all the windows. Do not use the original BApplication's or BView' SetCursor() methods if you intend to use these functions.
+
 FontPanel
 	There have been lots of ways to choose fonts in programs on BeOS. All of them stink because they lack the flexibility and consistency that a single font chooser window can offer. It works in a way similar to BFilePanel when it comes to behavior like hiding after clicking OK, the modification message, and so on.
 

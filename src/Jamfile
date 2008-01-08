@@ -11,6 +11,7 @@ Library $(LW_TOP)/libwalter :
 	general/ButtonDecorator.cpp
 	general/ColorWell.cpp
 	general/ComboBox.cpp
+	general/Cursor.cpp
 	general/FontPanel.cpp
 	general/PictureButton.cpp
 	general/Spinner.cpp

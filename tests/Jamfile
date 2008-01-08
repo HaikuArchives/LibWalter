@@ -12,6 +12,10 @@ LinkLibraries ComboBoxTest : $(LW_TOP)/libwalter.a ;
 Main ComboBoxTest :
 	ComboBox/Test.cpp ;
 
+LinkLibraries CursorTest : $(LW_TOP)/libwalter.a ;
+Main CursorTest :
+	Cursor/Test.cpp ;
+
 LinkLibraries DialogPaneTest : $(LW_TOP)/libwalter.a ;
 Main DialogPaneTest :
 	DialogPane/Test.cpp ;
