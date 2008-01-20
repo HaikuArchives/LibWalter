@@ -18,6 +18,7 @@ Library $(LW_TOP)/libwalter :
 	general/DialogPane.cpp
 	general/Utilities.cpp
 	general/PaneSwitch.cpp
+	general/ScreenInfo.cpp
 	
 	general/toolbar/Toolbar.cpp
 	general/toolbar/ToolbarButton.cpp
@@ -28,6 +29,9 @@ Library $(LW_TOP)/libwalter :
 	
 	general/SplitterView/Divider.cpp
 	general/SplitterView/SplitterView.cpp
+
+	general/InputRequest/InputRequest.cpp
+	general/InputRequest/InputRequestView.cpp
 	
 	storage/PathBox.cpp
 	storage/TextFile.cpp

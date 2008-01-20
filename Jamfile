@@ -2,7 +2,7 @@ SubDir LW_TOP ;
 
 HDRS += $(LW_INCLUDE) ;
 HDRS += $(LW_INCLUDE_PRIV) ;
-LINKFLAGS += -lbe -lroot -ltracker ;
+LINKFLAGS += -lbe -lroot -ltracker -ltranslation ;
 
 SubInclude LW_TOP src ;
 SubInclude LW_TOP tests ;
