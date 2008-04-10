@@ -2,9 +2,8 @@
 //
 // libwalter ToolbarSeparator.cpp
 //
-// Separator control for WToolbar
+// Separator item for WToolbar
 //
-// Revision: 20070519
 // Page width 80, tab width 4, encoding UTF-8, line endings LF.
 //
 // Original author:
@@ -29,9 +28,9 @@
  *
  * The separator looks like a 3D inset line if the toolbar's style is
  * W_TOOLBAR_STYLE_FLAT or W_TOOLBAR_STYLE_MENU, or a simple empty space if
- * style is W_TOOLBAR_STYLE_3D. It is vertical if the toolbar is
- * horizontal, or horizontal if the toolbar is vertical. The empty space size
- * is the double of toolbar's padding.
+ * style is W_TOOLBAR_STYLE_3D. It is vertical if the toolbar is horizontal,
+ * or horizontal if the toolbar is vertical. The empty space size is the double
+ * of toolbar's padding.
  */
 
 // Constructors and destructors
@@ -39,7 +38,7 @@
 /*!
  * \brief Creates a new toolbar separator.
  *
- * @param[in] name Name of the control, passed straight to the AKToolbarControl
+ * @param[in] name Name of the separator, passed straight to the WToolbarControl
  *                 constructor.
  */
 WToolbarSeparator::WToolbarSeparator(const char *name) :
@@ -141,17 +140,4 @@ void WToolbarSeparator::GetPreferredSize(float *width, float *height)
 	}
 	if (width != NULL) *width = w;
 	if (height != NULL) *height = h;
-}
-
-void WToolbarSeparator::MouseDown(BPoint point)
-{
-}
-
-void WToolbarSeparator::MouseMoved(BPoint point, uint32 transit,
-	const BMessage *message)
-{
-}
-
-void WToolbarSeparator::MouseUp(BPoint point)
-{
 }

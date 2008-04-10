@@ -14,6 +14,16 @@
 //
 // =============================================================================
 
+/* WToolbarButton is the classic toolbar button. It can have a picture or a
+ * label, or both. Currently it supports only bitmaps; SVG will be added later.
+ * It can have different pictures for different button size (e.g., "large" or
+ * "small") and for different states (enabled, disabled, mouse over, pushed,
+ * etc.). See the ButtonDecorator class for more info.
+ */
+
+// Standard C headers
+#include <math.h>
+
 // Haiku headers
 #include <Bitmap.h>
 
@@ -30,11 +40,22 @@
 
 // Constructors and destructors
 
+/* Creates a new button. name is the name of the item (will not be visible to
+ * the user), label is the label that is visible to the user if the toolbar is
+ * set to show item labels, picture is the button's picture (currently only
+ * bitmaps are supported), message is the message that is sent to the target
+ * when the button is clicked, switchMode if true will make the button remain
+ * pressed (the state can be checked with Value()). Any of these values can be
+ * NULL, if not required.
+ * The constructor will generate a grayscale version of the supplied picture to
+ * use as a disabled picture. The picture will become property of the button's
+ * decorator; do not delete it.
+ */
 WToolbarButton::WToolbarButton(const char *name, const char *label,
-	BBitmap *picture, BMessage *message, bool switchMode) :
-	WToolbarControl(name, message)
+	BBitmap *picture, BMessage *message, bool switchMode)
+	: WToolbarControl(name, message)
 {
-	_init_object();
+	_InitObject();
 
 	SetLabel(label);
 	SetSwitchMode(switchMode);
@@ -49,14 +70,14 @@ WToolbarButton::WToolbarButton(const char *name, const char *label,
 	}
 }
 
-WToolbarButton::WToolbarButton(BMessage *archive) :
-	WToolbarControl(archive)
+WToolbarButton::WToolbarButton(BMessage *archive)
+	: WToolbarControl(archive)
 {
 	BMessage decArchive;
 	bool switchMode;
 	int value;
 
-	_init_object();
+	_InitObject();
 
 	if (archive->FindMessage("WToolbarButton::decorator",
 	  &decArchive) == B_OK) {
@@ -88,10 +109,13 @@ WToolbarButton::~WToolbarButton()
 
 // Private
 
-void WToolbarButton::_init_object(void)
+void
+WToolbarButton::_InitObject(void)
 {
 	fDecorator = new ButtonDecorator(NULL, NULL, BD_POSITION_ABOVE);
 	fCanvas = NULL;
+	fMouseDown = false;
+	fMouseOver = false;
 	fStyle = W_TOOLBAR_STYLE_FLAT;
 	fSwitchMode = false;
 	fValue = B_CONTROL_OFF;
@@ -99,12 +123,23 @@ void WToolbarButton::_init_object(void)
 
 // Drawing hooks
 
-float WToolbarButton::BorderSize(void)
+/* Returns the thickness of the border, in toolbar's units. The default
+ * implementation returns 0 if the toolbar's style is W_TOOLBAR_STYLE_MENU, 2
+ * otherwise. You can overload this if your custom style's border has a differnt
+ * thickness, but currently the returned value will be rounded down.
+ */
+float
+WToolbarButton::BorderThickness(void)
 {
 	return (fStyle == W_TOOLBAR_STYLE_MENU ? 0.0 : 2.0);
 }
 
-void WToolbarButton::ContentSize(float *width, float *height)
+/* Returns the size of the button content, including the extra space for the
+ * pushed effect. You can overload this, but currently the returned values will
+ * be rounded down.
+ */
+void
+WToolbarButton::ContentSize(float *width, float *height)
 {
 	float w, h;
 	fDecorator->GetPreferredSize(fCanvas, &w, &h);
@@ -113,18 +148,25 @@ void WToolbarButton::ContentSize(float *width, float *height)
 		w += 1.0;
 		h += 1.0;
 	}
-	if (width != NULL) *width = w;
-	if (height != NULL) *height = h;
+	if (width != NULL)
+		*width = w;
+	if (height != NULL)
+		*height = h;
 }
 
-void WToolbarButton::DrawBackground(BRect updateRect)
+/* Draws the background of the button. You can overload this if you want your
+ * buttons to have a custom background.
+ */
+void
+WToolbarButton::DrawBackground(BRect updateRect)
 {
 	// Draw the menu selection background
 	if (Enabled() && Toolbar()->Enabled() && fMouseOver &&
-	  fStyle == W_TOOLBAR_STYLE_MENU) {
+	 	fStyle == W_TOOLBAR_STYLE_MENU) {
 		fCanvas->SetLowColor(ui_color(B_MENU_SELECTION_BACKGROUND_COLOR));
 		fCanvas->FillRect(Bounds(), B_SOLID_LOW);
 	}
+
 	// Draw the background when value is on
 	if (fStyle != W_TOOLBAR_STYLE_MENU && fValue == B_CONTROL_ON) {
 		fCanvas->SetHighColor(255, 255, 255, 128);
@@ -133,37 +175,45 @@ void WToolbarButton::DrawBackground(BRect updateRect)
 	}
 }
 
-void WToolbarButton::DrawBorder(BRect updateRect)
+/* Draws the button's border.
+ * If you want to draw a custom border, remember to overload BorderThickness()
+ * as well.
+ */
+void
+WToolbarButton::DrawBorder(BRect updateRect)
 {
-	bool do_draw = false;
+	bool doDraw = false;
 	bool pushed = false;
 
-	// Let's see if we have to draw the border, and how ------------------------
+	// Check if the border has to be drawn, and how
 
 	if (fStyle == W_TOOLBAR_STYLE_FLAT) {
 		// Flat toolbar: draw only if the mouse is over us or value is on
 		if ((fMouseOver && Enabled() && Toolbar()->Enabled()) ||
-		  fValue == B_CONTROL_ON) {
-			do_draw = true;
+		 	fValue == B_CONTROL_ON) {
+			doDraw = true;
 			pushed = (fMouseDown || fValue == B_CONTROL_ON);
 		}
-	}
-	else if (fStyle == W_TOOLBAR_STYLE_MENU) {
-		// Menu: just don't do it
-	}
-	else {
-		// 3D or unknown toolbar: draw it, boy
-		do_draw = true;
+	} else if (fStyle == W_TOOLBAR_STYLE_MENU) {
+		// Menu: no border needed
+	} else {
+		// 3D or unknown toolbar: draw it
+		doDraw = true;
 		pushed = (fMouseDown || fValue == B_CONTROL_ON);
 	}
 
-	// Draw the border ---------------------------------------------------------
+	// Draw the border
 
-	if (do_draw)
+	if (doDraw)
 		WToolbarSupport::Draw3DBorder(fCanvas, Bounds(), pushed);
 }
 
-void WToolbarButton::DrawContent(BPoint position, BRect updateRect)
+/* Draws the button's content at position.
+ * If you want to draw a custom content, remember to overload ContentSize() as
+ * well.
+ */
+void
+WToolbarButton::DrawContent(BPoint position, BRect updateRect)
 {
 	int status = BD_STATUS_NORMAL;
 	float w, h;
@@ -187,14 +237,28 @@ void WToolbarButton::DrawContent(BPoint position, BRect updateRect)
 	fDecorator->Draw(fCanvas, r, status);
 }
 
-float WToolbarButton::Padding(void)
+/* Returns the padding of the content (the empty space between the button's
+ * border and the content). You can overload this to give a custom padding, but
+ * currently the value will be rounded down.
+ */
+float
+WToolbarButton::Padding(void)
 {
 	return 2.0;
 }
 
 // BArchivable hooks
 
-status_t WToolbarButton::Archive(BMessage *archive, bool deep) const
+/* Archive the button into the given archive. Adds the following fields to the
+ * archive if the respective properties are different from the default:
+ *  WToolbarButton::decorator	message
+ *  WToolbarButton::switch_mode	bool
+ *  WToolbarButton::value		int32
+ * The decorator field is the archive of the decorator. The default decorator
+ * archives all the pictures and the label.
+ */
+status_t
+WToolbarButton::Archive(BMessage *archive, bool deep) const
 {
 	status_t status;
 
@@ -202,30 +266,52 @@ status_t WToolbarButton::Archive(BMessage *archive, bool deep) const
 
 	if (status == B_OK) {
 		BMessage decorator;
-		fDecorator->Archive(&decorator);
-		status = archive->AddMessage("WToolbarButton::decorator", &decorator);
+		status = fDecorator->Archive(&decorator);
+		if (status == B_OK)
+			status = archive->AddMessage("WToolbarButton::decorator",
+				&decorator);
 	}
 
 	if (status == B_OK && fSwitchMode == false)
 		status = archive->AddBool("WToolbarButton::switch_mode", fSwitchMode);
 
-	if (status == B_OK)
+	if (status == B_OK && fValue != B_CONTROL_OFF)
 		status = archive->AddInt32("WToolbarButton::value", (int32)fValue);
 
 	return status;
 }
 
-BArchivable * WToolbarButton::Instantiate(BMessage *archive)
+BArchivable *
+WToolbarButton::Instantiate(BMessage *archive)
 {
 	return (validate_instantiation(archive, "WToolbarButton") ?
 		new WToolbarButton(archive) : NULL);
 }
 
-// WToolbarControl hooks
+// WToolbarItem hooks
 
-void WToolbarButton::Draw(BView *canvas, BRect updateRect)
+void
+WToolbarButton::AttachedToToolbar(void)
 {
-	if (Toolbar() == NULL || canvas == NULL) return;
+	WToolbarItem::AttachedToToolbar();
+	fMouseDown = false;
+	fMouseOver = false;
+}
+
+void
+WToolbarButton::DetachedFromToolbar(void)
+{
+	WToolbarItem::DetachedFromToolbar();
+}
+
+/* Draws the button on the given canvas (the toolbar itself, or an off-screen
+ * buffer).
+ */
+void
+WToolbarButton::Draw(BView *canvas, BRect updateRect)
+{
+	if (Toolbar() == NULL || canvas == NULL)
+		return;
 
 	float w, h, ch, cw, border, padding;
 	BPoint cp;
@@ -236,8 +322,8 @@ void WToolbarButton::Draw(BView *canvas, BRect updateRect)
 
 	// Border and padding. We do it after setting infos because BorderSize()
 	// and Padding() may need them
-	border = BorderSize();
-	padding = Padding();
+	border = floor(BorderThickness());
+	padding = floor(Padding());
 
 	// Draw the background
 	fCanvas->PushState();
@@ -253,6 +339,8 @@ void WToolbarButton::Draw(BView *canvas, BRect updateRect)
 	w = Bounds().Width();
 	h = Bounds().Height();
 	ContentSize(&cw, &ch);
+	cw = floor(cw);
+	ch = floor(ch);
 	cp.x = floor((w - cw) / 2.0);
 	cp.y = floor((h - ch) / 2.0);
 
@@ -263,7 +351,12 @@ void WToolbarButton::Draw(BView *canvas, BRect updateRect)
 	canvas->PopState();
 }
 
-void WToolbarButton::GetPreferredSize(float *width, float *height)
+/* Returns the preferred size of the button, including the border, the padding,
+ * and the content. The button must be attached to a toolbar, or both values
+ * will be -1. If you aren't interested in one of the values, you can pass NULL.
+ */
+void
+WToolbarButton::GetPreferredSize(float *width, float *height)
 {
 	// We must be attached to a toolbar
 	if (Toolbar() == NULL) {
@@ -279,28 +372,52 @@ void WToolbarButton::GetPreferredSize(float *width, float *height)
 	fStyle = Toolbar()->Style();
 
 	// Calculate the size
-	border = BorderSize();
-	padding = Padding();
+	border = floor(BorderThickness());
+	padding = floor(Padding());
 	ContentSize(&w, &h);
-	w += border * 2.0 + padding * 2.0;
-	h += border * 2.0 + padding * 2.0;
+	w = floor(w) + border * 2.0 + padding * 2.0;
+	h = floor(h) + border * 2.0 + padding * 2.0;
 
 	if (width != NULL) *width = w - 1.0;
 	if (height != NULL) *height = h - 1.0;
 }
 
-void WToolbarButton::MouseUp(BPoint point)
+void
+WToolbarButton::MouseDown(BPoint point)
 {
-	fMouseDown = false;
-	if (fMouseOver && Enabled()) {
-		if (fSwitchMode)
-			fValue = (fValue == B_CONTROL_ON ? B_CONTROL_OFF : B_CONTROL_ON);
-		Invoke();
+	if (Toolbar() == NULL)
+		return;
+	if (fMouseOver) {
+		fMouseDown = true;
+		Invalidate();
 	}
-	Invalidate();
 }
 
-void WToolbarButton::Update(void)
+void
+WToolbarButton::MouseMoved(BPoint point, uint32 transit,
+	const BMessage *message)
+{
+	if (Toolbar() == NULL) return;
+	bool oldMouseOver = fMouseOver;
+	fMouseOver = (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW);
+	if (fMouseOver != oldMouseOver)
+		Invalidate();
+}
+
+void
+WToolbarButton::MouseUp(BPoint point)
+{
+	fMouseDown = false;
+	if (Toolbar() != NULL && fMouseOver && Enabled()) {
+		if (fSwitchMode)
+			fValue = (fValue == B_CONTROL_ON ? B_CONTROL_OFF : B_CONTROL_ON);
+		Invalidate();
+		Invoke();
+	}
+}
+
+void
+WToolbarButton::Update(void)
 {
 	if (Toolbar() == NULL) return;
 
@@ -330,18 +447,22 @@ void WToolbarButton::Update(void)
 
 // Other methods
 
-unsigned WToolbarButton::CountBitmapSets(void)
+unsigned
+WToolbarButton::CountBitmapSets(void)
 {
 	return fDecorator->CountBitmapSets();
 }
 
-bool WToolbarButton::DeleteBitmapSet(unsigned size)
+bool
+WToolbarButton::DeleteBitmapSet(unsigned size)
 {
-	if (size == 0) return false;
+	if (size == 0)
+		return false;
 	return fDecorator->DeleteBitmapSet(size);
 }
 
-bool WToolbarButton::DeleteBitmapSetAt(unsigned index)
+bool
+WToolbarButton::DeleteBitmapSetAt(unsigned index)
 {
 	return fDecorator->DeleteBitmapSetAt(index);
 }
@@ -351,13 +472,16 @@ void WToolbarButton::DeletePicture(void)
 	fDecorator->DeletePicture();
 }
 
-BDBitmapSet * WToolbarButton::GetBitmapSet(unsigned size)
+BDBitmapSet *
+WToolbarButton::GetBitmapSet(unsigned size)
 {
-	if (size == 0) return NULL;
+	if (size == 0)
+		return NULL;
 	return fDecorator->GetBitmapSet(size);
 }
 
-BDBitmapSet * WToolbarButton::GetBitmapSetAt(unsigned index)
+BDBitmapSet *
+WToolbarButton::GetBitmapSetAt(unsigned index)
 {
 	return fDecorator->GetBitmapSetAt(index);
 }
@@ -383,43 +507,54 @@ BBitmap * WToolbarButton::GetMenuCheckMark(void)
 	return ret;
 }
 
-void WToolbarButton::GetPicture(BBitmap *picture[8])
+void
+WToolbarButton::GetPicture(BBitmap *picture[8])
 {
-	if (picture == NULL) return;
+	if (picture == NULL)
+		return;
 	fDecorator->GetPicture(picture);
 }
 
-int WToolbarButton::IndexOfBitmapSet(BDBitmapSet *set)
+int
+WToolbarButton::IndexOfBitmapSet(BDBitmapSet *set)
 {
-	if (set == NULL) return -1;
+	if (set == NULL)
+		return -1;
 	return fDecorator->IndexOfBitmapSet(set);
 }
 
-const char * WToolbarButton::Label(void)
+const char *
+WToolbarButton::Label(void)
 {
 	return fDecorator->Label();
 }
 
-void WToolbarButton::SetLabel(const char *label)
+void
+WToolbarButton::SetLabel(const char *label)
 {
 	fDecorator->SetLabel(label);
 }
 
-bool WToolbarButton::SetPicture(BBitmap *picture[8])
+bool
+WToolbarButton::SetPicture(BBitmap *picture[8])
 {
-	if (picture == NULL) return false;
-	if (picture[0] == NULL) return false;
+	if (picture == NULL)
+		return false;
+	if (picture[0] == NULL)
+		return false;
 	return fDecorator->SetPicture(picture);
 }
 
-void WToolbarButton::SetSwitchMode(bool switchMode)
+void
+WToolbarButton::SetSwitchMode(bool switchMode)
 {
 	if (fSwitchMode == switchMode) return;
 	fSwitchMode = switchMode;
 	Invalidate();
 }
 
-void WToolbarButton::SetValue(int32 value)
+void
+WToolbarButton::SetValue(int32 value)
 {
 	if ((value != B_CONTROL_ON && value != B_CONTROL_OFF) || (fValue == value))
 		return;
@@ -427,12 +562,14 @@ void WToolbarButton::SetValue(int32 value)
 	Invalidate();
 }
 
-bool WToolbarButton::SwitchMode(void)
+bool
+WToolbarButton::SwitchMode(void)
 {
 	return fSwitchMode;
 }
 
-int32 WToolbarButton::Value(void)
+int32
+WToolbarButton::Value(void)
 {
 	return fValue;
 }

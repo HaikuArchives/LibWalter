@@ -35,77 +35,82 @@ class BBitmap;
 // =============================================================================
 
 class WToolbarButton : public WToolbarControl {
-private:
+public:
 
-	//		void				_calc_size(float &lh, float &lw, float &ph,
-	//								float &pw);
-			void				_init_object(void);
-			ButtonDecorator *	fDecorator;
-			bool				fSwitchMode;
-			int32				fValue;
+							WToolbarButton(const char *name,
+								const char *label,
+								BBitmap *picture,
+								BMessage *message = NULL,
+								bool switchMode = false);
+							WToolbarButton(BMessage *archive);
+virtual						~WToolbarButton();
+
+// BArchivable hooks
+virtual	status_t			Archive(BMessage *archive,
+								bool deep = true) const;
+static	BArchivable *		Instantiate(BMessage *archive);
+
+// WToolbarItem hooks
+virtual	void				AttachedToToolbar(void);
+virtual	void				DetachedFromToolbar(void);
+virtual	void				Draw(BView *canvas, BRect updateRect);
+virtual	void				GetPreferredSize(float *width, float *height);
+virtual	void				MouseDown(BPoint point);
+virtual	void				MouseMoved(BPoint point, uint32 transit,
+								const BMessage *message);
+virtual	void				MouseUp(BPoint point);
+virtual	void				Update(void);
+
+// Picture
+		void				GetPicture(BBitmap *picture[8]);
+virtual	bool				SetPicture(BBitmap *picture[8]);
+virtual	void				DeletePicture(void);
+
+// Special for bitmaps
+		unsigned			CountBitmapSets(void);
+		int					IndexOfBitmapSet(BDBitmapSet *set);
+		BDBitmapSet *		GetBitmapSet(unsigned size);
+		BDBitmapSet *		GetBitmapSetAt(unsigned index);
+		bool				DeleteBitmapSet(unsigned size);
+		bool				DeleteBitmapSetAt(unsigned index);
+
+// Label
+		const char *		Label(void);
+virtual	void				SetLabel(const char *label);
+
+// Value
+		int32				Value(void);
+virtual	void				SetValue(int32 value);
+
+// Other methods
+		ButtonDecorator *	Decorator(void);
+static	BBitmap *			GetMenuCheckMark(void);
+virtual	void				SetSwitchMode(bool switchMode);
+		bool				SwitchMode(void);
 
 protected:
 
-	// Infos for drawing hooks
-			BView *				fCanvas;
-			int					fStyle;
+// Drawing hooks
+virtual	float				BorderThickness(void);
+virtual	void				ContentSize(float *width, float *height);
+virtual	void				DrawBackground(BRect updateRect);
+virtual	void				DrawBorder(BRect updateRect);
+virtual	void				DrawContent(BPoint position, BRect updateRect);
+virtual	float				Padding(void);
 
-	// Drawing hooks
-	virtual	float				BorderSize(void);
-	virtual	void				ContentSize(float *width, float *height);
-	virtual	void				DrawBackground(BRect updateRect);
-	virtual	void				DrawBorder(BRect updateRect);
-	virtual	void				DrawContent(BPoint position, BRect updateRect);
-	virtual	float				Padding(void);
+private:
 
-public:
+		void				_InitObject(void);
+		ButtonDecorator *	fDecorator;
+		bool				fMouseDown;
+		bool				fMouseOver;
+		bool				fSwitchMode;
+		int32				fValue;
 
-								WToolbarButton(const char *name,
-									const char *label,
-									BBitmap *picture,
-									BMessage *message = NULL,
-									bool switchMode = false);
-								WToolbarButton(BMessage *archive);
+// Cached infos for drawing hooks
+		BView *				fCanvas;
+		int					fStyle;
 
-	virtual						~WToolbarButton();
-
-	// BArchivable hooks
-	virtual	status_t			Archive(BMessage *archive,
-									bool deep = true) const;
-	static	BArchivable *		Instantiate(BMessage *archive);
-
-	// WToolbarControl hooks
-	virtual	void				Draw(BView *canvas, BRect updateRect);
-	virtual	void				GetPreferredSize(float *width, float *height);
-	virtual	void				MouseUp(BPoint point);
-	virtual	void				Update(void);
-
-	// Picture
-			void				GetPicture(BBitmap *picture[8]);
-	virtual	bool				SetPicture(BBitmap *picture[8]);
-	virtual	void				DeletePicture(void);
-
-	// Special for bitmaps
-			unsigned			CountBitmapSets(void);
-			int					IndexOfBitmapSet(BDBitmapSet *set);
-			BDBitmapSet *		GetBitmapSet(unsigned size);
-			BDBitmapSet *		GetBitmapSetAt(unsigned index);
-			bool				DeleteBitmapSet(unsigned size);
-			bool				DeleteBitmapSetAt(unsigned index);
-
-	// Label
-			const char *		Label(void);
-	virtual	void				SetLabel(const char *label);
-
-	// Value
-			int32				Value(void);
-	virtual	void				SetValue(int32 value);
-
-	// Other methods
-			ButtonDecorator *	Decorator(void);
-	static	BBitmap *			GetMenuCheckMark(void);
-	virtual	void				SetSwitchMode(bool switchMode);
-			bool				SwitchMode(void);
 };
 
 #endif // _TOOLBAR_BUTTON_H_
