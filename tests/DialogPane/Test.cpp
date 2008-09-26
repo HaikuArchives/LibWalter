@@ -11,6 +11,7 @@
 
 #include <PaneSwitch.h>
 #include <DialogPane.h>
+#include <BarberPole.h>
 
 
 #define TEST_MESSAGE 'test'
@@ -22,32 +23,30 @@ private:
 public:
 
 MyWindow(void) :
-	BWindow(BRect(100, 100, 300, 300), "DiaglogPane test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	BWindow(BRect(100, 100, 400, 300), "DiaglogPane test", B_TITLED_WINDOW, B_NOT_ZOOMABLE )
 {
 	fMoreOptionsPane = new DialogPane(BRect(0,0,300,200), BRect(0,200,300,300),0,
 		               "moreOptions", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	AddChild(fMoreOptionsPane);
 
+	AddChild(fMoreOptionsPane);
 
 	fMoreOptionsPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fMoreOptionsPane->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 
 	fLatch = new PaneSwitch(BRect(05,75,30,90), "moreOptionsLatch", true, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
-	fLatch->SetTarget(fMoreOptionsPane);
-	fMoreOptionsPane->SetSwitch(fLatch);
 	fMoreOptionsPane->AddChild(fLatch);
-
-	fMoreOptionsPane->SetMode(0, true);
-
+		
+	fLatch->SetTarget(fMoreOptionsPane);	
+	fMoreOptionsPane->SetSwitch(fLatch);	
+	
+	fMoreOptionsPane->AddChild(new BarberPole(BRect(10,10,150,30),"barber", B_FOLLOW_TOP | B_FOLLOW_LEFT , B_WILL_DRAW));
 
 }
 
 
 void MessageReceived(BMessage *message)
 {
-	if (message->what == TEST_MESSAGE)
-		(new BAlert("Hello!", "Hello!", "OK"))->Go();
 	BWindow::MessageReceived(message);
 }
 
