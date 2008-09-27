@@ -19,6 +19,7 @@ Library $(LW_TOP)/libwalter :
 	general/Utilities.cpp
 #	general/PaneSwitch.cpp
 	general/ScreenInfo.cpp
+	general/ShrinkView.cpp
 	
 	general/toolbar/Toolbar.cpp
 	general/toolbar/ToolbarButton.cpp
