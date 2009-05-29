@@ -1661,7 +1661,7 @@ void WToolbar::Update(void)
 	const unsigned kLines = fLines.size();
 
 	float border, left, top, right, bottom, max, total, width, height, start;
-	vector<float> maxs, totals, sizes;
+	std::vector<float> maxs, totals, sizes;
 	unsigned i, l, sizeIndex = 0;
 	WToolbarLine *line;
 	WToolbarItem *item;

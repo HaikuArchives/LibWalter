@@ -69,7 +69,7 @@ ColorWell::Instantiate(BMessage *data)
 
 
 status_t
-ColorWell::Archive(BMessage *data, bool deep = true) const
+ColorWell::Archive(BMessage *data, bool deep) const
 {
 	status_t status = BControl::Archive(data, deep);
 	data->AddString("class","ColorWell");

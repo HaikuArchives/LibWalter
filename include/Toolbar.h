@@ -85,7 +85,7 @@ typedef struct {
 
 class WToolbar : public BView {
 private:
-	typedef vector<WToolbarItem*> WToolbarLine;
+	typedef std::vector<WToolbarItem*> WToolbarLine;
 			void					_draw_item(unsigned line, unsigned position,
 										BRect updateRect);
 			void					_init_object(void);
@@ -99,7 +99,7 @@ private:
 			BMessenger				fTarget;
 
 	// Internals
-			vector<WToolbarLine*>	fLines;
+			std::vector<WToolbarLine*>	fLines;
 			bool					fDisableUpdate;
 			bool					fDisableStyling;
 			WToolbarItem *			fMouseDownItem;

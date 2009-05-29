@@ -593,7 +593,7 @@ void SetAppCursor(const BCursor *cursor, bool impose)
 	be_app->PostMessage(message);
 }
 
-void SetAppCursor(const void *data, bool impose = false)
+void SetAppCursor(const void *data, bool impose)
 {
 	_install_app_filter();
 	BMessage *message = new BMessage(_MSG_SET_APP_CURSOR);

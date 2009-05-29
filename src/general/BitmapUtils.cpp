@@ -11,6 +11,7 @@
 
 // Standard C headers
 #include <stdio.h>
+#include <string.h>
 
 // Haiku headers
 #include <Application.h>

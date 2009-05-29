@@ -50,7 +50,7 @@ public:
 			uint32	GetCharacterLimit(const uint32 &limit);
 	
 private:
-	friend AutoTextControlFilter;
+	friend class AutoTextControlFilter;
 	
 	AutoTextControlFilter	*fFilter;
 	uint32					fCharLimit;

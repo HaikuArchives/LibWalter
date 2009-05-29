@@ -72,8 +72,8 @@ public:
 private:
 			void			_InitObject(void);
 			
-	friend	SpinnerArrowButton;
-	friend	SpinnerPrivateData;
+	friend	class SpinnerArrowButton;
+	friend	class SpinnerPrivateData;
 	
 	BTextControl		*fTextControl;
 	SpinnerArrowButton	*fUpButton,
