@@ -28,6 +28,11 @@ LinkLibraries PaneSwitchTest : $(LW_TOP)/libwalter.a ;
 Main PaneSwitchTest :
 	PaneSwitch/Test.cpp ;
 
+LinkLibraries ShrinkViewTest : $(LW_TOP)/libwalter.a ;
+Main ShrinkViewTest :
+	ShrinkView/Test.cpp ;
+
+
 LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
 Main SplitPanelTest :
 	SplitterView/LayeringTestApp.cpp
