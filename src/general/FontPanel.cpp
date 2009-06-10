@@ -357,10 +357,10 @@ FontView::MessageReceived(BMessage *msg)
 				break;
 			
 			EmptyStyleList();
-			int32 styleCount = count_font_styles((font_family)item->Text());
+			int32 styleCount = count_font_styles(const_cast<char *>(item->Text()));
 			for (int32 i = 0; i < styleCount; i++) {
 				font_style style;
-				if (get_font_style((font_family)item->Text(),i,&style) != B_OK)
+				if (get_font_style(const_cast<char *>(item->Text()),i,&style) != B_OK)
 					continue;
 				fStyleList->AddItem(new BStringItem((const char *)style));
 			}
@@ -380,8 +380,7 @@ FontView::MessageReceived(BMessage *msg)
 				break;
 			BFont font;
 			fPreview->GetFont(&font);
-			font.SetFamilyAndStyle((font_family)fitem->Text(),
-									(font_style)sitem->Text());
+			font.SetFamilyAndStyle(fitem->Text(), sitem->Text());
 			fPreview->SetFont(&font);
 			fPreview->Invalidate();
 			break;
