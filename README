@@ -43,6 +43,12 @@ ComboBox
 Cursor
 	This is not a class, but a set of functions to help you give a custom cursor to any view, window, or the whole app. They track the mouse moviment and automatically change the mouse cursor. There's an option to "impose" the window cursor to all the window's views, or the app cursor to all the windows. Do not use the original BApplication's or BView' SetCursor() methods if you intend to use these functions.
 
+DToolTip
+	Finally there is a free-as-in-freedom tooltip class that is simple to use! Get the singleton instance, point it at a BView you want to have a tooltip, and you're good to go!
+
+EasyPath
+	Working with file paths using BPath, BEntry, and entry_refs can be a chore. EasyPath greatly reduces the amount of effort required in storage-intensive tasks. It is more memory-intensive than other solutions because it is string-based, but it greatly eases development headaches.
+
 FontPanel
 	There have been lots of ways to choose fonts in programs on BeOS. All of them stink because they lack the flexibility and consistency that a single font chooser window can offer. It works in a way similar to BFilePanel when it comes to behavior like hiding after clicking OK, the modification message, and so on.
 
@@ -74,10 +80,10 @@ ToolbarSeparator
 
 LibWalter is in a pre-alpha state, so we don't provide a precompiled library to avoid confusion. However, you can compile LibWalter and link it with your application executable, or just take only the classes you need. To get the LibWalter source code from OSDrawer you can download the Nightly SVN Tree Snapshot, or pull it via anonymous SVN.
 
-Once you obtained the source, to compile the library you need Jam (downlaod it from the Haiku website). Open a Terminal window, go to the directory where you placed the sources, run ./configure and then jam; this will make both the library and the test applications.
-After you have the library (libwalter.a) compiled, it is recommended to copy it and its source to your application's source directory to avoid incompatibility with future versions of the library. If you're using BeIDE, add the library to your project by dropping it into the project window, then add the path to the header files to the project build options.
+Once you obtained the source, to compile the library you need Jam (download it from the Haiku website) or the Paladin IDE (download from BeBits or Haikuware). To build with jam, open a Terminal window, go to the directory where you placed the sources, run ./configure and then jam; this will make both the library and the test applications. To build Paladin, double-click on libwalter.pld and choose Make from the Build menu.
+After you have the library (libwalter.a) compiled, it is recommended to copy it and its headers to your application's source directory to avoid incompatibility with future versions of the library. If you're using BeIDE, add the library to your project by dropping it into the project window, then add the path to the header files to the project build options.
 
-Alternatively, you can add only the classes you need by adding the relative sources to your project.  Dependings by your compiler options, you may get some warnings; it is usually safe to ignore them.
+Alternatively, you can add only the classes you need by adding the relative sources to your project.  Depending on your compiler options, you may get some warnings; it is usually safe to ignore them.
 
 
 3. How to contribute

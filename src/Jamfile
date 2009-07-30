@@ -1,6 +1,7 @@
 SubDir LW_TOP src ;
 
 Library $(LW_TOP)/libwalter :
+	app/DToolTip.cpp
 	general/AutoTextControl.cpp
 	general/BarberPole.cpp
 	general/BitmapButton.cpp
@@ -34,6 +35,7 @@ Library $(LW_TOP)/libwalter :
 	general/InputRequest/InputRequest.cpp
 	general/InputRequest/InputRequestView.cpp
 	
+	storage/EasyPath.cpp
 	storage/PathBox.cpp
 	storage/TextFile.cpp
 	;
