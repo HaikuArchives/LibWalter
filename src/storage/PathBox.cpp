@@ -35,6 +35,22 @@ static property_info sProperties[] = {
 	},
 };
 
+
+class DropControl : public BTextControl
+{
+public:
+							DropControl(BRect frame, const char *name, const char *label,
+										const char *text, BMessage *msg,
+										uint32 resize = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+										uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+							DropControl(BMessage *data);
+							~DropControl(void);
+	static	BArchivable *	Instantiate(BMessage *data);
+	virtual	status_t		Archive(BMessage *data, bool deep = true) const;
+	virtual	void			MessageReceived(BMessage *msg);
+};
+
+
 PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 				const char *label, const int32 &resize, const int32 &flags)
  :	BView(frame,name,resize,flags),
@@ -47,7 +63,7 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 	entry_ref ref;
 	entry.GetRef(&ref);
 	
-	fFilePanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_DIRECTORY_NODE, false,
+	fFilePanel = new BFilePanel(B_OPEN_PANEL, &msgr, &ref, B_DIRECTORY_NODE | B_SYMLINK_NODE, false,
 								new BMessage(M_ENTRY_CHOSEN));
 	fFilePanel->SetButtonLabel(B_DEFAULT_BUTTON,"Select");
 	
@@ -55,10 +71,9 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 								new BMessage(M_SHOW_FILEPANEL),
 								B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	fBrowseButton->ResizeToPreferred();
-	fBrowseButton->MoveTo( frame.right - fBrowseButton->Bounds().Width() - 10, 10);
-	AddChild(fBrowseButton);
+	fBrowseButton->MoveTo( frame.right - fBrowseButton->Bounds().Width() - 10, 0);
 	
-	fPathControl = new BTextControl(BRect(10,10,11,11),"path",label,path,
+	fPathControl = new DropControl(BRect(0,0,1,1),"path",label,path,
 									new BMessage(M_PATHBOX_CHANGED),
 									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	
@@ -74,6 +89,7 @@ PathBox::PathBox(const BRect &frame, const char *name, const char *path,
 		fPathControl->GetPreferredSize(&w,&h);
 	fPathControl->ResizeTo(fBrowseButton->Frame().left - 20, h);
 	AddChild(fPathControl);
+	AddChild(fBrowseButton);
 }
 
 
@@ -138,7 +154,9 @@ PathBox::ResizeToPreferred(void)
 	ResizeTo(w,h);
 	fPathControl->ResizeToPreferred();
 	fBrowseButton->ResizeToPreferred();
-	fBrowseButton->MoveTo(fPathControl->Frame().right + 10, 10);
+	fPathControl->ResizeTo(fBrowseButton->Frame().left - 10, fPathControl->Bounds().Height());
+//	fBrowseButton->MoveTo(fPathControl->Frame().right + 10, 0);
+//	fBrowseButton->MoveTo(Bounds().right - 10 - fBrowseButton, 0);
 }
 
 
@@ -171,7 +189,7 @@ PathBox::GetPreferredSize(float *w, float *h)
 	if (w)
 		*w = width;
 	if (h)
-		*h = height + 20;
+		*h = height;
 }
 
 	
@@ -329,6 +347,20 @@ PathBox::Path(void) const
 
 
 void
+PathBox::SetDivider(float div)
+{
+	fPathControl->SetDivider(div);
+}
+
+
+float
+PathBox::Divider(void) const
+{
+	return fPathControl->Divider();
+}
+
+			
+void
 PathBox::MakeValidating(bool value)
 {
 	fValidate = value;
@@ -346,4 +378,65 @@ BFilePanel *
 PathBox::FilePanel(void) const
 {
 	return fFilePanel;
+}
+
+
+DropControl::DropControl(BRect frame, const char *name, const char *label,
+						const char *text, BMessage *msg, uint32 resize, uint32 flags)
+	:	BTextControl(frame,name,label,text,msg,resize,flags)
+{
+}
+
+
+DropControl::DropControl(BMessage *data)
+	:	BTextControl(data)
+{
+}
+
+
+DropControl::~DropControl(void)
+{
+}
+
+
+BArchivable *
+DropControl::Instantiate(BMessage *data)
+{
+	if (validate_instantiation(data, "DropControl"))
+		return new DropControl(data);
+
+	return NULL;
+}
+
+
+status_t
+DropControl::Archive(BMessage *data, bool deep = true) const
+{
+	status_t status = BTextControl::Archive(data,deep);
+	data->AddString("class","DropControl");
+	return status;
+}
+
+
+void
+DropControl::MessageReceived(BMessage *msg)
+{
+	if (msg->WasDropped() && Window())
+	{
+		entry_ref ref;
+		if (msg->FindRef("refs",&ref) == B_OK)
+		{
+			BPath path(&ref);
+			SetText(path.Path());
+		}
+	}
+	else
+	switch (msg->what)
+	{
+		default:
+		{
+			BTextControl::MessageReceived(msg);
+			break;
+		}
+	}
 }

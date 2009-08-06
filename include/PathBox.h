@@ -12,6 +12,8 @@
 #include <Button.h>
 #include <TextControl.h>
 
+class DropControl;
+
 class PathBox : public BView
 {
 public:
@@ -49,6 +51,9 @@ public:
 			
 			const char *	Path(void) const;
 			
+			void			SetDivider(float div);
+			float			Divider(void) const;
+			
 	// This method toggles whether or not the PathBox instance should check
 	// to make sure that paths typed in actually exist. It defaults to false.
 	virtual	void			MakeValidating(bool value);
@@ -58,7 +63,7 @@ public:
 	
 private:
 	BFilePanel				*fFilePanel;
-	BTextControl			*fPathControl;
+	DropControl				*fPathControl;
 	BButton					*fBrowseButton;
 	bool					fValidate;
 };
