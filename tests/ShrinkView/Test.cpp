@@ -22,7 +22,7 @@ private:
 public:
 
 MyWindow(void) :
-	BWindow(BRect(100, 100, 400, 400), "PaneSwitch test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	BWindow(BRect(100, 100, 400, 400), "ShrinkView test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect b = Bounds();
 	
@@ -61,7 +61,7 @@ private:
 	MyWindow *fWindow;
 public:
 
-MyApp(void) : BApplication("application/libwalter-PaneSwitch-test")
+MyApp(void) : BApplication("application/libwalter-ShrinkView-test")
 {
 	fWindow = new MyWindow();
 }
