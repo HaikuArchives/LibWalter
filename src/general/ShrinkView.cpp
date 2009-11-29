@@ -13,8 +13,6 @@
 
 #include <Window.h>
 
-#include <string.h>
-
 /*=============================================================================================*\
 |	ShrinkView																					|
 +-----------------------------------------------------------------------------------------------+
@@ -24,8 +22,10 @@
 |		char * pzLabel: Etiquette de la view.													|
 |		bool bShrink: True si la view doit etre initialiment reduite, false sinon.				|
 \*=============================================================================================*/
-ShrinkView::ShrinkView(BRect frame, char * pzLabel, bool bShrink, BBitmap * pBmp)
-		: BView::BView(frame, "ShrinkView", B_FOLLOW_NONE, B_WILL_DRAW)	
+ShrinkView::ShrinkView(BRect frame, char * pzLabel, bool bShrink, BBitmap * pBmp, uint32 flags)
+		:
+		BView::BView(frame, "ShrinkView", B_FOLLOW_NONE, B_WILL_DRAW),
+		fShrinkFlags(flags)
 {
 	rgb_color color = {192, 192, 192, 0};
 	SetViewColor(color);
@@ -33,12 +33,12 @@ ShrinkView::ShrinkView(BRect frame, char * pzLabel, bool bShrink, BBitmap * pBmp
 	m_bShrink = bShrink;
 	m_bMouseOver = false;
 	strcpy(m_pzLabel, pzLabel);
-	
+
 	if(m_bShrink)
 	{
 		ResizeTo(Bounds().Width(), 16);
 	}
-	m_pBmp = pBmp;	
+	m_pBmp = pBmp;
 }//End of ShrinkView.
 
 /*=============================================================================================*\
@@ -53,28 +53,28 @@ void ShrinkView::Draw(BRect updateRect)
 	BPoint pPointList[8];		//Utilise pour dessiner les polygone.
 	rgb_color color = {0,0,0,0};
 	rgb_color colorHigh = {0,0,0,0};
-	
+
 	SetDrawingMode(B_OP_COPY);
 	if(m_pBmp)
 	{
 		uint32 * uiBits = (uint32*)m_pBmp->Bits();
 		uint32 uiColor = uiBits[141];
 		uint32 uiColorHigh = uiBits[289];
-		
+
 		color.red = ( uiColor & 0xFF0000) / 0x10000;
 		color.green = (uiColor & 0xFF00) / 0x100;
 		color.blue = (uiColor & 0xFF) ;
 		colorHigh.red = ( uiColorHigh & 0xFF0000) / 0x10000;
 		colorHigh.green = (uiColorHigh & 0xFF00) / 0x100;
 		colorHigh.blue = (uiColorHigh & 0xFF) ;
-			
+
 	}
 
 	//if(updateRect.left < 10)
 	{
 		if(m_pBmp)
 		{
-			DrawBitmap(m_pBmp, BRect(140,15,147,15), BRect(Bounds().Width() - 7, 16, Bounds().Width(), Bounds().Height() - 7));				 
+			DrawBitmap(m_pBmp, BRect(140,15,147,15), BRect(Bounds().Width() - 7, 16, Bounds().Width(), Bounds().Height() - 7));
 		}
 
 	}
@@ -86,37 +86,37 @@ void ShrinkView::Draw(BRect updateRect)
 
 		}
 	}
-	
-	
+
+
 	//Dessiner l'etiquette si necessaire.
 	if(updateRect.top < 16 && updateRect.right >= 16)
 	{
-		
+
 		if(m_pBmp)
 		{
-			
+
 			if(m_bShrink && m_bMouseOver)
 			{
 				DrawBitmap(m_pBmp, BRect(80,0,95,15), BRect(Bounds().Width() - 15,0,Bounds().Width(),15));
-				DrawBitmap(m_pBmp, BRect(137,0,137,15), BRect(16, 0, Bounds().Width() - 15, 15)); 
+				DrawBitmap(m_pBmp, BRect(137,0,137,15), BRect(16, 0, Bounds().Width() - 15, 15));
 			}
 			else if(m_bShrink)
 			{
 				DrawBitmap(m_pBmp, BRect(64,0,79,15), BRect(Bounds().Width() - 15,0,Bounds().Width(),15));
-				DrawBitmap(m_pBmp, BRect(136,0,136,15), BRect(16, 0, Bounds().Width() - 15, 15)); 
+				DrawBitmap(m_pBmp, BRect(136,0,136,15), BRect(16, 0, Bounds().Width() - 15, 15));
 			}
 			else if(m_bMouseOver)
 			{
 				DrawBitmap(m_pBmp, BRect(112,0,127,15), BRect(Bounds().Width() - 15,0,Bounds().Width(),15));
-				DrawBitmap(m_pBmp, BRect(139,0,139,15), BRect(16, 0, Bounds().Width() - 15, 15)); 
+				DrawBitmap(m_pBmp, BRect(139,0,139,15), BRect(16, 0, Bounds().Width() - 15, 15));
 			}
 			else
 			{
 				DrawBitmap(m_pBmp, BRect(96,0,111,15), BRect(Bounds().Width() - 15,0,Bounds().Width(),15));
-				DrawBitmap(m_pBmp, BRect(138,0,138,15), BRect(16, 0, Bounds().Width() - 15 , 15)); 
+				DrawBitmap(m_pBmp, BRect(138,0,138,15), BRect(16, 0, Bounds().Width() - 15 , 15));
 			}
 			SetFont(be_bold_font);
-					
+
 			if(m_bMouseOver)
 			{
 				SetHighColor(colorHigh);
@@ -124,10 +124,10 @@ void ShrinkView::Draw(BRect updateRect)
 			else
 			{
 				SetHighColor(color);
-			}	
+			}
 			SetDrawingMode(B_OP_OVER);
-			DrawString(m_pzLabel, BPoint(18,12), NULL);	
-			SetDrawingMode(B_OP_COPY);	
+			DrawString(m_pzLabel, BPoint(18,12), NULL);
+			SetDrawingMode(B_OP_COPY);
 		}
 		else
 		{
@@ -135,7 +135,7 @@ void ShrinkView::Draw(BRect updateRect)
 			{
 				DrawDegrader(BRect(16,0,Bounds().Width(),4), 255, 192);
 				DrawDegrader(BRect(16,11,Bounds().Width(),15), 192, 128);
-			
+
 				//Remplir le milieu de l'etiquette en gris
 				SetHighColor(192, 192, 192, 0);
 				FillRect(BRect(16, 5, Bounds().Width(), 10));
@@ -150,7 +150,7 @@ void ShrinkView::Draw(BRect updateRect)
 			DrawString(m_pzLabel, BPoint(18,12), NULL);
 		}
 	}
-		
+
 	//Redessiner le boutton si nessesaire.
 	if(updateRect.left < 16 && updateRect.top < 16)
 	{
@@ -172,7 +172,7 @@ void ShrinkView::Draw(BRect updateRect)
 			{
 				DrawBitmap(m_pBmp, BRect(32,0,47,15), BRect(0,0,15,15));
 			}
-		
+
 		}
 		else
 		{
@@ -181,7 +181,7 @@ void ShrinkView::Draw(BRect updateRect)
 			{
 				DrawDegrader(BRect(0, 0, 16, 4), 255, 192);
 				DrawDegrader(BRect(0, 11, 16, 15), 192, 128);
-			
+
 				//Remplir le milieu de l'etiquette en gris
 				SetHighColor(192, 192, 192, 0);
 				FillRect(BRect(0, 5, 15, 10));
@@ -190,10 +190,10 @@ void ShrinkView::Draw(BRect updateRect)
 			{
 				DrawDegrader(BRect(0,0,15,15), 255, 192);
 			}
-		
+
 			//Dessiner le Boutton si le curseur est au dessus du triangle.
 			if( m_bMouseOver)
-			{	
+			{
 			SetHighColor(64, 64, 64, 0);
 				pPointList[0] = BPoint(1,3);
 				pPointList[1] = BPoint(3,1);
@@ -203,30 +203,30 @@ void ShrinkView::Draw(BRect updateRect)
 				pPointList[5] = BPoint(12,14);
 				pPointList[6] = BPoint(3,14);
 				pPointList[7] = BPoint(1,12);
-				StrokePolygon(pPointList, 8, true,  B_SOLID_HIGH);	
-		
+				StrokePolygon(pPointList, 8, true,  B_SOLID_HIGH);
+
 				SetHighColor(255, 255, 255, 0);
 				pPointList[0] = BPoint(2,12);
 				pPointList[1] = BPoint(2,3);
 				pPointList[2] = BPoint(3,2);
 				pPointList[3] = BPoint(12,2);
-				StrokePolygon(pPointList, 4, false,  B_SOLID_HIGH);	
-		
+				StrokePolygon(pPointList, 4, false,  B_SOLID_HIGH);
+
 				SetHighColor(192, 192, 192, 0);
 				pPointList[0] = BPoint(3,3);
 				pPointList[1] = BPoint(12,3);
 				pPointList[2] = BPoint(12,12);
 				pPointList[3] = BPoint(3,12);
-				FillPolygon(pPointList, 4,  B_SOLID_HIGH);	
-		
+				FillPolygon(pPointList, 4,  B_SOLID_HIGH);
+
 				SetHighColor(128, 128, 128, 0);
 				pPointList[0] = BPoint(13,3);
 				pPointList[1] = BPoint(13,12);
 				pPointList[2] = BPoint(12,13);
 				pPointList[3] = BPoint(3,13);
-				StrokePolygon(pPointList, 4, false,  B_SOLID_HIGH);	
+				StrokePolygon(pPointList, 4, false,  B_SOLID_HIGH);
 			}
-	
+
 			//Dessiner le triangle vers la droite.
 			// La View est reduite.
 			if(m_bShrink)
@@ -251,7 +251,7 @@ void ShrinkView::Draw(BRect updateRect)
 			}
 		}
 	}
-	
+
 	//Redessiner le degrader du bas si necessaire
 	if(!m_bShrink && updateRect.bottom > Bounds().Height() - 8)
 	{
@@ -259,13 +259,13 @@ void ShrinkView::Draw(BRect updateRect)
 		{
 			DrawBitmap(m_pBmp, BRect(128,0,135,7), BRect(0,Bounds().Height()-7,7,Bounds().Height()));
 			DrawBitmap(m_pBmp, BRect(128,8,135,15), BRect(Bounds().Width() - 7,Bounds().Height()-7,Bounds().Width(),Bounds().Height()));
-			DrawBitmap(m_pBmp, BRect(140,0,140,7), BRect(8, Bounds().Height()-7, Bounds().Width() - 7, Bounds().Height())); 
+			DrawBitmap(m_pBmp, BRect(140,0,140,7), BRect(8, Bounds().Height()-7, Bounds().Width() - 7, Bounds().Height()));
 		}
 		else
 		{
 			DrawDegrader(BRect(0,Bounds().bottom - 8,Bounds().Width(),Bounds().bottom), 192, 128);
 		}
-	} 
+	}
 }//End of Draw.
 
 
@@ -277,14 +277,14 @@ void ShrinkView::Draw(BRect updateRect)
 |		BPoint point: Location ou curseur.														|
 \*=============================================================================================*/
 void ShrinkView::MouseDown(BPoint point)
-{	
+{
 	BView::MouseDown(point);
 	if( point.x >= 0 && point.x < Bounds().Width() && point.y >= 0 && point.y < 16)
 	{
 		if(m_bShrink)
 		{
 			Expand();
-		}	
+		}
 		else
 		{
 			Shrink();
@@ -307,7 +307,7 @@ void ShrinkView::MouseDown(BPoint point)
 void ShrinkView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	BView::MouseMoved(point, transit, message);
-	
+
 	//Verifie si le curseur est au dessus du boutton.
 	if( point.x >= 0 && point.x < Bounds().Width() && point.y >= 0 && point.y < 16)
 	{
@@ -325,9 +325,9 @@ void ShrinkView::MouseMoved(BPoint point, uint32 transit, const BMessage *messag
 		{
 			m_bMouseOver = false;
 			Draw(BRect(0,0,Bounds().Width(),15));
-		}	
+		}
 	}
-	
+
 	//Le curseur est sortie de la view.
 	if(transit == B_EXITED_VIEW)
 	{
@@ -345,18 +345,18 @@ void ShrinkView::MouseMoved(BPoint point, uint32 transit, const BMessage *messag
 void ShrinkView::Shrink()
 {
 	BView * pTempView;	//Utiliser pour parcourir les View attacher a la meme fenetre mere.
-	
+
 	//Reduire la View.
 	ResizeTo(Frame().Width(), 16.0);
 	m_bShrink = true;
 
 	//Redimentionner la fenetre mere.
-	if( Window() != NULL )
+	if( Window() != NULL && (fShrinkFlags & B_AUTO_FIT_WINDOW))
 	{
 		Window()->ResizeBy(0, - (m_fFullHeight - 15.0));
 	}
-	
-	//Deplacer, si necessaire, les autre View. 
+
+	//Deplacer, si necessaire, les autre View.
 	pTempView = this;
 	while( pTempView->PreviousSibling() != NULL)
 	{
@@ -365,14 +365,23 @@ void ShrinkView::Shrink()
 	while(pTempView != NULL)
 	{
 		if(Frame().top + 16.0 <= pTempView->Frame().top )
-		{	
+		{
 			pTempView->MoveBy(0, -(m_fFullHeight - 15.0));
 		}
 		pTempView = pTempView->NextSibling();
 	}
-	
+
 	Draw(Bounds());
 }//End of Shrink.
+
+
+
+void
+ShrinkView::SetMode(uint32 flags)
+{
+	fShrinkFlags = flags;
+}
+
 
 /*=============================================================================================*\
 |	Expand																						|
@@ -382,18 +391,18 @@ void ShrinkView::Shrink()
 void ShrinkView::Expand()
 {
 	BView * pTempView;	//Utiliser pour parcourir les View attacher a la meme fenetre mere.
-	
+
 	//Agradir la View.
 	ResizeTo(Frame().Width(), m_fFullHeight);
 	m_bShrink = false;
 
 	//Redimentionner la fenetre mere
-	if( Window() != NULL )
+	if( Window() != NULL && (fShrinkFlags & B_AUTO_FIT_WINDOW))
 	{
-		Window()->ResizeBy(0, m_fFullHeight - 15.0 );		
+		Window()->ResizeBy(0, m_fFullHeight - 15.0 );
 	}
-	
-	//Deplacer, si necessaire, les autre View. 
+
+	//Deplacer, si necessaire, les autre View.
 	pTempView = this;
 	while( pTempView->PreviousSibling() != NULL)
 	{
@@ -402,12 +411,12 @@ void ShrinkView::Expand()
 	while(pTempView != NULL)
 	{
 		if(Frame().top + 16.0 <= pTempView->Frame().top )
-		{	
+		{
 			pTempView->MoveBy(0, m_fFullHeight - 15.0);
 		}
 		pTempView = pTempView->NextSibling();
 	}
-	
+
 	Draw(Bounds());
 }//End of Expand.
 
@@ -424,7 +433,7 @@ void ShrinkView::Expand()
 void ShrinkView::DrawDegrader(BRect rect, int iStartGray, int iEndGray)
 {
 	int i, iGray;
-	
+
 	for(i = 0; i <= rect.Height(); i++)
 	{
 		iGray = iStartGray + ((iEndGray - iStartGray) / (int)rect.Height()) * i;
@@ -436,11 +445,11 @@ void ShrinkView::DrawDegrader(BRect rect, int iStartGray, int iEndGray)
 void ShrinkView::AttachedToWindow()
 {
 	uint32 * pSource;
-	
+
 	if(!m_pBmp) return;
-				
+
 	pSource = (uint32*)m_pBmp->Bits();
-		
+
 	if(m_pBmp->ColorSpace() == B_RGB32)
 	{
 		for(int i = 0; i < m_pBmp->BitsLength()/4; i++)

@@ -19,31 +19,41 @@
 class MyWindow : public BWindow {
 private:
 	PaneSwitch* fPermissionsSwitch;
+	ShrinkView*	fBack;
 public:
 
 MyWindow(void) :
 	BWindow(BRect(100, 100, 400, 400), "ShrinkView test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect b = Bounds();
-	
-	BView *back = new ShrinkView(BRect(b.left, b.top + 1, b.right, b.top + 40), "First");
-	b = back->Frame();
-		
-	AddChild(back);
-	
-	AddChild(new ShrinkView(BRect(b.left, b.bottom + 50, b.right, b.bottom + 97), "Second"));
 
-	fPermissionsSwitch = new PaneSwitch(BRect(20,20,160,160), "Permissions");
+	fBack = new ShrinkView(BRect(b.left, b.top + 1, b.right, b.top + 70), "First");
+	b = fBack->Frame();
+
+	AddChild(fBack);
+
+	AddChild(new ShrinkView(BRect(b.left, b.bottom + 70, b.right, b.bottom + 100), "Second"));
+
+	fPermissionsSwitch = new PaneSwitch(BRect(20, 20, 60, 60), "Permissions");
 	fPermissionsSwitch->SetMessage(new BMessage(TEST_MESSAGE));
-	back->AddChild(fPermissionsSwitch);
+	fBack->AddChild(fPermissionsSwitch);
 
 }
 
 
 void MessageReceived(BMessage *message)
 {
-	if (message->what == TEST_MESSAGE)
-		(new BAlert("Hello!", "Hello!", "OK"))->Go();
+	if (message->what == TEST_MESSAGE) {
+		switch ((new BAlert("Hello", "Changing mode", "Auto fit", "Normal"))->Go()) {
+			case 0:
+				fBack->SetMode(ShrinkView::B_AUTO_FIT_WINDOW);
+				break;
+			case 1:
+				fBack->SetMode(ShrinkView::B_NORMAL);
+				break;
+		}
+
+	}
 	BWindow::MessageReceived(message);
 }
 
@@ -58,7 +68,10 @@ bool QuitRequested(void)
 
 class MyApp : public BApplication { // ------------------------------------------------------------
 private:
-	MyWindow *fWindow;
+
+	MyWindow*	fWindow;
+
+
 public:
 
 MyApp(void) : BApplication("application/libwalter-ShrinkView-test")

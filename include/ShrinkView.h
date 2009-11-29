@@ -13,38 +13,41 @@
 #include <View.h>
 #include <Bitmap.h>
 
-#ifndef BENET_SHRINK
-#define BENET_SHRINK 0x000F0001
-#endif
+class ShrinkView: public BView {
 
-#ifndef BENET_EXPAND
-#define BENET_EXPAND 0x000F0002
-#endif
+public:
 
-class ShrinkView: public BView
-{
-	public:
-		ShrinkView(BRect frame, char * pLabel, bool bShrink = false, BBitmap* pBmp = NULL);
-		bool IsShrink() { return m_bShrink; }	
-		
+	typedef enum {
+		B_SHRINK = 0x00080001,
+		B_EXPAND = 0x00080002,
+		B_NORMAL = (1 << 0),
+		B_AUTO_FIT_WINDOW = (1 << 1),
+	} shrink_mode;
 
-		//Fonction de BView redefini.
-		virtual void Draw(BRect updateRect);
-		virtual void AttachedToWindow();
-		virtual void MouseDown(BPoint point);
-		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage* message);
+					ShrinkView(BRect frame, char* pzLabel, bool bShrink = false,
+						BBitmap* pBmp = NULL, uint32 flags = B_NORMAL);
+			bool	IsShrink() { return m_bShrink; }
+			void	SetMode(uint32 flags);
 
-	private:
-		float m_fFullHeight;	//La hauteur initiale de la View.
-		bool m_bShrink;			//True si le View est reduite, false sinon.	
-		bool m_bMouseOver;		//True si le curseur est au dessus du boutton d'agrandissement et reduction.
-		char m_pzLabel[256];	//L'etiquette a affichier.
-		BBitmap* m_pBmp;
+	//Fonction de BView redefini.
+	virtual void 	Draw(BRect updateRect);
+	virtual void 	AttachedToWindow();
+	virtual void 	MouseDown(BPoint point);
+	virtual void 	MouseMoved(BPoint point, uint32 transit, const BMessage* message);
 
-		//Fonction appele pour agrandir ou reduire la View.
-		void Shrink();
-		void Expand();
-		void DrawDegrader(BRect rect, int iStartGray, int iEndGray);
+private:
+			float 		m_fFullHeight;	//La hauteur initiale de la View
+			bool 		m_bShrink;		//True si le View est reduite, false sinon
+			bool		m_bMouseOver;	//True si le curseur est au dessus du
+										//boutton d'agrandissement et reduction
+			char 		m_pzLabel[256];	//L'etiquette a affichier
+			BBitmap* 	m_pBmp;
+			uint32		fShrinkFlags;
+
+			//Fonction appele pour agrandir ou reduire la View.
+			void		Shrink();
+			void		Expand();
+			void		DrawDegrader(BRect rect, int iStartGray, int iEndGray);
 };
 
 #endif //__SHRINK_VIEW__
