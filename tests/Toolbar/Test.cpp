@@ -107,7 +107,7 @@ void LoadTrackerIcons(void)
 	BFile file;
 
 	// Open libtracker.so as a resources file
-	if (file.SetTo("/boot/beos/system/lib/libtracker.so", B_READ_ONLY) != B_OK)
+	if (file.SetTo("/boot/system/lib/libtracker.so", B_READ_ONLY) != B_OK)
 		return;
 	if (res.SetTo(&file, false) != B_OK)
 		return;
