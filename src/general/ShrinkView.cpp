@@ -12,6 +12,7 @@
 #endif
 
 #include <Window.h>
+#include <string.h>
 
 /*=============================================================================================*\
 |	ShrinkView																					|
@@ -231,7 +232,7 @@ void ShrinkView::Draw(BRect updateRect)
 			// La View est reduite.
 			if(m_bShrink)
 			{
-			SetHighColor(0, 0, 0, 256);
+			SetHighColor(0, 0, 0);
 				pPointList[0] = BPoint(9,7);
 				pPointList[1] = BPoint(6,4);
 				pPointList[2] = BPoint(6,11);
@@ -242,7 +243,7 @@ void ShrinkView::Draw(BRect updateRect)
 			// La View est agrandi.
 			else
 			{
-				SetHighColor(0, 0, 0, 256);
+				SetHighColor(0, 0, 0);
 				pPointList[0] = BPoint(7,9);
 				pPointList[1] = BPoint(4,6);
 				pPointList[2] = BPoint(11,6);

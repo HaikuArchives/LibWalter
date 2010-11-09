@@ -410,7 +410,7 @@ DropControl::Instantiate(BMessage *data)
 
 
 status_t
-DropControl::Archive(BMessage *data, bool deep = true) const
+DropControl::Archive(BMessage *data, bool deep) const
 {
 	status_t status = BTextControl::Archive(data,deep);
 	data->AddString("class","DropControl");
