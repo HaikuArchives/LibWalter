@@ -421,7 +421,7 @@ FontView::EmptyStyleList(void)
 		Window()->Lock();
 	
 	while (fStyleList->CountItems() > 0) {
-		BStringItem *item = (BStringItem*)fStyleList->RemoveItem(0L);
+		BStringItem *item = (BStringItem*)fStyleList->RemoveItem((int32) 0);
 		delete item;
 	}
 	

@@ -12,8 +12,8 @@
 
 const uint32 B_DIVIDER_MOVED	= 'BDM';
 
-static const int8 sHorizontalCursorData[68] = { 16,1,8,10,0,0,1,128,3,192,7,224,0,0,0,0,0,0,255,255,255,255,0,0,0,0,0,0,7,224,3,192,1,128,0,0,0,0,1,128,3,192,7,224,0,0,0,0,0,0,255,255,255,255,0,0,0,0,0,0,7,224,3,192,1,128,0,0 };
-static const int8 sVerticalCursorData[68] = { 16,1,10,8,1,128,1,128,1,128,1,128,1,128,17,136,49,140,113,142,113,142,49,140,17,136,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,17,136,49,140,113,142,113,142,49,140,17,136,1,128,1,128,1,128,1,128,1,128 };
+static const uint8 sHorizontalCursorData[68] = { 16,1,8,10,0,0,1,128,3,192,7,224,0,0,0,0,0,0,255,255,255,255,0,0,0,0,0,0,7,224,3,192,1,128,0,0,0,0,1,128,3,192,7,224,0,0,0,0,0,0,255,255,255,255,0,0,0,0,0,0,7,224,3,192,1,128,0,0 };
+static const uint8 sVerticalCursorData[68] = { 16,1,10,8,1,128,1,128,1,128,1,128,1,128,17,136,49,140,113,142,113,142,49,140,17,136,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,17,136,49,140,113,142,113,142,49,140,17,136,1,128,1,128,1,128,1,128,1,128 };
 
 Divider::Divider(BView *first, BView *second, orientation dir)
   :	BBox(BRect(0,0,0,0),"Divider",B_FOLLOW_ALL_SIDES,B_WILL_DRAW),
@@ -256,11 +256,11 @@ Divider::MoveBy(float x, float y)
 		// Look MoveByX for explanations
 		if (((Frame().top + (y - 1)) > fFirstView->Frame().top)&&((Frame().bottom + y + 1) < fSecondView->Frame().bottom)) {
 			BBox::MoveBy(0,y);
-			Frame().bottom = Frame().bottom + y;
+			float bottom = Frame().bottom + y;
 			Invalidate();
 			fFirstView->ResizeBy(0,((Frame().top - 1) - fFirstView->Frame().bottom));
-			fSecondView->ResizeBy(0,(fSecondView->Frame().top - (Frame().bottom + 1)));
-			fSecondView->MoveTo(0,Frame().bottom + 1);
+			fSecondView->ResizeBy(0,(fSecondView->Frame().top - (bottom + 1)));
+			fSecondView->MoveTo(0,bottom + 1);
 		}
 	}
 }
