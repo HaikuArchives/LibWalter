@@ -2,7 +2,7 @@
 
 LibWalter is a code collection which aims to fill in the gaps in the BeOS API, released under the MIT license. Designed to be compatible with BeOS R5, Zeta 1.x, and Haiku.
 
-#### 0. Index:
+### 0. Index:
 
 1. Included classes and usage notes
 2. How to use LibWalter
@@ -84,7 +84,7 @@ Many times reading a text file one line at a time, is needed for one reason or a
 
 A classic toolbar view. Can contain several items such as buttons and separators, and you can design your own by subclassing the appropriate class. Items can be arranged in rows or columns (also in multiple lines) and there are several options for both the developer and the final user.
 
-### How to use LibWalter
+### 2. How to use LibWalter
 
 LibWalter is in a pre-alpha state, so we don't provide a precompiled library to avoid confusion. However, you can compile LibWalter and link it with your application executable, or just take only the classes you need. To get the LibWalter source code from OSDrawer you can download the Nightly SVN Tree Snapshot, or pull it via anonymous SVN.
 
@@ -94,6 +94,6 @@ After you have the library (libwalter.a) compiled, it is recommended to copy it 
 Alternatively, you can add only the classes you need by adding the relative sources to your project.  Depending on your compiler options, you may get some warnings; it is usually safe to ignore them.
 
 
-### How to contribute
+### 3. How to contribute
 
 If you want to help improve LibWalter, you can simply start by fixing the issues in the bug tracker or just send us an pull request with your change.
