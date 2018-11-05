@@ -2,11 +2,11 @@
 
 LibWalter is a code collection which aims to fill in the gaps in the BeOS API, released under the MIT license. Designed to be compatible with BeOS R5, Zeta 1.x, and Haiku.
 
-## Index:
+### 0. Index:
 
-#### 1. Included classes and usage notes
-#### 2. How to use LibWalter
-#### 3. How to contribute
+1. Included classes and usage notes
+2. How to use LibWalter
+3. How to contribute
 
 ### 1. Included classes and usage notes
 
