@@ -3,6 +3,7 @@ SubDir LW_TOP ;
 HDRS += $(LW_INCLUDE) ;
 HDRS += $(LW_INCLUDE_PRIV) ;
 LINKFLAGS += -lbe -lroot -ltracker -ltranslation ;
+LINK = g++ ;
 
 SubInclude LW_TOP src ;
 SubInclude LW_TOP tests ;
