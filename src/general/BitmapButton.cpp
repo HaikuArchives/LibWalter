@@ -5,6 +5,9 @@
 */
 #include "BitmapButton.h"
 
+#include <Bitmap.h>
+#include <Message.h>
+
 BitmapButton::BitmapButton(const BRect &frame, const char *name, BBitmap *up,
 						BBitmap *down, BMessage *msg, const int32 &resize,
 						const int32 &flags)

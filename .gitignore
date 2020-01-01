@@ -1,4 +1,6 @@
 *.o
 *.a
+*.so
+compile_commands.json
 Jamrules
 tests/*Test

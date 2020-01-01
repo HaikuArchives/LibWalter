@@ -4,11 +4,21 @@ LibWalter is a code collection which aims to fill in the gaps in the BeOS API, r
 
 ## 0. Index:
 
-1. Included classes and usage notes
-2. How to use LibWalter
-3. How to contribute
+1. Stable classes and usage notes
+2. Experimental classes and usage notes
+3. How to use LibWalter
+4. How to contribute
 
-## 1. Included classes and usage notes
+## 1. Stable classes and usage notes
+
+Currently the old libwalter classes, below, are undergoing testing. Once they are thoroughly tested they will appear in this list. Other well tested controls
+may be taken from other projects (such as the Paladin IDE) and placed directly here.
+
+By being in this category the class, function, and member names are going to remain consistent in the same major library version.
+
+## 2. Experimental classes and usage notes
+
+By being in this category the class, function, and member names are not stable, and some core functionality and behaviour of the controls may change.
 
 ### AutoTextControl
 
@@ -86,10 +96,10 @@ A classic toolbar view. Can contain several items such as buttons and separators
 
 ## 2. How to use LibWalter
 
-LibWalter is in a pre-alpha state, so we don't provide a precompiled library to avoid confusion. However, you can compile LibWalter and link it with your application executable, or just take only the classes you need. To get the LibWalter source code from OSDrawer you can download the Nightly SVN Tree Snapshot, or pull it via anonymous SVN.
+LibWalter is now provided as a precompiled shared library - libwalter.so. To get the LibWalter source code you can clone the repository on GitHub.
 
-Once you obtained the source, to compile the library you need Jam (download it from the Haiku website) or the Paladin IDE (download from BeBits or Haikuware). To build with jam, open a Terminal window, go to the directory where you placed the sources, run ./configure and then jam; this will make both the library and the test applications. To build Paladin, double-click on libwalter.pld and choose Make from the Build menu.
-After you have the library (libwalter.a) compiled, it is recommended to copy it and its headers to your application's source directory to avoid incompatibility with future versions of the library. If you're using BeIDE, add the library to your project by dropping it into the project window, then add the path to the header files to the project build options.
+Once you obtained the source, to compile the library you need either Jam (download it from the Haiku website) or the Paladin IDE (download from HaikuDepot). To build with jam, open a Terminal window, go to the directory where you placed the sources, run ./configure and then jam; this will make both the library and the test applications. To build Paladin, double-click on libwalter.pld and choose Make from the Build menu.
+After you have the library (libwalter.so) compiled, it is recommended to copy it and its headers to your application's source directory to avoid incompatibility with future versions of the library. If you're using BeIDE, add the library to your project by dropping it into the project window, then add the path to the header files to the project build options. Alternatively run ```Paladin -d -v -b libwalter.pld``` from the command line.
 
 Alternatively, you can add only the classes you need by adding the relative sources to your project.  Depending on your compiler options, you may get some warnings; it is usually safe to ignore them.
 

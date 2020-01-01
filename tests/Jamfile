@@ -1,39 +1,39 @@
 SubDir LW_TOP tests ;
 
-LinkLibraries ToolbarTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries ToolbarTest : $(LW_TOP)/libwalter.so ;
 Main ToolbarTest :
 	Toolbar/Test.cpp ;
 
-LinkLibraries ColorWellTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries ColorWellTest : $(LW_TOP)/libwalter.so ;
 Main ColorWellTest :
 	ColorWell/Test.cpp ;
 
-LinkLibraries ComboBoxTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries ComboBoxTest : $(LW_TOP)/libwalter.so ;
 Main ComboBoxTest :
 	ComboBox/Test.cpp ;
 
-LinkLibraries InputRequestTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries InputRequestTest : $(LW_TOP)/libwalter.so ;
 Main InputRequestTest :
 	InputRequest/Test.cpp ;
 
-LinkLibraries CursorTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries CursorTest : $(LW_TOP)/libwalter.so ;
 Main CursorTest :
 	Cursor/Test.cpp ;
 
-LinkLibraries DialogPaneBarberTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries DialogPaneBarberTest : $(LW_TOP)/libwalter.so ;
 Main DialogPaneBarberTest :
 	DialogPane/Test.cpp ;
 
-LinkLibraries PaneSwitchTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries PaneSwitchTest : $(LW_TOP)/libwalter.so ;
 Main PaneSwitchTest :
 	PaneSwitch/Test.cpp ;
 
-LinkLibraries ShrinkViewTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries ShrinkViewTest : $(LW_TOP)/libwalter.so ;
 Main ShrinkViewTest :
 	ShrinkView/Test.cpp ;
 
 
-LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries SplitPanelTest : $(LW_TOP)/libwalter.so ;
 Main SplitPanelTest :
 	SplitterView/LayeringTestApp.cpp
 	SplitterView/main.cpp
@@ -41,6 +41,6 @@ Main SplitPanelTest :
 	SplitterView/TestWindow.cpp
 ;
 
-LinkLibraries PictureButtonTest : $(LW_TOP)/libwalter.a ;
+LinkLibraries PictureButtonTest : $(LW_TOP)/libwalter.so ;
 Main PictureButtonTest :
 	PictureButton/Test.cpp ;

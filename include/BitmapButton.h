@@ -6,12 +6,11 @@
 #ifndef BITMAP_BUTTON_H
 #define BITMAP_BUTTON_H
 
-#include <Looper.h>
-#include <Application.h>
-#include <Window.h>
 #include <Button.h>
-#include <Bitmap.h>
-#include <Rect.h>
+
+class BBitmap;
+class BRect;
+class BMessage;
 
 class BitmapButton : public BButton
 {
