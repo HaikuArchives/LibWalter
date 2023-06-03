@@ -20,9 +20,9 @@ LinkLibraries CursorTest : $(LW_TOP)/libwalter.a ;
 Main CursorTest :
 	Cursor/Test.cpp ;
 
-LinkLibraries DialogPaneBarberTest : $(LW_TOP)/libwalter.a ;
-Main DialogPaneBarberTest :
-	DialogPane/Test.cpp ;
+#LinkLibraries DialogPaneBarberTest : $(LW_TOP)/libwalter.a ;
+#Main DialogPaneBarberTest :
+#	DialogPane/Test.cpp ;
 
 LinkLibraries PaneSwitchTest : $(LW_TOP)/libwalter.a ;
 Main PaneSwitchTest :
